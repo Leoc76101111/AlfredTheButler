@@ -28,31 +28,33 @@ local affix_types = {
 local function create_checkbox(value, key)
     return checkbox:new(value, get_hash(plugin_label .. "_" .. key))
 end
+local function add_affix_tree(name)
+    local tree_name = tostring(name) .. '_affix_tree'
+    gui.elements[tree_name] = tree_node:new(2)
+end
 local function add_affix_checkbox(name,data)
     for _,affix in pairs(data) do
         if affix.is_aspect == false then
-            local name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
-            local search_name = 'search_' .. name
-            gui.elements[name] = create_checkbox(false, name)
-            gui.elements[search_name] = create_checkbox(false, name)
+            local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
+            gui.elements[checkbox_name] = create_checkbox(false, checkbox_name)
         end
     end
     return
 end
-local function render_affix_checkbox(name,data,is_search)
+local function add_affix_search(name)
+    local search_name = tostring(name) .. '_affix_search'
+    gui.elements[search_name] = input_text:new(get_hash(plugin_label .. "_search_input"))
+end
+local function render_affix_checkbox(name,data)
+    local search_name = tostring(name) .. '_affix_search'
     for _,affix in pairs(data) do
         if affix.is_aspect == false then
-            local name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
-            local search_name = 'search_' .. name
-            if is_search then
-                local search_string = gui.elements.search_affix_input:get()
-                if search_string ~= '' and (string.lower(affix.affix_name):match(search_string) or string.lower(affix.affix_description):match(search_string)) then
-                    gui.elements[search_name]:render(affix.affix_name, affix.affix_description)
-                end
-            else 
-                if gui.elements[search_name]:get() or gui.elements[name]:get() then
-                    gui.elements[name]:render(affix.affix_name, affix.affix_description)
-                end
+            local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
+            local search_string = gui.elements[search_name]:get()
+            if search_string ~= '' and (string.lower(affix.affix_name):match(search_string) or string.lower(affix.affix_description):match(search_string)) then
+                gui.elements[checkbox_name]:render(affix.affix_name, affix.affix_description)
+            elseif gui.elements[checkbox_name]:get() then
+                gui.elements[checkbox_name]:render(affix.affix_name, affix.affix_description)
             end
         end
     end
@@ -95,10 +97,6 @@ gui.elements = {
     ancestral_affix_ga_slider = slider_int:new(0, 3, 1, get_hash(plugin_label .. "_affix_ga_slider")),
     ancestral_affix_ga = create_checkbox(false, "affix_ga"),
 
-    selected_affix_tree = tree_node:new(2),
-    search_affix_tree = tree_node:new(2),
-    search_affix_input = input_text:new(get_hash(plugin_label .. "_search_input")),
-
     restock_tree = tree_node:new(1),
     restock_toggle = create_checkbox(false, "restock_toggle"),
 
@@ -110,7 +108,9 @@ gui.elements = {
 }
 
 for _,affix_type in pairs(affix_types) do
+    add_affix_tree(affix_type.name)
     add_affix_checkbox(affix_type.name, affix_type.data)
+    add_affix_search(affix_type.name)
 end
 
 function gui.render()
@@ -143,18 +143,14 @@ function gui.render()
                 gui.elements.ancestral_affix_ga_slider:render("Min matching GA", "Minimum matching greater affix")
                 gui.elements.ancestral_filter_tree:pop()
             end
-            if gui.elements.selected_affix_tree:push("selected affixes") then
-                for _,affix_type in pairs(affix_types) do
-                    render_affix_checkbox(affix_type.name, affix_type.data, false)
+            for _,affix_type in pairs(affix_types) do
+                local tree_name = tostring(affix_type.name) .. '_affix_tree'
+                local search_name = tostring(affix_type.name) .. '_affix_search'
+                if gui.elements[tree_name]:push(affix_type.name) then
+                    gui.elements[search_name]:render("Search", "Find affixes", false, '', '')
+                    render_affix_checkbox(affix_type.name, affix_type.data)
+                    gui.elements[tree_name]:pop()
                 end
-                gui.elements.selected_affix_tree:pop()
-            end
-            if gui.elements.selected_affix_tree:push("Search affixes") then
-                gui.elements.search_affix_input:render("Search", "Find affixes", false, '', '')
-                for _,affix_type in pairs(affix_types) do
-                    render_affix_checkbox(affix_type.name, affix_type.data, true)
-                end
-                gui.elements.selected_affix_tree:pop()
             end
         end
 
