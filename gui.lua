@@ -1,3 +1,4 @@
+local utils = require "core.utils"
 local gui = {}
 local plugin_label = "alfred_the_butler"
 
@@ -48,13 +49,13 @@ end
 local function render_affix_checkbox(name,data)
     local search_name = tostring(name) .. '_affix_search'
     for _,affix in pairs(data) do
-        if affix.is_aspect == false then
+        if affix.is_aspect == false and (affix.class == 'all' or affix.class == utils.get_character_class()) then
             local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
             local search_string = gui.elements[search_name]:get()
-            if search_string ~= '' and (string.lower(affix.affix_name):match(search_string) or string.lower(affix.affix_description):match(search_string)) then
-                gui.elements[checkbox_name]:render(affix.affix_name, affix.affix_description)
+            if search_string ~= '' and (string.lower(affix.name):match(search_string) or string.lower(affix.description):match(search_string)) then
+                gui.elements[checkbox_name]:render(affix.name, affix.description)
             elseif gui.elements[checkbox_name]:get() then
-                gui.elements[checkbox_name]:render(affix.affix_name, affix.affix_description)
+                gui.elements[checkbox_name]:render(affix.name, affix.description)
             end
         end
     end
