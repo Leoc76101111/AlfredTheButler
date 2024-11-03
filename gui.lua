@@ -1,8 +1,52 @@
 local gui = {}
 local plugin_label = "alfred_the_butler"
 
+local helm_affix = require "data.helm"
+local chest_affix = require "data.chest"
+local gloves_affix = require "data.gloves"
+local pants_affix = require "data.pants"
+local boots_affix = require "data.boots"
+local amulet_affix = require "data.amulet"
+local ring_affix = require "data.ring"
+local weapon_affix = require "data.weapon"
+local offhand_affix = require "data.offhand"
+local unique_affix = require "data.unique"
+
+local affix_types = {
+    {name = "helm", data = helm_affix},
+    {name = "chest", data = chest_affix},
+    {name = "gloves", data = gloves_affix},
+    {name = "pants", data = pants_affix},
+    {name = "boots", data = boots_affix},
+    {name = "amulet", data = amulet_affix},
+    {name = "ring", data = ring_affix},
+    {name = "weapon", data = weapon_affix},
+    {name = "offhand", data = offhand_affix},
+    {name = "unique", data = unique_affix},
+}
+
 local function create_checkbox(value, key)
     return checkbox:new(value, get_hash(plugin_label .. "_" .. key))
+end
+local function add_affix_checkbox(name,data)
+    for _,affix in pairs(data) do
+        if affix.is_aspect == false then
+            local name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
+            gui.elements[name] = create_checkbox(false, name)
+        end
+    end
+    return
+end
+local function render_checked_affix_checkbox(name,data)
+    for _,affix in pairs(data) do
+        if affix.is_aspect == false then
+            local name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
+            if gui.elements[name]:get() then
+                gui.elements[name]:render(affix.affix_name, affix.affix_description)
+            end
+        end
+    end
+    return
 end
 
 gui.stash_options = {
@@ -41,6 +85,8 @@ gui.elements = {
     ancestral_affix_ga_slider = slider_int:new(0, 3, 1, get_hash(plugin_label .. "_affix_ga_slider")),
     ancestral_affix_ga = create_checkbox(false, "affix_ga"),
 
+    selected_affix_tree = tree_node:new(2),
+
     restock_tree = tree_node:new(1),
     restock_toggle = create_checkbox(false, "restock_toggle"),
 
@@ -50,6 +96,11 @@ gui.elements = {
     repair_tree = tree_node:new(1),
     repair_toggle = create_checkbox(false, "repair_toggle"),
 }
+
+for _,affix_type in pairs(affix_types) do
+    add_affix_checkbox(affix_type.name, affix_type.data)
+end
+
 function gui.render()
     if not gui.elements.main_tree:push("Alfred the Butler | Leoric | v0.1.0") then return end
     gui.elements.main_toggle:render("Enable", "Enable the bot")
@@ -79,6 +130,12 @@ function gui.render()
                 gui.elements.ancestral_affix_slider:render("Min matching Affix", "Minimum matching affix to keep")
                 gui.elements.ancestral_affix_ga_slider:render("Min matching GA", "Minimum matching greater affix")
                 gui.elements.ancestral_filter_tree:pop()
+            end
+            if gui.elements.selected_affix_tree:push("unique affixes") then
+                for _,affix_type in pairs(affix_types) do
+                    render_checked_affix_checkbox(affix_type.name, affix_type.data)
+                end
+                gui.elements.selected_affix_tree:pop()
             end
         end
 
