@@ -7,6 +7,7 @@ local settings = {
     use_keybind = false,
     item_use_stash = false,
     inventory_limit = 20,
+    timeout = 120,
     -- item_magic = utils.item_enum["SALVAGE"],
     -- item_rare = utils.item_enum["SALVAGE"],
     -- item_legendary = utils.item_enum["SALVAGE"],
@@ -44,6 +45,7 @@ function settings:update_settings()
     settings.use_keybind = gui.elements.use_keybind:get()
     settings.item_use_stash = gui.elements.stash_toggle:get()
     settings.inventory_limit = gui.elements.inventory_limit_slider:get()
+    settings.timeout = gui.elements.timeout_slider:get()
     settings.item_legendary_or_lower = gui.elements.item_legendary_or_lower:get()
     settings.item_unique = gui.elements.item_unique:get()
     settings.item_junk = gui.elements.item_junk:get()
