@@ -58,6 +58,7 @@ gui.elements = {
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. "_keybind_toggle" )),
     stash_toggle = create_checkbox(false, "stash_toggle"),
     inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. "_inventory_limit_slider")),
+    timeout_slider = slider_int:new(10, 600, 120, get_hash(plugin_label .. "_timeout_slider")),
 
     item_tree = tree_node:new(1),
     item_legendary_or_lower = combo_box:new(1, get_hash(plugin_label .. "_item_legendary_or_lower")),
@@ -106,6 +107,7 @@ function gui.render()
         gui.elements.keybind_toggle:render("Toggle Keybind", "Toggle the bot for quick enable");
     end
     -- gui.elements.stash_toggle:render("Keep item in stash","Keep item in stash")
+    gui.elements.timeout_slider:render("Timeout","no. seconds to timeout alfred when failed to complete tasks")
     gui.elements.inventory_limit_slider:render("Inventory Limit","minimum number if items before stash/salvage/sell")
     if gui.elements.item_tree:push("Non-Ancestral") then
         gui.elements.item_legendary_or_lower:render("non-unique items", gui.item_options, "Select what to do with non-ancestral non-unique legendary items")
