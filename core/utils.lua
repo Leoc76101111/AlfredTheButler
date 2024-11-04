@@ -1,3 +1,4 @@
+local json = require "core.json"
 local utils    = {}
 local item_types = {
     {name = "helm", data = require "data.affix.helm"},
@@ -35,20 +36,27 @@ local function get_plugin_root_path()
     return plugin_root
 end
 
-local function get_export_filename()
+local function get_export_filename(is_backup)
     local filename = get_plugin_root_path()
-    filename = filename .. "\\data\\export\\alfred-"
+    filename = filename .. "data\\export"
+    if is_backup then
+        filename = filename .. "\\alfred-backup-"
+    else
+        filename = filename .. "\\alfred-"
+    end        
     filename = filename .. os.time(os.date("!*t"))
-    filename = filename .. ".lua"
+    filename = filename .. ".json"
     return filename
 end
 
 local function get_import_full_filename(name)
     local filename = get_plugin_root_path()
-    filename = filename .. "\\data\\export\\"
+    filename = filename .. "data\\import\\"
     filename = filename .. name
     return filename
 end
+
+
 
 function utils.get_character_class()
     local local_player = get_local_player();
@@ -76,11 +84,44 @@ function utils.get_item_aspects()
     return item_aspect
 end
 
-function utils.import_filters(name)
+function utils.import_filters(elements)
+    local filename = get_import_full_filename(elements.affix_import_name:get())
+    local file, err = io.open(filename,"r")
+    if not file then
+        console.print("error opening file")
+        return
+    end
+    io.input(file)
+    local data = io.read()
+    if pcall(function () return json.decode(data) end) then
+        local new_affix = json.decode(data)
+        local new_affix_set = {}
+        for _,affix in pairs(new_affix) do
+            new_affix_set[affix] = true
+        end
+        -- make a backup
+        utils.export_filters(elements,true)
+
+        -- clear and set new affix
+        for _,affix_type in pairs(item_affix) do
+            for _,affix in pairs(affix_type.data) do
+                local checkbox_name = tostring(affix_type.name) .. '_affix_' .. tostring(affix.sno_id)
+                if new_affix_set[checkbox_name] then
+                    elements[checkbox_name]:set(true)
+                else
+                    elements[checkbox_name]:set(false)
+                end
+            end
+        end
+    else
+        console.print('error in import file')
+    end
+    io.close(file)
+    console.print('export ' .. filename .. ' done')
     return
 end
 
-function utils.export_filters(elements)
+function utils.export_filters(elements,is_backup)
     local selected_affix = {}
     for _,affix_type in pairs(item_affix) do
         for _,affix in pairs(affix_type.data) do
@@ -90,19 +131,14 @@ function utils.export_filters(elements)
             end
         end
     end
-    local filename = get_export_filename()
+    local filename = get_export_filename(is_backup)
     local file, err = io.open(filename,"w")
     if not file then
         console.print("error opening file")
     end
-    file:write("local affix = {\n")
-    for _,affix in pairs(selected_affix) do
-        file:write('"')
-        file:write(affix)
-        file:write('",\n')
-    end
-    file:write("}\nreturn affix")
-    file:close()
+    io.output(file)
+    io.write(json.encode(selected_affix))
+    io.close(file)
     
     console.print('export ' .. filename .. ' done')
     return

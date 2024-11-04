@@ -41,9 +41,9 @@ end)
 on_render_menu(function ()
     gui.render()
     if gui.elements.affix_export_button:get() then
-        utils.export_filters(gui.elements)
+        utils.export_filters(gui.elements,false)
     elseif gui.elements.affix_import_button:get() and gui.elements.affix_import_name:get() ~= '' then
-        utils.import_filters(gui.elements.import_name:get())
+        utils.import_filters(gui.elements)
     end
 end)
 on_render(render_pulse)
