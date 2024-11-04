@@ -1,3 +1,4 @@
+local plugin_label = "alfred_the_butler"
 local json = require "core.json"
 local utils    = {}
 local item_types = {
@@ -88,7 +89,7 @@ function utils.import_filters(elements)
     local filename = get_import_full_filename(elements.affix_import_name:get())
     local file, err = io.open(filename,"r")
     if not file then
-        console.print("error opening file")
+        utils.log("error opening file")
         return
     end
     io.input(file)
@@ -114,10 +115,10 @@ function utils.import_filters(elements)
             end
         end
     else
-        console.print('error in import file')
+        utils.log('error in import file')
     end
     io.close(file)
-    console.print('export ' .. filename .. ' done')
+    utils.log('export ' .. filename .. ' done')
     return
 end
 
@@ -134,13 +135,18 @@ function utils.export_filters(elements,is_backup)
     local filename = get_export_filename(is_backup)
     local file, err = io.open(filename,"w")
     if not file then
-        console.print("error opening file")
+        utils.log("error opening file")
     end
     io.output(file)
     io.write(json.encode(selected_affix))
     io.close(file)
     
-    console.print('export ' .. filename .. ' done')
+    utils.log('export ' .. filename .. ' done')
+    return
+end
+
+function utils.log(msg)
+    console.print(plugin_label .. ": " .. msg)
     return
 end
 
