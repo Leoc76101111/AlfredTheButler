@@ -1,8 +1,8 @@
-local plugin_label = "alfred_the_butler"
-local settings = require "core.settings"
+local plugin_label = 'alfred_the_butler'
+local settings = require 'core.settings'
 local task_manager = {}
 local tasks = {}
-local current_task = { name = "Idle" } -- Default state when no task is active
+local current_task = { name = 'Idle' } -- Default state when no task is active
 local finished_time = 0
 
 function task_manager.set_finished_time(time)
@@ -35,16 +35,16 @@ function task_manager.execute_tasks()
     end
 
     -- The if statement has been removed, and current_task is always assigned
-    current_task = current_task or { status = "Idle" }
+    current_task = current_task or { status = 'Idle' }
 end
 
 function task_manager.get_current_task()
     return current_task
 end
 
-local task_files = {"status"}
+local task_files = {'status'}
 for _, file in ipairs(task_files) do
-    local task = require("tasks." .. file)
+    local task = require('tasks.' .. file)
     task_manager.register_task(task)
 end
 

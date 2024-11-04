@@ -1,18 +1,18 @@
-local plugin_label = "alfred_the_butler"
-local json = require "core.json"
-local tracker = require "core.tracker"
+local plugin_label = 'alfred_the_butler'
+local json = require 'core.json'
+local tracker = require 'core.tracker'
 local utils    = {}
 local item_types = {
-    "helm",
-    "chest",
-    "gloves",
-    "pants",
-    "boots",
-    "amulet",
-    "ring",
-    "weapon",
-    "offhand",
-    "unique",
+    'helm',
+    'chest',
+    'gloves',
+    'pants',
+    'boots',
+    'amulet',
+    'ring',
+    'weapon',
+    'offhand',
+    'unique',
 }
 local item_affix = {}
 local item_aspect = {}
@@ -24,29 +24,29 @@ utils.item_enum = {
 }
 
 utils.mythics = {}
-utils.mythics["1901484"] = "Tyrael's Might"
-utils.mythics["223271"] = "The Grandfather"
-utils.mythics["241930"] = "Andariel's Visage"
-utils.mythics["359165"] = "Ahavarion, Spear of Lycander"
-utils.mythics["221017"] = "Doombringer"
-utils.mythics["609820"] = "Harlequin Crest"
-utils.mythics["1275935"] = "Melted Heart of Selig"
-utils.mythics["1306338"] = "‍Ring of Starless Skies"
-utils.mythics["2059803"] = "Shroud of False Death"
-utils.mythics["1982241"] = "Nesekem, the Herald"
-utils.mythics["2059799"] = "Heir of Perdition"
-utils.mythics["2059813"] = "Shattered Vow"
+utils.mythics['1901484'] = "Tyrael's Might"
+utils.mythics['223271'] = 'The Grandfather'
+utils.mythics['241930'] = "Andariel's Visage"
+utils.mythics['359165'] = 'Ahavarion, Spear of Lycander'
+utils.mythics['221017'] = 'Doombringer'
+utils.mythics['609820'] = 'Harlequin Crest'
+utils.mythics['1275935'] = 'Melted Heart of Selig'
+utils.mythics['1306338'] = '‍Ring of Starless Skies'
+utils.mythics['2059803'] = 'Shroud of False Death'
+utils.mythics['1982241'] = 'Nesekem, the Herald'
+utils.mythics['2059799'] = 'Heir of Perdition'
+utils.mythics['2059813'] = 'Shattered Vow'
 
 local function get_plugin_root_path()
     local plugin_root = string.gmatch(package.path, '.*?\\?')()
-    plugin_root = plugin_root:gsub("?","")
+    plugin_root = plugin_root:gsub('?','')
     return plugin_root
 end
 
 local function get_affixes_and_aspect(name)
     local filename = get_plugin_root_path()
-    filename = filename .. "data\\affix\\" .. name .. '.json'
-    local file, err = io.open(filename,"r")
+    filename = filename .. 'data\\affix\\' .. name .. '.json'
+    local file, err = io.open(filename,'r')
     if not file then
         utils.log('error opening file' .. filename)
         return
@@ -71,20 +71,20 @@ end
 
 local function get_export_filename(is_backup)
     local filename = get_plugin_root_path()
-    filename = filename .. "data\\export"
+    filename = filename .. 'data\\export'
     if is_backup then
-        filename = filename .. "\\alfred-backup-"
+        filename = filename .. '\\alfred-backup-'
     else
-        filename = filename .. "\\alfred-"
+        filename = filename .. '\\alfred-'
     end        
-    filename = filename .. os.time(os.date("!*t"))
-    filename = filename .. ".json"
+    filename = filename .. os.time(os.date('!*t'))
+    filename = filename .. '.json'
     return filename
 end
 
 local function get_import_full_filename(name)
     local filename = get_plugin_root_path()
-    filename = filename .. "data\\import\\"
+    filename = filename .. 'data\\import\\'
     filename = filename .. name
     return filename
 end
@@ -93,17 +93,17 @@ function utils.get_character_class()
     local local_player = get_local_player();
     local class_id = local_player:get_character_class_id()
     local character_classes = {
-        [0] = "sorcerer",
-        [1] = "barbarian",
-        [3] = "rogue",
-        [5] = "druid",
-        [6] = "necromancer",
-        [7] = "spiritborn"
+        [0] = 'sorcerer',
+        [1] = 'barbarian',
+        [3] = 'rogue',
+        [5] = 'druid',
+        [6] = 'necromancer',
+        [7] = 'spiritborn'
     }
     if character_classes[class_id] then
         return character_classes[class_id]
     else
-        return "default"
+        return 'default'
     end
 end
 
@@ -117,7 +117,7 @@ end
 
 function utils.import_filters(elements)
     local filename = get_import_full_filename(elements.affix_import_name:get())
-    local file, err = io.open(filename,"r")
+    local file, err = io.open(filename,'r')
     if not file then
         utils.log('error opening file' .. filename)
         return
@@ -163,7 +163,7 @@ function utils.export_filters(elements,is_backup)
         end
     end
     local filename = get_export_filename(is_backup)
-    local file, err = io.open(filename,"w")
+    local file, err = io.open(filename,'w')
     if not file then
         utils.log('error opening file' .. filename)
     end
@@ -176,13 +176,13 @@ function utils.export_filters(elements,is_backup)
 end
 
 function utils.log(msg)
-    console.print(plugin_label .. ": " .. tostring(msg))
+    console.print(plugin_label .. ': ' .. tostring(msg))
     return
 end
 
 function utils.get_greater_affix_count(display_name)
     local count = 0
-    for _ in display_name:gmatch("GreaterAffix") do
+    for _ in display_name:gmatch('GreaterAffix') do
        count = count + 1
     end
     return count
@@ -210,7 +210,7 @@ function utils.update_tracker_count(settings)
             end
 
             if item:is_locked() or utils.mythics[item_id] ~= nil then
-                item_settings = utils.item_enum["KEEP"]
+                item_settings = utils.item_enum['KEEP']
             elseif greater_affix_count > 0 then
                 if item:is_junk() then
                     item_settings = settings.ancestral_item_junk
@@ -229,9 +229,9 @@ function utils.update_tracker_count(settings)
                 end
             end
 
-            if item_settings == utils.item_enum["SELL"] then
+            if item_settings == utils.item_enum['SELL'] then
                 sell_counter = sell_counter + 1
-            elseif item_settings == utils.item_enum["SALVAGE"] then
+            elseif item_settings == utils.item_enum['SALVAGE'] then
                 salvage_counter = salvage_counter + 1
             else
                 stash_counter = stash_counter + 1
