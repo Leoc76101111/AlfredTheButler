@@ -42,8 +42,12 @@ on_render_menu(function ()
     gui.render()
     if gui.elements.affix_export_button:get() then
         utils.export_filters(gui.elements,false)
-    elseif gui.elements.affix_import_button:get() and gui.elements.affix_import_name:get() ~= '' then
-        utils.import_filters(gui.elements)
+    elseif gui.elements.affix_import_button:get() then
+        if gui.elements.affix_import_name:get() ~= '' then
+            utils.import_filters(gui.elements)
+        else
+            utils.log("no import file name")
+        end
     end
 end)
 on_render(render_pulse)

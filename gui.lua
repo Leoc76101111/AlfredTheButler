@@ -1,6 +1,6 @@
+local plugin_label = "alfred_the_butler"
 local utils = require "core.utils"
 local gui = {}
-local plugin_label = "alfred_the_butler"
 
 local affix_types = utils.get_item_affixes()
 
