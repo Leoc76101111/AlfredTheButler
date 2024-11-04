@@ -87,6 +87,7 @@ gui.elements = {
 
     repair_tree = tree_node:new(1),
     repair_toggle = create_checkbox(false, "repair_toggle"),
+    seperator = combo_box:new(0, get_hash(plugin_label .. "_seperator")),
 }
 
 for _,affix_type in pairs(affix_types) do
@@ -124,9 +125,11 @@ function gui.render()
                 gui.elements.ancestral_keep_ga_slider:render("Min Greater Affix", "Minimun greater affix to keep")
                 gui.elements.ancestral_affix_slider:render("Min matching Affix", "Minimum matching affix to keep")
                 gui.elements.ancestral_affix_ga_slider:render("Min matching GA", "Minimum matching greater affix")
-                gui.elements.affix_export_button:render("export", "export all selected affixes to export folder", 0)
-                gui.elements.affix_import_name:render("import file name", "file name to import", false, '', '')
-                gui.elements.affix_import_button:render("import", "import selected affixes from file", 0)
+                gui.elements.seperator:render("",{"Export"},"")
+                gui.elements.affix_export_button:render("", "export all selected affixes to export folder", 0)
+                gui.elements.seperator:render("",{"Import"},"")
+                gui.elements.affix_import_name:render("file name", "file name to import", false, 'import', '')
+                gui.elements.affix_import_button:render("", "import selected affixes from file", 0)
                 gui.elements.ancestral_filter_tree:pop()
             end
             for _,affix_type in pairs(affix_types) do
