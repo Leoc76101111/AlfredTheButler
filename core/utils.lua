@@ -2,26 +2,43 @@ local plugin_label = "alfred_the_butler"
 local json = require "core.json"
 local utils    = {}
 local item_types = {
-    {name = "helm", data = require "data.affix.helm"},
-    {name = "chest", data = require "data.affix.chest"},
-    {name = "gloves", data = require "data.affix.gloves"},
-    {name = "pants", data = require "data.affix.pants"},
-    {name = "boots", data = require "data.affix.boots"},
-    {name = "amulet", data = require "data.affix.amulet"},
-    {name = "ring", data = require "data.affix.ring"},
-    {name = "weapon", data = require "data.affix.weapon"},
-    {name = "offhand", data = require "data.affix.offhand"},
-    {name = "unique", data = require "data.affix.unique"},
+    "helm",
+    "chest",
+    "gloves",
+    "pants",
+    "boots",
+    "amulet",
+    "ring",
+    "weapon",
+    "offhand",
+    "unique",
 }
 local item_affix = {}
 local item_aspect = {}
 
-local function get_affixes_and_aspect(name,data)
+local function get_plugin_root_path()
+    local plugin_root = string.gmatch(package.path, '.*?\\?')()
+    plugin_root = plugin_root:gsub("?","")
+    return plugin_root
+end
+
+local function get_affixes_and_aspect(name)
+    local filename = get_plugin_root_path()
+    filename = filename .. "data\\affix\\" .. name .. '.json'
+    local file, err = io.open(filename,"r")
+    if not file then
+        utils.log('error opening file' .. filename)
+        return
+    end
+    io.input(file)
+    local data = json.decode(io.read())
+    io.close(file)
     local affix_group = {
         name = name,
         data = {}
     }
     for _,affix in pairs(data) do
+        utils.log(affix.name)
         if affix.is_aspect == false then
             affix_group.data[#affix_group.data+1] = affix
         else
@@ -31,11 +48,6 @@ local function get_affixes_and_aspect(name,data)
     item_affix[#item_affix+1] = affix_group
 end
 
-local function get_plugin_root_path()
-    local plugin_root = string.gmatch(package.path, '.*?\\?')()
-    plugin_root = plugin_root:gsub("?","")
-    return plugin_root
-end
 
 local function get_export_filename(is_backup)
     local filename = get_plugin_root_path()
@@ -89,7 +101,7 @@ function utils.import_filters(elements)
     local filename = get_import_full_filename(elements.affix_import_name:get())
     local file, err = io.open(filename,"r")
     if not file then
-        utils.log("error opening file")
+        utils.log('error opening file' .. filename)
         return
     end
     io.input(file)
@@ -115,7 +127,7 @@ function utils.import_filters(elements)
             end
         end
     else
-        utils.log('error in import file')
+        utils.log('error in import file' .. filename)
     end
     io.close(file)
     utils.log('export ' .. filename .. ' done')
@@ -135,7 +147,7 @@ function utils.export_filters(elements,is_backup)
     local filename = get_export_filename(is_backup)
     local file, err = io.open(filename,"w")
     if not file then
-        utils.log("error opening file")
+        utils.log('error opening file' .. filename)
     end
     io.output(file)
     io.write(json.encode(selected_affix))
@@ -146,12 +158,12 @@ function utils.export_filters(elements,is_backup)
 end
 
 function utils.log(msg)
-    console.print(plugin_label .. ": " .. msg)
+    console.print(plugin_label .. ": " .. tostring(msg))
     return
 end
 
 for _,types in pairs(item_types) do
-    get_affixes_and_aspect(types.name,types.data)
+    get_affixes_and_aspect(types)
 end
 
 return utils

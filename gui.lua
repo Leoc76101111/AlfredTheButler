@@ -25,13 +25,15 @@ end
 local function render_affix_checkbox(name,data)
     local search_name = tostring(name) .. '_affix_search'
     for _,affix in pairs(data) do
-        if affix.class == 'all' or affix.class == utils.get_character_class() then
-            local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
-            local search_string = string.lower(gui.elements[search_name]:get())
-            if search_string ~= '' and (string.lower(affix.name):match(search_string) or string.lower(affix.description):match(search_string)) then
-                gui.elements[checkbox_name]:render(affix.name, affix.description)
-            elseif gui.elements[checkbox_name]:get() then
-                gui.elements[checkbox_name]:render(affix.name, affix.description)
+        for _,class in pairs(affix.class) do
+            if class == 'all' or class == utils.get_character_class() then
+                local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
+                local search_string = string.lower(gui.elements[search_name]:get())
+                if search_string ~= '' and (string.lower(affix.name):match(search_string) or string.lower(affix.description):match(search_string)) then
+                    gui.elements[checkbox_name]:render(affix.name, affix.description)
+                elseif gui.elements[checkbox_name]:get() then
+                    gui.elements[checkbox_name]:render(affix.name, affix.description)
+                end
             end
         end
     end
