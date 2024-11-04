@@ -1,25 +1,15 @@
 local utils    = {}
-local helm_affix = require "data.helm"
-local chest_affix = require "data.chest"
-local gloves_affix = require "data.gloves"
-local pants_affix = require "data.pants"
-local boots_affix = require "data.boots"
-local amulet_affix = require "data.amulet"
-local ring_affix = require "data.ring"
-local weapon_affix = require "data.weapon"
-local offhand_affix = require "data.offhand"
-local unique_affix = require "data.unique"
 local item_types = {
-    {name = "helm", data = helm_affix},
-    {name = "chest", data = chest_affix},
-    {name = "gloves", data = gloves_affix},
-    {name = "pants", data = pants_affix},
-    {name = "boots", data = boots_affix},
-    {name = "amulet", data = amulet_affix},
-    {name = "ring", data = ring_affix},
-    {name = "weapon", data = weapon_affix},
-    {name = "offhand", data = offhand_affix},
-    {name = "unique", data = unique_affix},
+    {name = "helm", data = require "data.affix.helm"},
+    {name = "chest", data = require "data.affix.chest"},
+    {name = "gloves", data = require "data.affix.gloves"},
+    {name = "pants", data = require "data.affix.pants"},
+    {name = "boots", data = require "data.affix.boots"},
+    {name = "amulet", data = require "data.affix.amulet"},
+    {name = "ring", data = require "data.affix.ring"},
+    {name = "weapon", data = require "data.affix.weapon"},
+    {name = "offhand", data = require "data.affix.offhand"},
+    {name = "unique", data = require "data.affix.unique"},
 }
 local item_affix = {}
 local item_aspect = {}
@@ -39,10 +29,26 @@ local function get_affixes_and_aspect(name,data)
     item_affix[#item_affix+1] = affix_group
 end
 
-for _,types in pairs(item_types) do
-    get_affixes_and_aspect(types.name,types.data)
+local function get_plugin_root_path()
+    local plugin_root = string.gmatch(package.path, '.*?\\?')()
+    plugin_root = plugin_root:gsub("?","")
+    return plugin_root
 end
 
+local function get_export_filename()
+    local filename = get_plugin_root_path()
+    filename = filename .. "\\data\\export\\alfred-"
+    filename = filename .. os.time(os.date("!*t"))
+    filename = filename .. ".lua"
+    return filename
+end
+
+local function get_import_full_filename(name)
+    local filename = get_plugin_root_path()
+    filename = filename .. "\\data\\export\\"
+    filename = filename .. name
+    return filename
+end
 
 function utils.get_character_class()
     local local_player = get_local_player();
@@ -68,6 +74,42 @@ end
 
 function utils.get_item_aspects()
     return item_aspect
+end
+
+function utils.import_filters(name)
+    return
+end
+
+function utils.export_filters(elements)
+    local selected_affix = {}
+    for _,affix_type in pairs(item_affix) do
+        for _,affix in pairs(affix_type.data) do
+            local checkbox_name = tostring(affix_type.name) .. '_affix_' .. tostring(affix.sno_id)
+            if elements[checkbox_name]:get() then
+                selected_affix[#selected_affix+1] = checkbox_name
+            end
+        end
+    end
+    local filename = get_export_filename()
+    local file, err = io.open(filename,"w")
+    if not file then
+        console.print("error opening file")
+    end
+    file:write("local affix = {\n")
+    for _,affix in pairs(selected_affix) do
+        file:write('"')
+        file:write(affix)
+        file:write('",\n')
+    end
+    file:write("}\nreturn affix")
+    file:close()
+    
+    console.print('export ' .. filename .. ' done')
+    return
+end
+
+for _,types in pairs(item_types) do
+    get_affixes_and_aspect(types.name,types.data)
 end
 
 return utils

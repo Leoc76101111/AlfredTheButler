@@ -75,6 +75,10 @@ gui.elements = {
     ancestral_affix_ga_slider = slider_int:new(0, 3, 1, get_hash(plugin_label .. "_affix_ga_slider")),
     ancestral_affix_ga = create_checkbox(false, "affix_ga"),
 
+    affix_export_button = button:new(get_hash(plugin_label .. "_affix_export_button")),
+    affix_import_button = button:new(get_hash(plugin_label .. "_affix_import_button")),
+    affix_import_name = input_text:new(get_hash(plugin_label .. "_affix_import_button")),
+
     restock_tree = tree_node:new(1),
     restock_toggle = create_checkbox(false, "restock_toggle"),
 
@@ -116,10 +120,13 @@ function gui.render()
         gui.elements.ancestral_keep_max_aspect:render("Keep max aspect","Keep max aspect")
         gui.elements.ancestral_filter_toggle:render("Use affix filter", "use affix filter")
         if gui.elements.ancestral_filter_toggle:get() then
-            if gui.elements.ancestral_filter_tree:push("global settings") then
+            if gui.elements.ancestral_filter_tree:push("General") then
                 gui.elements.ancestral_keep_ga_slider:render("Min Greater Affix", "Minimun greater affix to keep")
                 gui.elements.ancestral_affix_slider:render("Min matching Affix", "Minimum matching affix to keep")
                 gui.elements.ancestral_affix_ga_slider:render("Min matching GA", "Minimum matching greater affix")
+                gui.elements.affix_export_button:render("export", "export all selected affixes to export folder", 0)
+                gui.elements.affix_import_name:render("import file name", "file name to import", false, '', '')
+                gui.elements.affix_import_button:render("import", "import selected affixes from file", 0)
                 gui.elements.ancestral_filter_tree:pop()
             end
             for _,affix_type in pairs(affix_types) do
