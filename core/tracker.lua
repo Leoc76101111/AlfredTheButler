@@ -1,4 +1,4 @@
-local plugin_label = "alfred_the_butler"
+local plugin_label = 'alfred_the_butler'
 local tracker = {
     name = plugin_label,
     inventory_full = false,
