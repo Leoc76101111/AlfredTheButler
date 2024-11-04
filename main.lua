@@ -28,11 +28,7 @@ local function render_pulse()
     if not settings.get_keybind_state() then
         graphics.text_2d("Alfred Task: Paused", vec2:new(8, 50), 20, color_white(255))
     elseif current_task then
-        if current_task.name == 'Status' then
-            graphics.text_2d("Alfred Task: " .. current_task.status, vec2:new(8, 50), 20, color_white(255))
-        else
-            graphics.text_2d("Alfred Task: " .. current_task.name, vec2:new(8, 50), 20, color_white(255))
-        end
+        graphics.text_2d("Alfred Task: " .. current_task.status, vec2:new(8, 50), 20, color_white(255))
     else
         graphics.text_2d("Alfred Task: Unknown", vec2:new(8, 50), 20, color_white(255))
     end

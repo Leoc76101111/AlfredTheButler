@@ -35,7 +35,7 @@ function task_manager.execute_tasks()
     end
 
     -- The if statement has been removed, and current_task is always assigned
-    current_task = current_task or { name = "Idle" }
+    current_task = current_task or { status = "Idle" }
 end
 
 function task_manager.get_current_task()

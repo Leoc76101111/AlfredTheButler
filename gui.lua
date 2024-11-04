@@ -105,7 +105,7 @@ function gui.render()
     if gui.elements.use_keybind:get() then
         gui.elements.keybind_toggle:render("Toggle Keybind", "Toggle the bot for quick enable");
     end
-    gui.elements.stash_toggle:render("Keep item in stash","Keep item in stash")
+    -- gui.elements.stash_toggle:render("Keep item in stash","Keep item in stash")
     gui.elements.inventory_limit_slider:render("Inventory Limit","minimum number if items before stash/salvage/sell")
     if gui.elements.item_tree:push("Non-Ancestral") then
         gui.elements.item_legendary_or_lower:render("non-unique items", gui.item_options, "Select what to do with non-ancestral non-unique legendary items")

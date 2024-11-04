@@ -7,7 +7,8 @@ local tracker = {
     inventory_count = 0,
     salvage_count = 0,
     sell_count = 0,
-    stash_count = 0
+    stash_count = 0,
+    trigger_tasks = false
 }
 
 return tracker
