@@ -5,12 +5,12 @@ local tracker = require 'core.tracker'
 local gui = require 'gui'
 
 local status_enum = {
-    'IDLE' = 'Idle',
-    'SELL' = 'Selling',
-    'MOVING' = 'Moving to vendor',
-    'INTERACTING' = 'Interacting with vendor',
-    'RESETING' = 'Re-trying sell',
-    'FAILED' = 'Failed to sell'
+    IDLE = 'Idle',
+    SELL = 'Selling',
+    MOVING = 'Moving to vendor',
+    INTERACTING = 'Interacting with vendor',
+    RESETING = 'Re-trying sell',
+    FAILED = 'Failed to sell'
 }
 
 local task = {

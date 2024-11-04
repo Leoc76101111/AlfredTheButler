@@ -56,6 +56,7 @@ gui.elements = {
     main_toggle = create_checkbox(false, 'main_toggle'),
     use_keybind = create_checkbox(false, 'use_keybind'),
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_keybind_toggle' )),
+    manual_keybind = keybind:new(0x0B,false,get_hash(plugin_label .. '_manual_keybind')),
     stash_toggle = create_checkbox(false, 'stash_toggle'),
     inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. '_inventory_limit_slider')),
     timeout_slider = slider_int:new(10, 600, 120, get_hash(plugin_label .. '_timeout_slider')),
@@ -105,6 +106,7 @@ function gui.render()
     gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot');
     if gui.elements.use_keybind:get() then
         gui.elements.keybind_toggle:render('Toggle Keybind', 'Toggle the bot for quick enable');
+        gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now if in cerrigar', 0)
     end
     -- gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
     gui.elements.inventory_limit_slider:render('Inventory Limit','minimum number if items before stash/salvage/sell')

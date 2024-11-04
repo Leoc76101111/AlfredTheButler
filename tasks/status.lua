@@ -5,15 +5,14 @@ local tracker = require 'core.tracker'
 local gui = require 'gui'
 
 local status_enum = {
-    'IDLE' = 'Idle',
-    'WAITING' = 'Waiting to be in Cerrigar',
-    'TIMEOUT' = 'Alfred is in timeout'
+    IDLE = 'Idle',
+    WAITING = 'Waiting to be in Cerrigar',
+    TIMEOUT = 'Alfred is in timeout'
 }
 
 local task = {
     name = 'Status',
-    status = status_enum['IDLE'],
-    last_reset = 0
+    status = status_enum['IDLE']
 }
 
 function task.shouldExecute()
@@ -25,7 +24,7 @@ function task.shouldExecute()
         return true
     elseif tracker.salvage_failed and tracker.sell_failed then
         tracker.trigger_tasks = false
-        task.last_reset = get_time_since_inject()
+        tracker.last_reset = get_time_since_inject()
         return true
     end
     
@@ -40,12 +39,12 @@ function task.Execute()
     local item_count = tracker.salvage_count + tracker.sell_count
     local current_time = get_time_since_inject()
     -- wait {timeout} seconds since last reset to set to retrigger task
-    if item_count >= tracker.inventory_limit and task.last_reset + 120 > current_time then
+    if item_count >= tracker.inventory_limit and tracker.last_reset + settings.timeout < current_time then
         task.status = status_enum['WAITING']
         tracker.trigger_tasks = true
         tracker.salvage_failed = false
         tracker.sell_failed = false
-    elseif task.last_reset + settings.timeout < current_time
+    elseif tracker.last_reset + settings.timeout >= current_time then
         task.status = status_enum['TIMEOUT']
     else
         task.status = status_enum['IDLE']

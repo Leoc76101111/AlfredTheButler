@@ -25,6 +25,13 @@ end
 
 local function render_pulse()
     if not local_player or not settings.enabled then return end
+    if settings.get_keybind_state() and gui.elements.manual_keybind:get_state() == 1 then
+        gui.elements.manual_keybind:set(false)
+        tracker.last_reset = true
+        tracker.trigger_tasks = true
+        tracker.salvage_failed = false
+        tracker.sell_failed = false
+    end
     local current_task = task_manager.get_current_task()
     if not settings.get_keybind_state() then
         graphics.text_2d('Alfred Task: Paused', vec2:new(8, 50), 20, color_white(255))
