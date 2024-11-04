@@ -11,7 +11,11 @@ local status_task = {
 }
 
 function status_task.shouldExecute()
-    if not utils.player_in_zone("Scos_Cerrigar") then
+    if tracker.trigger_tasks and salvage_count == 0 and sell_count == o then
+        -- add stash action when stash is available
+        tracker.trigger_tasks = false
+    end
+    if not utils.player_in_zone("Scos_Cerrigar") or not tracker.trigger_tasks then
         return true
     end
     return false
@@ -25,6 +29,7 @@ function status_task.Execute()
     local item_count = tracker.salvage_count + tracker.sell_count
     if item_count >= tracker.inventory_limit then
         status_task.status = "Waiting to be in Cerrigar"
+        status_task.trigger_tasks = true
     else
         status_task.status = "Idle"
     end
