@@ -16,6 +16,12 @@ local item_types = {
 local item_affix = {}
 local item_aspect = {}
 
+utils.item_enum = {
+    KEEP = 0,
+    SALVAGE = 1,
+    SELL = 2
+}
+
 local function get_plugin_root_path()
     local plugin_root = string.gmatch(package.path, '.*?\\?')()
     plugin_root = plugin_root:gsub("?","")
@@ -38,7 +44,6 @@ local function get_affixes_and_aspect(name)
         data = {}
     }
     for _,affix in pairs(data) do
-        utils.log(affix.name)
         if affix.is_aspect == false then
             affix_group.data[#affix_group.data+1] = affix
         else
@@ -68,8 +73,6 @@ local function get_import_full_filename(name)
     filename = filename .. name
     return filename
 end
-
-
 
 function utils.get_character_class()
     local local_player = get_local_player();

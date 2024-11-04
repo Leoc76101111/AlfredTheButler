@@ -2,8 +2,8 @@
 
 local gui          = require "gui"
 local utils        = require "core.utils"
+local settings     = require "core.settings"
 -- local task_manager = require "core.task_manager"
--- local settings     = require "core.settings"
 
 local local_player, player_position
 
@@ -13,18 +13,17 @@ local function update_locals()
 end
 
 local function main_pulse()
-    if true then return end
     settings:update_settings()
-    if not local_player or not (settings.enabled and utils.get_keybind_state() ) then return end
+    if not local_player or not (settings.enabled and settings.get_keybind_state() ) then return end
     if orbwalker.get_orb_mode() ~= 3 then
         orbwalker.set_clear_toggle(true);
     end
-    task_manager.execute_tasks()
+    -- task_manager.execute_tasks()
 end
 
 local function render_pulse()
     if true then return end
-    if not local_player or not (settings.enabled and utils.get_keybind_state() ) then return end
+    if not local_player or not (settings.enabled and settings.get_keybind_state() ) then return end
     local current_task = task_manager.get_current_task()
     if current_task then
         local px, py, pz = player_position:x(), player_position:y(), player_position:z()
