@@ -5,12 +5,12 @@ local tracker = require 'core.tracker'
 local gui = require 'gui'
 
 local status_enum = {
-    'IDLE' = 'Idle',
-    'SALVAGE' = 'Salvaging',
-    'MOVING' = 'Moving to blacksmith',
-    'INTERACTING' = 'Interacting with blacksmith',
-    'RESETING' = 'Re-trying salvage',
-    'FAILED' = 'Failed to salvage'
+    IDLE = 'Idle',
+    SALVAGE = 'Salvaging',
+    MOVING = 'Moving to blacksmith',
+    INTERACTING = 'Interacting with blacksmith',
+    RESETING = 'Re-trying salvage',
+    FAILED = 'Failed to salvage'
 }
 
 local task = {
