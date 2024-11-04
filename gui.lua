@@ -2,29 +2,7 @@ local utils = require "core.utils"
 local gui = {}
 local plugin_label = "alfred_the_butler"
 
-local helm_affix = require "data.helm"
-local chest_affix = require "data.chest"
-local gloves_affix = require "data.gloves"
-local pants_affix = require "data.pants"
-local boots_affix = require "data.boots"
-local amulet_affix = require "data.amulet"
-local ring_affix = require "data.ring"
-local weapon_affix = require "data.weapon"
-local offhand_affix = require "data.offhand"
-local unique_affix = require "data.unique"
-
-local affix_types = {
-    {name = "helm", data = helm_affix},
-    {name = "chest", data = chest_affix},
-    {name = "gloves", data = gloves_affix},
-    {name = "pants", data = pants_affix},
-    {name = "boots", data = boots_affix},
-    {name = "amulet", data = amulet_affix},
-    {name = "ring", data = ring_affix},
-    {name = "weapon", data = weapon_affix},
-    {name = "offhand", data = offhand_affix},
-    {name = "unique", data = unique_affix},
-}
+local affix_types = utils.get_item_affixes()
 
 local function create_checkbox(value, key)
     return checkbox:new(value, get_hash(plugin_label .. "_" .. key))
@@ -35,10 +13,8 @@ local function add_affix_tree(name)
 end
 local function add_affix_checkbox(name,data)
     for _,affix in pairs(data) do
-        if affix.is_aspect == false then
-            local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
-            gui.elements[checkbox_name] = create_checkbox(false, checkbox_name)
-        end
+        local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
+        gui.elements[checkbox_name] = create_checkbox(false, checkbox_name)
     end
     return
 end
@@ -49,7 +25,7 @@ end
 local function render_affix_checkbox(name,data)
     local search_name = tostring(name) .. '_affix_search'
     for _,affix in pairs(data) do
-        if affix.is_aspect == false and (affix.class == 'all' or affix.class == utils.get_character_class()) then
+        if affix.class == 'all' or affix.class == utils.get_character_class() then
             local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
             local search_string = string.lower(gui.elements[search_name]:get())
             if search_string ~= '' and (string.lower(affix.name):match(search_string) or string.lower(affix.description):match(search_string)) then
@@ -79,6 +55,7 @@ gui.elements = {
     use_keybind = create_checkbox(false, "use_keybind"),
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. "_keybind_toggle" )),
     stash_toggle = create_checkbox(false, "stash_toggle"),
+    inventory_limit_slider = slider_int:new(1, 30, 20, get_hash(plugin_label .. "_inventory_limit_slider")),
 
     item_tree = tree_node:new(1),
     item_legendary_or_lower = combo_box:new(1, get_hash(plugin_label .. "_item_legendary_or_lower")),
@@ -122,6 +99,7 @@ function gui.render()
         gui.elements.keybind_toggle:render("Toggle Keybind", "Toggle the bot for quick enable");
     end
     gui.elements.stash_toggle:render("Keep item in stash","Keep item in stash")
+    gui.elements.inventory_limit_slider:render("Inventory Limit","minimum number if items before stash/salvage/sell")
     if gui.elements.item_tree:push("Non-Ancestral") then
         gui.elements.item_legendary_or_lower:render("non-unique items", gui.item_options, "Select what to do with non-ancestral non-unique legendary items")
         gui.elements.item_unique:render("unique items", gui.item_options, "Select what to do with non-ancestral unique items")
@@ -136,9 +114,9 @@ function gui.render()
         gui.elements.ancestral_item_unique:render("unique items", gui.item_options, "Select what to do with unique items")
         gui.elements.ancestral_item_junk:render("junk items", gui.item_options, "Select what to do with junk items")
         gui.elements.ancestral_keep_max_aspect:render("Keep max aspect","Keep max aspect")
-        gui.elements.ancestral_filter_toggle:render("Use filter", "use filter")
+        gui.elements.ancestral_filter_toggle:render("Use affix filter", "use affix filter")
         if gui.elements.ancestral_filter_toggle:get() then
-            if gui.elements.ancestral_filter_tree:push("affix filters") then
+            if gui.elements.ancestral_filter_tree:push("global settings") then
                 gui.elements.ancestral_keep_ga_slider:render("Min Greater Affix", "Minimun greater affix to keep")
                 gui.elements.ancestral_affix_slider:render("Min matching Affix", "Minimum matching affix to keep")
                 gui.elements.ancestral_affix_ga_slider:render("Min matching GA", "Minimum matching greater affix")
