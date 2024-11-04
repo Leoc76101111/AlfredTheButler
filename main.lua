@@ -1,9 +1,10 @@
--- if true then return end
+local plugin_label = "alfred_the_butler"
 
 local gui          = require "gui"
 local utils        = require "core.utils"
 local settings     = require "core.settings"
--- local task_manager = require "core.task_manager"
+local task_manager = require "core.task_manager"
+local tracker      = require "core.tracker"
 
 local local_player, player_position
 
@@ -14,22 +15,35 @@ end
 
 local function main_pulse()
     settings:update_settings()
-    if not local_player or not (settings.enabled and settings.get_keybind_state() ) then return end
+    if not local_player or not (settings.enabled and settings.get_keybind_state()) then return end
     if orbwalker.get_orb_mode() ~= 3 then
         orbwalker.set_clear_toggle(true);
     end
-    -- task_manager.execute_tasks()
+    task_manager.execute_tasks()
 end
 
 local function render_pulse()
-    if true then return end
-    if not local_player or not (settings.enabled and settings.get_keybind_state() ) then return end
+    if not local_player or not settings.enabled then return end
     local current_task = task_manager.get_current_task()
-    if current_task then
-        local px, py, pz = player_position:x(), player_position:y(), player_position:z()
-        local draw_pos = vec3:new(px, py - 2, pz + 3)
-        graphics.text_3d("Current Task: " .. current_task.name, draw_pos, 14, color_white(255))
+    if not settings.get_keybind_state() then
+        graphics.text_2d("Alfred Task: Paused", vec2:new(8, 50), 20, color_white(255))
+    elseif current_task then
+        if current_task.name == 'Status' then
+            graphics.text_2d("Alfred Task: " .. current_task.status, vec2:new(8, 50), 20, color_white(255))
+        else
+            graphics.text_2d("Alfred Task: " .. current_task.name, vec2:new(8, 50), 20, color_white(255))
+        end
+    else
+        graphics.text_2d("Alfred Task: Unknown", vec2:new(8, 50), 20, color_white(255))
     end
+    
+    utils.update_tracker_count(settings)
+    graphics.text_2d("Limit      : " .. tracker.inventory_limit , vec2:new(8, 70), 20, color_white(255))
+    graphics.text_2d("Inventory  : " .. tracker.inventory_count , vec2:new(8, 90), 20, color_white(255))
+    graphics.text_2d("Keep       : " .. tracker.stash_count, vec2:new(8, 110), 20, color_white(255))
+    graphics.text_2d("Salvage    : " .. tracker.salvage_count, vec2:new(8, 130), 20, color_white(255))
+    graphics.text_2d("Sell       : " .. tracker.sell_count, vec2:new(8, 150), 20, color_white(255))
+    
 end
 
 on_update(function()
@@ -49,4 +63,5 @@ on_render_menu(function ()
         end
     end
 end)
+plugin_alfred_the_butler_tracker = tracker
 on_render(render_pulse)

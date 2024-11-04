@@ -1,5 +1,6 @@
 local plugin_label = "alfred_the_butler"
 local json = require "core.json"
+local tracker = require "core.tracker"
 local utils    = {}
 local item_types = {
     "helm",
@@ -21,6 +22,20 @@ utils.item_enum = {
     SALVAGE = 1,
     SELL = 2
 }
+
+utils.mythics = {}
+utils.mythics["1901484"] = "Tyrael's Might"
+utils.mythics["223271"] = "The Grandfather"
+utils.mythics["241930"] = "Andariel's Visage"
+utils.mythics["359165"] = "Ahavarion, Spear of Lycander"
+utils.mythics["221017"] = "Doombringer"
+utils.mythics["609820"] = "Harlequin Crest"
+utils.mythics["1275935"] = "Melted Heart of Selig"
+utils.mythics["1306338"] = "‍Ring of Starless Skies"
+utils.mythics["2059803"] = "Shroud of False Death"
+utils.mythics["1982241"] = "Nesekem, the Herald"
+utils.mythics["2059799"] = "Heir of Perdition"
+utils.mythics["2059813"] = "Shattered Vow"
 
 local function get_plugin_root_path()
     local plugin_root = string.gmatch(package.path, '.*?\\?')()
@@ -163,6 +178,77 @@ end
 function utils.log(msg)
     console.print(plugin_label .. ": " .. tostring(msg))
     return
+end
+
+function utils.get_greater_affix_count(display_name)
+    local count = 0
+    for _ in display_name:gmatch("GreaterAffix") do
+       count = count + 1
+    end
+    return count
+end
+
+function utils.update_tracker_count(settings)
+    local counter = 0
+    local salvage_counter = 0
+    local sell_counter = 0
+    local stash_counter = 0
+    local local_player = get_local_player()
+    if not local_player then return end
+    local items = local_player:get_inventory_items()
+    for _, item in pairs(items) do
+        if item then
+            counter = counter + 1
+            local display_name = item:get_display_name()
+            local greater_affix_count = utils.get_greater_affix_count(display_name)
+            local item_id = item:get_sno_id()
+            local is_unique = false
+            local item_settings
+            
+            if item:get_rarity() == 6 then
+                is_unique = true
+            end
+
+            if item:is_locked() or utils.mythics[item_id] ~= nil then
+                item_settings = utils.item_enum["KEEP"]
+            elseif greater_affix_count > 0 then
+                if item:is_junk() then
+                    item_settings = settings.ancestral_item_junk
+                elseif is_unique then
+                    item_settings = settings.ancestral_item_unique
+                else
+                    item_settings = settings.ancestral_item_legendary
+                end
+            else
+                if item:is_junk() then
+                    item_settings = settings.item_junk
+                elseif is_unique then
+                    item_settings = settings.item_unique
+                else
+                    item_settings = settings.item_legendary_or_lower
+                end
+            end
+
+            if item_settings == utils.item_enum["SELL"] then
+                sell_counter = sell_counter + 1
+            elseif item_settings == utils.item_enum["SALVAGE"] then
+                salvage_counter = salvage_counter + 1
+            else
+                stash_counter = stash_counter + 1
+            end
+        else
+            utils.log('no item??')
+        end
+    end
+    tracker.inventory_count = counter
+    tracker.salvage_count = salvage_counter
+    tracker.sell_count = sell_counter
+    tracker.stash_count = stash_counter
+    tracker.inventory_limit = settings.inventory_limit
+end
+
+function utils.player_in_zone(zname)
+    return get_current_world():get_current_zone_name() == zname
 end
 
 for _,types in pairs(item_types) do

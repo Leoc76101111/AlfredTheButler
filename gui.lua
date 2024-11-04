@@ -57,7 +57,7 @@ gui.elements = {
     use_keybind = create_checkbox(false, "use_keybind"),
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. "_keybind_toggle" )),
     stash_toggle = create_checkbox(false, "stash_toggle"),
-    inventory_limit_slider = slider_int:new(1, 30, 20, get_hash(plugin_label .. "_inventory_limit_slider")),
+    inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. "_inventory_limit_slider")),
 
     item_tree = tree_node:new(1),
     item_legendary_or_lower = combo_box:new(1, get_hash(plugin_label .. "_item_legendary_or_lower")),
