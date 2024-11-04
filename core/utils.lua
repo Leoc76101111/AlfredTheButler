@@ -251,6 +251,18 @@ function utils.player_in_zone(zname)
     return get_current_world():get_current_zone_name() == zname
 end
 
+function utils.get_blacksmith()
+
+end
+
+function utils.get_vendor()
+
+end
+
+function utils.distance_to()
+
+end
+
 for _,types in pairs(item_types) do
     get_affixes_and_aspect(types)
 end
