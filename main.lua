@@ -1,9 +1,9 @@
 -- if true then return end
 
 local gui          = require "gui"
+local utils        = require "core.utils"
 -- local task_manager = require "core.task_manager"
 -- local settings     = require "core.settings"
--- local utils        = require "core.utils"
 
 local local_player, player_position
 
@@ -38,5 +38,12 @@ on_update(function()
     main_pulse()
 end)
 
-on_render_menu(gui.render)
+on_render_menu(function ()
+    gui.render()
+    if gui.elements.affix_export_button:get() then
+        utils.export_filters(gui.elements)
+    elseif gui.elements.affix_import_button:get() and gui.elements.affix_import_name:get() ~= '' then
+        utils.import_filters(gui.elements.import_name:get())
+    end
+end)
 on_render(render_pulse)
