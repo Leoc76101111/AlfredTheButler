@@ -130,7 +130,7 @@ function gui.render()
             if gui.elements.ancestral_filter_tree:push('General') then
                 gui.elements.ancestral_ga_count_slider:render('Min Greater Affix', 'Minimun greater affix to keep')
                 gui.elements.ancestral_affix_count_slider:render('Min matching Affix', 'Minimum matching affix to keep')
-                gui.elements.ancestral_affix_ga_count_slider:render('Min matching GA', 'Minimum matching greater affix')
+                -- gui.elements.ancestral_affix_ga_count_slider:render('Min matching GA', 'Minimum matching greater affix')
                 gui.elements.seperator:render('',{'Export'},'')
                 gui.elements.affix_export_button:render('', 'export all selected affixes to export folder', 0)
                 gui.elements.seperator:render('',{'Import'},'')
