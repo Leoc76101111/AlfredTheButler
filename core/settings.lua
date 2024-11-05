@@ -59,12 +59,14 @@ function settings:update_settings()
     settings.ancestral_affix_ga_count = gui.elements.ancestral_affix_ga_count_slider:get()
     settings.ancestral_affix = {}
     for _,affix_type in pairs(affix_types) do
-        for _,affix in pairs(affix_type) do
-            local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
+        settings.ancestral_affix[affix_type.name] = {}
+        for _,affix in pairs(affix_type.data) do
+            local checkbox_name = tostring(affix_type.name) .. '_affix_' .. tostring(affix.sno_id)
             if gui.elements[checkbox_name] and gui.elements[checkbox_name]:get() then
-                settings.ancestral_affix[affix.sno_id] = true
+                settings.ancestral_affix[affix_type.name][affix.sno_id] = true
             end
         end
     end
 end
+utils.settings = settings
 return settings
