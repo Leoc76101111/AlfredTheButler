@@ -23,20 +23,20 @@ utils.item_enum = {
     SELL = 2
 }
 
-utils.mythics = {}
-utils.mythics['1901484'] = "Tyrael's Might"
-utils.mythics['223271'] = 'The Grandfather'
-utils.mythics['241930'] = "Andariel's Visage"
-utils.mythics['359165'] = 'Ahavarion, Spear of Lycander'
-utils.mythics['221017'] = 'Doombringer'
-utils.mythics['609820'] = 'Harlequin Crest'
-utils.mythics['1275935'] = 'Melted Heart of Selig'
-utils.mythics['1306338'] = '‍Ring of Starless Skies'
-utils.mythics['2059803'] = 'Shroud of False Death'
-utils.mythics['1982241'] = 'Nesekem, the Herald'
-utils.mythics['2059799'] = 'Heir of Perdition'
-utils.mythics['2059813'] = 'Shattered Vow'
-
+utils.mythics = {
+    ['1901484'] = "Tyrael's Might",
+    ['223271'] = 'The Grandfather',
+    ['241930'] = "Andariel's Visage",
+    ['359165'] = 'Ahavarion, Spear of Lycander',
+    ['221017'] = 'Doombringer',
+    ['609820'] = 'Harlequin Crest',
+    ['1275935'] = 'Melted Heart of Selig',
+    ['1306338'] = '‍Ring of Starless Skies',
+    ['2059803'] = 'Shroud of False Death',
+    ['1982241'] = 'Nesekem, the Herald',
+    ['2059799'] = 'Heir of Perdition',
+    ['2059813'] = 'Shattered Vow',
+}
 local function get_plugin_root_path()
     local plugin_root = string.gmatch(package.path, '.*?\\?')()
     plugin_root = plugin_root:gsub('?','')
@@ -188,7 +188,11 @@ function utils.get_greater_affix_count(display_name)
     return count
 end
 function utils.is_max_aspect(affix)
-
+    local affix_id = affix.affix_name_hash
+    if item_aspect[affix_id] and affix:get_roll() == affix:get_roll_max() then 
+        return true
+    end
+    return false
 end
 function utils.is_correct_affix(item_type,affix)
     local affix_id = affix.affix_name_hash
@@ -262,6 +266,9 @@ function utils.is_salvage_or_sell(item,action)
     local ancestral_affix_ga_count = 0
     local item_type = utils.get_item_type(item)
     for _,affix in pairs(item_affixes) do
+        if utils.settings.ancestral_keep_max_aspect and utils.is_max_aspect(affix) then
+            return false
+        end
         if item_type == 'unknown' then
             for _,types in pairs(item_types) do
                 if utils.is_correct_affix(types,affix) then
