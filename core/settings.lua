@@ -22,7 +22,10 @@ local settings = {
     ancestral_filter = false,
     ancestral_affix_count = 0,
     ancestral_affix_ga_count = 0,
-    ancestral_affix = {}
+    ancestral_affix = {},
+    aggresive_movement = false,
+    path_angle = 10
+
 }
 
 function settings.get_keybind_state()
@@ -58,6 +61,8 @@ function settings:update_settings()
     settings.ancestral_affix_count = gui.elements.ancestral_affix_count_slider:get()
     settings.ancestral_affix_ga_count = gui.elements.ancestral_affix_ga_count_slider:get()
     settings.ancestral_affix = {}
+    settings.aggresive_movement = gui.elements.explorer_aggressive_movement_toggle:get()
+    settings.path_angle = gui.elements.explorer_path_angle_slider:get()
     for _,affix_type in pairs(affix_types) do
         settings.ancestral_affix[affix_type.name] = {}
         for _,affix in pairs(affix_type.data) do
