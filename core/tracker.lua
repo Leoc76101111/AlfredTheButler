@@ -14,6 +14,7 @@ local tracker = {
     salvage_done = false,
     sell_failed = false,
     sell_done = false,
+    external_caller = nil,
     external_trigger = true,
     external_trigger_callback = nil,
     external_pause = false,
@@ -38,22 +39,23 @@ local external_tracker = {
             sell_done = tracker.sell_done,
         }
     end,
-    pause = function () 
+    pause = function (caller) 
+        tracker.external_caller = caller
         tracker.external_pause = true
     end,
     resume = function () 
+        tracker.external_caller = nil
         tracker.external_pause = false
     end,
-    trigger_tasks = function (callback) 
-        tracker.trigger_tasks = true
+    trigger_tasks = function (caller, callback) 
         tracker.external_trigger = true
         if callback then
             tracker.external_trigger_callback = callback
         end
     end,
-    trigger_tasks_with_teleport = function (callback) 
+    trigger_tasks_with_teleport = function (caller,callback) 
         -- not implemented
-        tracker.trigger_tasks = true
+        tracker.external_caller = caller
         tracker.external_trigger = true
         tracker.external_trigger_teleport = true
         if callback then
