@@ -18,7 +18,7 @@ local task = {
 function task.shouldExecute()
     if not utils.player_in_zone('Scos_Cerrigar') then
         return true
-    elseif tracker.trigger_tasks and salvage_count == 0 and sell_count == o then
+    elseif tracker.trigger_tasks and tracker.salvage_done and tracker.sell_done then
         -- add stash action when stash is available
         tracker.trigger_tasks = false
         return true
@@ -42,7 +42,9 @@ function task.Execute()
     if item_count >= tracker.inventory_limit and tracker.last_reset + settings.timeout < current_time then
         task.status = status_enum['WAITING']
         tracker.trigger_tasks = true
+        tracker.salvage_done = false
         tracker.salvage_failed = false
+        tracker.sell_done = false
         tracker.sell_failed = false
     elseif tracker.last_reset + settings.timeout >= current_time then
         task.status = status_enum['TIMEOUT']

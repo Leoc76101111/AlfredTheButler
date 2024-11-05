@@ -31,6 +31,8 @@ local function render_pulse()
         tracker.trigger_tasks = true
         tracker.salvage_failed = false
         tracker.sell_failed = false
+        tracker.salvage_done = false
+        tracker.sell_done = false
     end
     if gui.elements.dump_keybind:get_state() == 1 then
         utils.dump_inventory_info()
