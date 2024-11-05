@@ -1,7 +1,10 @@
 local plugin_label = 'alfred_the_butler'
 local json = require 'core.json'
 local tracker = require 'core.tracker'
-local utils    = {settings={}}
+local utils    = {
+    settings = {},
+    last_dump_time = 0,
+}
 local item_types = {
     'helm',
     'chest',
@@ -62,7 +65,7 @@ local function get_affixes_and_aspect(name)
         if affix.is_aspect == false then
             affix_group.data[#affix_group.data+1] = affix
         else
-            item_aspect[affix.sno_id] = true
+            item_aspect[affix.sno_id] = affix.name
         end
     end
     item_affix[#item_affix+1] = affix_group
@@ -326,6 +329,49 @@ function utils.update_tracker_count()
     tracker.sell_count = sell_counter
     tracker.stash_count = stash_counter
     tracker.inventory_limit = utils.settings.inventory_limit
+end
+
+function utils.dump_inventory_info()
+    -- debounce second
+    local current_time = get_time_since_inject()
+    if utils.last_dump_time + 1 >= current_time then return end
+    local local_player = get_local_player()
+    if not local_player then return end
+    local items = local_player:get_inventory_items()
+    local items_info = {}
+    for _, item in pairs(items) do
+        local item_info = {}
+        if item then
+            item_info['name'] = item:get_display_name()
+            item_info['id'] = item:get_sno_id()
+            item_info['type'] = utils.get_item_type(item)
+            item_info['affix'] = {}
+            item_info['aspect'] = {}
+            for _,affix in pairs(item:get_affixes()) do
+                local affix_id = affix.affix_name_hash
+                if item_aspect[affix_id] then
+                    item_info['aspect']['id'] = affix_id
+                    item_info['aspect']['name'] = affix:get_name()
+                    item_info['aspect']['roll'] = affix:get_roll()
+                    item_info['aspect']['max_roll'] = affix:get_roll_max()
+                    item_info['aspect']['min_roll'] = affix:get_roll_min()
+                else
+                    item_info['affix'][#item_info['affix']+1] = {
+                        ['id'] = affix_id,
+                        ['name'] = affix:get_name(),
+                        ['roll'] = affix:get_roll(),
+                        ['max_roll'] = affix:get_roll_max(),
+                        ['min_roll'] = affix:get_roll_min()
+                    }
+                end
+            end
+        end
+        items_info[#items_info+1] = item_info
+    end
+    utils.log(json.encode(items_info))
+    -- can write to file too
+    utils.last_dump_time = current_time
+    return
 end
 
 function utils.player_in_zone(zname)

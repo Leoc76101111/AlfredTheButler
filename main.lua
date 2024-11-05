@@ -25,12 +25,15 @@ end
 
 local function render_pulse()
     if not local_player or not settings.enabled then return end
-    if settings.get_keybind_state() and gui.elements.manual_keybind:get_state() == 1 then
+    if gui.elements.manual_keybind:get_state() == 1 then
         gui.elements.manual_keybind:set(false)
         tracker.last_reset = 0
         tracker.trigger_tasks = true
         tracker.salvage_failed = false
         tracker.sell_failed = false
+    end
+    if gui.elements.dump_keybind:get_state() == 1 then
+        utils.dump_inventory_info()
     end
     local current_task = task_manager.get_current_task()
     if not settings.get_keybind_state() then

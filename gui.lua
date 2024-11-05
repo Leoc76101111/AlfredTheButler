@@ -29,7 +29,11 @@ local function render_affix_checkbox(name,data)
             if class == 'all' or class == utils.get_character_class() then
                 local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
                 local search_string = string.lower(gui.elements[search_name]:get())
-                if search_string ~= '' and (string.lower(affix.name):match(search_string) or string.lower(affix.description):match(search_string)) then
+                if search_string ~= '' and 
+                    (string.lower(affix.name):match(search_string) or 
+                    string.lower(affix.description):match(search_string) or
+                    string.lower(affix.sno_id):match(search_string)) 
+                then
                     gui.elements[checkbox_name]:render(affix.name, affix.description)
                 elseif gui.elements[checkbox_name]:get() then
                     gui.elements[checkbox_name]:render(affix.name, affix.description)
@@ -57,6 +61,7 @@ gui.elements = {
     use_keybind = create_checkbox(false, 'use_keybind'),
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_keybind_toggle' )),
     manual_keybind = keybind:new(0x0B,false,get_hash(plugin_label .. '_manual_keybind')),
+    dump_keybind = keybind:new(0x0c,false,get_hash(plugin_label .. '_dump_keybind')),
     stash_toggle = create_checkbox(false, 'stash_toggle'),
     inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. '_inventory_limit_slider')),
     timeout_slider = slider_int:new(10, 600, 120, get_hash(plugin_label .. '_timeout_slider')),
@@ -103,10 +108,11 @@ end
 function gui.render()
     if not gui.elements.main_tree:push('Alfred the Butler | Leoric | v0.1.0') then return end
     gui.elements.main_toggle:render('Enable', 'Enable alfred')
-    gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot');
+    gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot')
     if gui.elements.use_keybind:get() then
         gui.elements.keybind_toggle:render('Toggle Keybind', 'Toggle the bot for quick enable');
-        gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now if in cerrigar', 0)
+        gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now if in cerrigar')
+        gui.elements.dump_keybind:render('Dump items info', 'Dump all item info to log')
     end
     -- gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
     gui.elements.inventory_limit_slider:render('Inventory Limit','minimum number if items before stash/salvage/sell')
