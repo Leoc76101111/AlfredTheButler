@@ -27,7 +27,7 @@ local function render_pulse()
     if not local_player or not settings.enabled then return end
     if settings.get_keybind_state() and gui.elements.manual_keybind:get_state() == 1 then
         gui.elements.manual_keybind:set(false)
-        tracker.last_reset = true
+        tracker.last_reset = 0
         tracker.trigger_tasks = true
         tracker.salvage_failed = false
         tracker.sell_failed = false
@@ -67,5 +67,9 @@ on_render_menu(function ()
         end
     end
 end)
+-- incase for somet reason settings is not set for utils
+if not utils.settings then
+    utils.settings = settings
+end
 plugin_alfred_the_butler_tracker = tracker
 on_render(render_pulse)
