@@ -27,7 +27,14 @@ function task.interact()
 
 end
 function task.sell()
-
+    local local_player = get_local_player()
+    if not local_player then return end
+    local items = local_player:get_inventory_items()
+    for _, item in pairs(items) do
+        if item and utils.is_salvage_or_sell(item,utils.item_enum['SELL']) then
+            loot_manager.salvage_specific_item(inventory_item)
+        end
+    end
 end
 function task.reset()
 

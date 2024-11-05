@@ -19,7 +19,7 @@ local function main_pulse()
     if orbwalker.get_orb_mode() ~= 3 then
         orbwalker.set_clear_toggle(true);
     end
-    utils.update_tracker_count(settings)
+    utils.update_tracker_count()
     task_manager.execute_tasks()
 end
 
@@ -41,7 +41,7 @@ local function render_pulse()
         graphics.text_2d('Alfred Task: Unknown', vec2:new(8, 50), 20, color_white(255))
     end
     
-    utils.update_tracker_count(settings)
+    utils.update_tracker_count()
     graphics.text_2d('Limit      : ' .. tracker.inventory_limit , vec2:new(8, 70), 20, color_white(255))
     graphics.text_2d('Inventory  : ' .. tracker.inventory_count , vec2:new(8, 90), 20, color_white(255))
     graphics.text_2d('Keep       : ' .. tracker.stash_count, vec2:new(8, 110), 20, color_white(255))

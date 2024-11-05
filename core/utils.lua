@@ -1,7 +1,7 @@
 local plugin_label = 'alfred_the_butler'
 local json = require 'core.json'
 local tracker = require 'core.tracker'
-local utils    = {}
+local utils    = {settings={}}
 local item_types = {
     'helm',
     'chest',
@@ -62,7 +62,7 @@ local function get_affixes_and_aspect(name)
         if affix.is_aspect == false then
             affix_group.data[#affix_group.data+1] = affix
         else
-            item_aspect[#item_aspect+1] = affix
+            item_aspect[affix.sno_id] = true
         end
     end
     item_affix[#item_affix+1] = affix_group
@@ -187,8 +187,112 @@ function utils.get_greater_affix_count(display_name)
     end
     return count
 end
+function utils.is_max_aspect(affix)
 
-function utils.update_tracker_count(settings)
+end
+function utils.is_correct_affix(item_type,affix)
+    local affix_id = affix.affix_name_hash
+    if utils.settings.ancestral_affix[item_type][affix_id] then
+        return true
+    end
+    return false
+end
+function utils.get_item_type(item)
+    local name = string.lower(item:get_name())
+    local offhand = {
+        "focus",
+        "book",
+        "totem",
+        "shield"
+    }
+    local weapon = {
+        "2h",
+        "1h",
+        "quarterstaff",
+        "glaive"
+    }
+    for _,types in pairs(item_types) do
+        if name:match(types) then
+            return types
+        end
+    end
+    for _,types in pairs(offhand) do
+        if name:match(types) then
+            return "offhand"
+        end
+    end
+    for _,types in pairs(weapon) do
+        if name:match(types) then
+            return "weapon"
+        end
+    end
+    retun "unknown"
+end
+function utils.is_salvage_or_sell(item,action)
+    if item:is_locked() or utils.mythics[item_id] ~= nil then
+        return false
+    end
+    local display_name = item:get_display_name()
+    local ancestral_ga_count = utils.get_greater_affix_count(display_name)
+    
+    local item_id = item:get_sno_id()
+    local is_unique = false
+    if item:get_rarity() == 6 then
+        is_unique = true
+    end
+    -- non ancestral
+    if ancestral_ga_count <= 0 then
+        if item:is_junk() and utils.settings.item_junk == action then
+            return true
+        elseif is_unique and utils.settings.item_unique == action then
+            return true
+        elseif not is_unique and utils.settings.item_legendary_or_lower == action then
+            return true
+        else 
+            return false
+        end
+    end
+
+    -- ancestral 
+    if item:is_junk() and utils.settings.ancestral_item_junk == action then
+        return true
+    end
+    local item_affixes = item:get_affixes()
+    local ancestral_affix_count = 0
+    local ancestral_affix_ga_count = 0
+    local item_type = utils.get_item_type(item)
+    for _,affix in pairs(item_affixes) do
+        if item_type == 'unknown' then
+            for _,types in pairs(item_types) do
+                if utils.is_correct_affix(types,affix) then
+                    ancestral_affix_count = ancestral_affix_count + 1
+                    -- to do matching ga, might need some data collection
+                end
+            end
+        else
+            if utils.is_correct_affix(item_type,affix) then
+                ancestral_affix_count = ancestral_affix_count + 1
+                -- to do matching ga, might need some data collection
+            elseif is_unique and utils.is_correct_affix('unique',affix) then
+                ancestral_affix_count = ancestral_affix_count + 1
+                -- to do matching ga, might need some data collection
+            end
+        end
+    end
+    if (utils.settings.ancestral_filter and 
+        ancestral_affix_count < utils.settings.ancestral_affix_count) or
+        ancestral_ga_count < utils.settings.ancestral_ga_count
+    then
+        if is_unique and utils.settings.ancestral_item_unique == action then
+            return true
+        elseif not is_unique and utils.settings.ancestral_item_legendary == action then
+            return true
+        end
+    end
+    return false
+end
+
+function utils.update_tracker_count()
     local counter = 0
     local salvage_counter = 0
     local sell_counter = 0
@@ -199,40 +303,10 @@ function utils.update_tracker_count(settings)
     for _, item in pairs(items) do
         if item then
             counter = counter + 1
-            local display_name = item:get_display_name()
-            local greater_affix_count = utils.get_greater_affix_count(display_name)
-            local item_id = item:get_sno_id()
-            local is_unique = false
-            local item_settings
-            
-            if item:get_rarity() == 6 then
-                is_unique = true
-            end
-
-            if item:is_locked() or utils.mythics[item_id] ~= nil then
-                item_settings = utils.item_enum['KEEP']
-            elseif greater_affix_count > 0 then
-                if item:is_junk() then
-                    item_settings = settings.ancestral_item_junk
-                elseif is_unique then
-                    item_settings = settings.ancestral_item_unique
-                else
-                    item_settings = settings.ancestral_item_legendary
-                end
-            else
-                if item:is_junk() then
-                    item_settings = settings.item_junk
-                elseif is_unique then
-                    item_settings = settings.item_unique
-                else
-                    item_settings = settings.item_legendary_or_lower
-                end
-            end
-
-            if item_settings == utils.item_enum['SELL'] then
-                sell_counter = sell_counter + 1
-            elseif item_settings == utils.item_enum['SALVAGE'] then
+            if utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE']) then
                 salvage_counter = salvage_counter + 1
+            elseif utils.is_salvage_or_sell(item,utils.item_enum['SELL']) then
+                sell_counter = sell_counter + 1
             else
                 stash_counter = stash_counter + 1
             end
@@ -244,7 +318,7 @@ function utils.update_tracker_count(settings)
     tracker.salvage_count = salvage_counter
     tracker.sell_count = sell_counter
     tracker.stash_count = stash_counter
-    tracker.inventory_limit = settings.inventory_limit
+    tracker.inventory_limit = utils.settings.inventory_limit
 end
 
 function utils.player_in_zone(zname)
