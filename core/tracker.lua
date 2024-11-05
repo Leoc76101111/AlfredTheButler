@@ -13,7 +13,54 @@ local tracker = {
     salvage_failed = false,
     salvage_done = false,
     sell_failed = false,
-    sell_done = false
+    sell_done = false,
+    external_trigger = true,
+    external_trigger_callback = nil,
+    external_pause = false,
+    external_trigger_teleport = false,
+    external_trigger_teleport_callback = nil
 }
+
+local external_tracker = {
+    get_status = function ()
+        return {
+            inventory_full = tracker.inventory_full,
+            inventory_limit = tracker.inventory_limit,
+            inventor_count = tracker.inventor_count,
+            salvage_count = tracker.salvage_count,
+            sell_count = tracker.sell_count,
+            stash_count = tracker.stash_count,
+            trigger_tasks = tracker.trigger_tasks,
+            last_reset = tracker.last_reset,
+            salvage_failed = tracker.salvage_failed,
+            salvage_done = tracker.salvage_done,
+            sell_failed = tracker.sell_failed,
+            sell_done = tracker.sell_done,
+        }
+    end,
+    pause = function () 
+        tracker.external_pause = true
+    end,
+    resume = function () 
+        tracker.external_pause = false
+    end,
+    trigger_tasks = function (callback) 
+        tracker.trigger_tasks = true
+        tracker.external_trigger = true
+        if callback then
+            tracker.external_trigger_callback = callback
+        end
+    end,
+    trigger_tasks_with_teleport = function (callback) 
+        -- not implemented
+        tracker.trigger_tasks = true
+        tracker.external_trigger = true
+        tracker.external_trigger_teleport = true
+        if callback then
+            tracker.external_trigger_teleport_callback = callback
+        end
+    end,
+}
+tracker.external_tracker = external_tracker
 
 return tracker

@@ -76,5 +76,5 @@ end)
 if not utils.settings then
     utils.settings = settings
 end
-plugin_alfred_the_butler_tracker = tracker
+plugin_alfred_the_butler_tracker = tracker.external_tracker
 on_render(render_pulse)

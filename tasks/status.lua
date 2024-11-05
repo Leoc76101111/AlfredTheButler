@@ -16,19 +16,33 @@ local task = {
 }
 
 function task.shouldExecute()
+    local should_execute = false
+    local task_done = false
     if not utils.player_in_zone('Scos_Cerrigar') then
-        return true
+        should_execute = true
+    elseif settings.allow_external and tracker.external_pause then
+        should_execute = true
     elseif tracker.trigger_tasks and tracker.salvage_done and tracker.sell_done then
         -- add stash action when stash is available
-        tracker.trigger_tasks = false
-        return true
+        task_done = true
+        should_execute = true
     elseif tracker.salvage_failed and tracker.sell_failed then
-        tracker.trigger_tasks = false
         tracker.last_reset = get_time_since_inject()
-        return true
+        task_done = true
+        should_execute = true
     end
     
-    return false
+    if task_done then
+        tracker.trigger_tasks = false
+        if settings.allow_external and tracker.external_trigger then
+            tracker.external_trigger = false
+            if tracker.external_trigger_callback then
+                pcall(tracker.external_trigger_callback)
+                tracker.external_trigger_callback = nil
+            end
+        end
+    end
+    return should_execute
 end
 
 function task.Execute()
