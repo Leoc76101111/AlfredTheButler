@@ -65,6 +65,7 @@ gui.elements = {
     stash_toggle = create_checkbox(false, 'stash_toggle'),
     inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. '_inventory_limit_slider')),
     timeout_slider = slider_int:new(10, 600, 120, get_hash(plugin_label .. '_timeout_slider')),
+    allow_external_toggle = create_checkbox(false, 'allow_external_toggle'),
 
     item_tree = tree_node:new(1),
     item_legendary_or_lower = combo_box:new(1, get_hash(plugin_label .. '_item_legendary_or_lower')),
@@ -98,6 +99,7 @@ gui.elements = {
     repair_toggle = create_checkbox(false, 'repair_toggle'),
     seperator = combo_box:new(0, get_hash(plugin_label .. '_seperator')),
 
+    explorer_tree = tree_node:new(1),
     explorer_path_angle_slider = slider_int:new(0, 360, 10, get_hash(plugin_label .. '_explorer_path_angle_slider')),
     explorer_aggressive_movement_toggle = create_checkbox(true, 'explorer_aggressive_movement_toggle'),
 }
@@ -117,11 +119,15 @@ function gui.render()
         gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now if in cerrigar')
         gui.elements.dump_keybind:render('Dump items info', 'Dump all item info to log')
     end
-    gui.elements.explorer_path_angle_slider:render("Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
-    gui.elements.explorer_aggressive_movement_toggle:render("Aggresive movement","move directly to the target")
     -- gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
     gui.elements.inventory_limit_slider:render('Inventory Limit','minimum number if items before stash/salvage/sell')
     gui.elements.timeout_slider:render('Timeout','no. seconds to timeout alfred when failed to complete tasks')
+    gui.elements.allow_external_toggle:render('allow external','allow other plugins to call alfred')
+    if gui.elements.explorer_tree:push('Explorer settings') then
+        gui.elements.explorer_path_angle_slider:render("Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
+        gui.elements.explorer_aggressive_movement_toggle:render("Aggresive movement","move directly to the target")
+        gui.elements.explorer_tree:pop()
+    end
     if gui.elements.item_tree:push('Non-Ancestral') then
         gui.elements.item_legendary_or_lower:render('non-unique items', gui.item_options, 'Select what to do with non-ancestral non-unique legendary items')
         gui.elements.item_unique:render('unique items', gui.item_options, 'Select what to do with non-ancestral unique items')
