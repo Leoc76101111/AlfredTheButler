@@ -7,7 +7,7 @@ local gui = require 'gui'
 local explorerlite = require 'core.explorerlite'
 
 -- actions need to be overwritten
-local extend = {
+local extension = {
     get_npc = function () end,
     move = function () end,
     interact = function () end,
@@ -47,13 +47,13 @@ function base.new_task()
         reset_state = nil
     }
 
-    task.extend = extend
+    task.extension = extension
     task.status_enum = status_enum
     task.shouldExecute = shouldExecute
 
     function task.Execute()
         local current_time = get_time_since_inject()
-        local npc = task.extend.get_npc()
+        local npc = task.extension.get_npc()
         local npc_bugged = false
         local player_stuck = false
         local player_position = get_player_position()
@@ -82,68 +82,68 @@ function base.new_task()
             task.last_interaction = current_time
             task.retry = task.retry + 1
             task.reset_state = task.status_enum['MOVING']
-            task.extend.reset()
+            task.extension.reset()
             task.last_stuck_location = player_position
         elseif task.status == task.status_enum['RESETTING'] and
             task.last_interaction + task.interaction_timeout > current_time
         then
             task.status = task.status_enum['RESETTING']
-            task.extend.reset()
+            task.extension.reset()
         elseif (not npc or (not npc_bugged and utils.distance_to(npc) >= 2)) and
             task.last_interaction + task.interaction_timeout < current_time
         then
             task.status = task.status_enum['MOVING']
             task.last_interaction = current_time
             task.last_stuck_location = nil
-            task.extend.move()
+            task.extension.move()
         elseif task.status == task.status_enum['MOVING'] and
             (not npc or (not npc_bugged and utils.distance_to(npc) >= 2)) and
             task.last_interaction + task.interaction_timeout > current_time
         then
             task.status = task.status_enum['MOVING']
-            task.extend.move()
+            task.extension.move()
         elseif (npc_bugged or (npc and utils.distance_to(npc) < 2)) and
             task.status == task.status_enum['MOVING']
         then
             task.status = task.status_enum['INTERACTING']
             task.last_interaction = current_time
-            task.extend.interact()
+            task.extension.interact()
         elseif task.status == task.status_enum['INTERACTING'] and
             task.last_interaction + task.interaction_timeout > current_time
         then
             task.status = task.status_enum['INTERACTING']
-            task.extend.interact()
+            task.extension.interact()
         elseif task.status == task.status_enum['INTERACTING'] and
             task.last_interaction + task.interaction_timeout < current_time
         then
             task.status = task.status_enum['EXECUTE']
             task.last_interaction = current_time
-            task.extend.execute()
+            task.extension.execute()
         elseif task.status == task.status_enum['EXECUTE'] and
             task.last_interaction + task.interaction_timeout > current_time and
-            not task.extend.is_done()
+            not task.extension.is_done()
         then
             task.status = task.status_enum['EXECUTE']
-            task.extend.execute()
+            task.extension.execute()
         elseif task.status == task.status_enum['EXECUTE'] and
             task.last_interaction + task.interaction_timeout < current_time and
-            not task.extend.is_done() and
+            not task.extension.is_done() and
             task.retry < task.max_retries
         then
             task.status = task.status_enum['RESETTING']
             task.last_interaction = current_time
             task.retry = task.retry + 1
             task.reset_state = task.status_enum['EXECUTE']
-            task.extend.reset()
-        elseif task.extend.is_done() then
+            task.extension.reset()
+        elseif task.extension.is_done() then
             task.status = task.status_enum['IDLE']
             task.retry = 0
             task.last_interaction = 0
-            task.extend.done()
+            task.extension.done()
         else
             task.status  = task.status_enum['FAILED']
             task.retry = 0
-            task.extend.failed()
+            task.extension.failed()
         end
     end
 
