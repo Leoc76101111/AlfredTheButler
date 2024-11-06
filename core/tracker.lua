@@ -15,6 +15,7 @@ local tracker = {
     salvage_done                       = false,
     sell_failed                        = false,
     sell_done                          = false,
+    all_task_done                      = false,
     external_caller                    = nil,
     external_trigger                   = true,
     external_trigger_callback          = nil,
@@ -22,6 +23,16 @@ local tracker = {
     external_trigger_teleport          = false,
     external_trigger_teleport_callback = nil
 }
+
+function tracker.reset_all_task()
+    tracker.last_reset = 0
+    tracker.trigger_tasks = true
+    tracker.salvage_failed = false
+    tracker.sell_failed = false
+    tracker.salvage_done = false
+    tracker.sell_done = false
+    tracker.all_task_done = false
+end
 
 local external_tracker = {
     get_status = function ()
@@ -39,6 +50,7 @@ local external_tracker = {
             salvage_done    = tracker.salvage_done,
             sell_failed     = tracker.sell_failed,
             sell_done       = tracker.sell_done,
+            all_task_done   = tracker.all_task_done,
         }
     end,
     pause = function (caller)
