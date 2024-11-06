@@ -1,8 +1,8 @@
 local plugin_label = 'alfred_the_butler'
+
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
-local gui = require 'gui'
 
 local status_enum = {
     IDLE = 'Idle',
@@ -32,7 +32,7 @@ function task.shouldExecute()
         task_done = true
         should_execute = true
     end
-    
+
     if task_done then
         tracker.trigger_tasks = false
         if settings.allow_external and tracker.external_trigger then
@@ -51,6 +51,7 @@ function task.shouldExecute()
             -- end
         end
     end
+
     return should_execute
 end
 
@@ -59,6 +60,7 @@ function task.Execute()
     if not local_player then
         return
     end
+
     local item_count = tracker.salvage_count + tracker.sell_count
     local current_time = get_time_since_inject()
     if settings.allow_external and tracker.external_pause then

@@ -1,3 +1,5 @@
+local plugin_label = 'alfred_the_butler'
+
 local gui = require 'gui'
 local utils = require 'core.utils'
 local affix_types = utils.get_item_affixes()
@@ -75,5 +77,6 @@ function settings:update_settings()
         end
     end
 end
+
 utils.settings = settings
 return settings

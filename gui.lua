@@ -1,4 +1,5 @@
 local plugin_label = 'alfred_the_butler'
+
 local utils = require 'core.utils'
 local gui = {}
 
@@ -7,21 +8,24 @@ local affix_types = utils.get_item_affixes()
 local function create_checkbox(value, key)
     return checkbox:new(value, get_hash(plugin_label .. '_' .. key))
 end
+
 local function add_affix_tree(name)
     local tree_name = tostring(name) .. '_affix_tree'
     gui.elements[tree_name] = tree_node:new(2)
 end
+
 local function add_affix_checkbox(name,data)
     for _,affix in pairs(data) do
         local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
         gui.elements[checkbox_name] = create_checkbox(false, checkbox_name)
     end
-    return
 end
+
 local function add_affix_search(name)
     local search_name = tostring(name) .. '_affix_search'
     gui.elements[search_name] = input_text:new(get_hash(plugin_label .. '_search_input'))
 end
+
 local function render_affix_checkbox(name,data)
     local search_name = tostring(name) .. '_affix_search'
     for _,affix in pairs(data) do
@@ -41,7 +45,6 @@ local function render_affix_checkbox(name,data)
             end
         end
     end
-    return
 end
 
 gui.stash_options = {
@@ -58,10 +61,12 @@ gui.item_options = {
 gui.elements = {
     main_tree = tree_node:new(0),
     main_toggle = create_checkbox(false, 'main_toggle'),
+
     use_keybind = create_checkbox(false, 'use_keybind'),
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_keybind_toggle' )),
     manual_keybind = keybind:new(0x0B,false,get_hash(plugin_label .. '_manual_keybind')),
     dump_keybind = keybind:new(0x0c,false,get_hash(plugin_label .. '_dump_keybind')),
+
     stash_toggle = create_checkbox(false, 'stash_toggle'),
     inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. '_inventory_limit_slider')),
     timeout_slider = slider_int:new(10, 600, 120, get_hash(plugin_label .. '_timeout_slider')),
@@ -97,11 +102,12 @@ gui.elements = {
 
     repair_tree = tree_node:new(1),
     repair_toggle = create_checkbox(false, 'repair_toggle'),
-    seperator = combo_box:new(0, get_hash(plugin_label .. '_seperator')),
 
     explorer_tree = tree_node:new(1),
     explorer_path_angle_slider = slider_int:new(0, 360, 10, get_hash(plugin_label .. '_explorer_path_angle_slider')),
     explorer_aggressive_movement_toggle = create_checkbox(true, 'explorer_aggressive_movement_toggle'),
+
+    seperator = combo_box:new(0, get_hash(plugin_label .. '_seperator')),
 }
 
 for _,affix_type in pairs(affix_types) do
@@ -165,7 +171,6 @@ function gui.render()
                 end
             end
         end
-
         gui.elements.ancestral_item_tree:pop()
     end
     -- if gui.elements.restock_tree:push('Restock') then

@@ -1,6 +1,8 @@
 local plugin_label = 'alfred_the_butler'
+
 local json = require 'core.json'
 local tracker = require 'core.tracker'
+
 local utils    = {
     settings = {},
     last_dump_time = 0,
@@ -58,10 +60,29 @@ utils.mythics = {
     ['2059799'] = 'Heir of Perdition',
     ['2059813'] = 'Shattered Vow',
 }
+
 local function get_plugin_root_path()
     local plugin_root = string.gmatch(package.path, '.*?\\?')()
     plugin_root = plugin_root:gsub('?','')
     return plugin_root
+end
+local function get_export_filename(is_backup)
+    local filename = get_plugin_root_path()
+    filename = filename .. 'data\\export'
+    if is_backup then
+        filename = filename .. '\\alfred-backup-'
+    else
+        filename = filename .. '\\alfred-'
+    end        
+    filename = filename .. os.time(os.date('!*t'))
+    filename = filename .. '.json'
+    return filename
+end
+local function get_import_full_filename(name)
+    local filename = get_plugin_root_path()
+    filename = filename .. 'data\\import\\'
+    filename = filename .. name
+    return filename
 end
 
 local function get_affixes_and_aspect(name)
@@ -88,26 +109,15 @@ local function get_affixes_and_aspect(name)
     end
     item_affix[#item_affix+1] = affix_group
 end
-
-
-local function get_export_filename(is_backup)
-    local filename = get_plugin_root_path()
-    filename = filename .. 'data\\export'
-    if is_backup then
-        filename = filename .. '\\alfred-backup-'
-    else
-        filename = filename .. '\\alfred-'
-    end        
-    filename = filename .. os.time(os.date('!*t'))
-    filename = filename .. '.json'
-    return filename
+function utils.get_item_affixes()
+    return item_affix
+end
+function utils.get_item_aspects()
+    return item_aspect
 end
 
-local function get_import_full_filename(name)
-    local filename = get_plugin_root_path()
-    filename = filename .. 'data\\import\\'
-    filename = filename .. name
-    return filename
+function utils.log(msg)
+    console.print(plugin_label .. ': ' .. tostring(msg))
 end
 
 function utils.get_character_class()
@@ -128,77 +138,55 @@ function utils.get_character_class()
     end
 end
 
-function utils.get_item_affixes()
-    return item_affix
+function utils.player_in_zone(zname)
+    return get_current_world():get_current_zone_name() == zname
 end
 
-function utils.get_item_aspects()
-    return item_aspect
-end
-
-function utils.import_filters(elements)
-    local filename = get_import_full_filename(elements.affix_import_name:get())
-    local file, err = io.open(filename,'r')
-    if not file then
-        utils.log('error opening file' .. filename)
-        return
-    end
-    io.input(file)
-    local data = io.read()
-    if pcall(function () return json.decode(data) end) then
-        local new_affix = json.decode(data)
-        local new_affix_set = {}
-        for _,affix in pairs(new_affix) do
-            new_affix_set[affix] = true
-        end
-        -- make a backup
-        utils.export_filters(elements,true)
-
-        -- clear and set new affix
-        for _,affix_type in pairs(item_affix) do
-            for _,affix in pairs(affix_type.data) do
-                local checkbox_name = tostring(affix_type.name) .. '_affix_' .. tostring(affix.sno_id)
-                if new_affix_set[checkbox_name] then
-                    elements[checkbox_name]:set(true)
-                else
-                    elements[checkbox_name]:set(false)
-                end
-            end
-        end
-    else
-        utils.log('error in import file' .. filename)
-    end
-    io.close(file)
-    utils.log('export ' .. filename .. ' done')
-    return
-end
-
-function utils.export_filters(elements,is_backup)
-    local selected_affix = {}
-    for _,affix_type in pairs(item_affix) do
-        for _,affix in pairs(affix_type.data) do
-            local checkbox_name = tostring(affix_type.name) .. '_affix_' .. tostring(affix.sno_id)
-            if elements[checkbox_name]:get() then
-                selected_affix[#selected_affix+1] = checkbox_name
-            end
+function utils.get_npc(name)
+    local actors = actors_manager:get_all_actors()
+    for _, actor in pairs(actors) do
+        local actor_name = actor:get_skin_name()
+        if actor_name == name then
+            return actor
         end
     end
-    local filename = get_export_filename(is_backup)
-    local file, err = io.open(filename,'w')
-    if not file then
-        utils.log('error opening file' .. filename)
-    end
-    io.output(file)
-    io.write(json.encode(selected_affix))
-    io.close(file)
-    
-    utils.log('export ' .. filename .. ' done')
-    return
+    return nil
 end
+function utils.get_blacksmith()
+    return utils.get_npc(utils.npc_enum['BLACKSMITH'])
+end
+function utils.get_vendor(use_alt)
+    if use_alt then 
+        return utils.get_npc(utils.npc_enum['WEAPON'])
+    end
+    return utils.get_npc(utils.npc_enum['SILVERSMITH'])
+end
+function utils.get_npc_location(name)
+    return utils.npc_loc_enum[name]
+end
+function utils.get_blacksmith_location()
+    return utils.get_npc_location('BLACKSMITH')
+end
+function utils.get_vendor_location(use_alt)
+    if use_alt then 
+        return utils.get_npc_location('WEAPON')
+    end
+    return utils.get_npc_location('SILVERSMITH')
+end
+function utils.distance_to(target)
+    local player_pos = get_player_position()
+    local target_pos
 
-function utils.log(msg)
-    console.print(plugin_label .. ': ' .. tostring(msg))
-    return
+    if target.get_position then
+        target_pos = target:get_position()
+    elseif target.x then
+        target_pos = target
+    end
+
+    return player_pos:dist_to(target_pos)
+end
+function utils.is_same_position(pos1, pos2)
+    return pos1:x() == pos2:x() and pos1:y() == pos2:y() and pos1:z() == pos2:z()
 end
 
 function utils.get_greater_affix_count(display_name)
@@ -208,7 +196,6 @@ function utils.get_greater_affix_count(display_name)
     end
     return count
 end
-
 function utils.is_max_aspect(affix)
     local affix_id = affix.affix_name_hash
     if item_aspect[affix_id] and affix:get_roll() == affix:get_roll_max() then 
@@ -216,7 +203,6 @@ function utils.is_max_aspect(affix)
     end
     return false
 end
-
 function utils.is_correct_affix(item_type,affix)
     local affix_id = affix.affix_name_hash
     if utils.settings.ancestral_affix[item_type][affix_id] then
@@ -224,7 +210,6 @@ function utils.is_correct_affix(item_type,affix)
     end
     return false
 end
-
 function utils.get_item_type(item)
     local name = string.lower(item:get_name())
     local offhand = {
@@ -254,9 +239,8 @@ function utils.get_item_type(item)
             return "weapon"
         end
     end
-    retun "unknown"
+    return "unknown"
 end
-
 function utils.is_salvage_or_sell(item,action)
     if item:is_locked() or utils.mythics[item_id] ~= nil then
         return false
@@ -323,7 +307,6 @@ function utils.is_salvage_or_sell(item,action)
     end
     return false
 end
-
 function utils.update_tracker_count()
     local counter = 0
     local salvage_counter = 0
@@ -353,9 +336,68 @@ function utils.update_tracker_count()
     tracker.inventory_limit = utils.settings.inventory_limit
 end
 
+function utils.import_filters(elements)
+    local filename = get_import_full_filename(elements.affix_import_name:get())
+    local file, err = io.open(filename,'r')
+    if not file then
+        utils.log('error opening file' .. filename)
+        return
+    end
+    io.input(file)
+    local data = io.read()
+    if pcall(function () return json.decode(data) end) then
+        local new_affix = json.decode(data)
+        local new_affix_set = {}
+        for _,affix in pairs(new_affix) do
+            new_affix_set[affix] = true
+        end
+        -- make a backup
+        utils.export_filters(elements,true)
+
+        -- clear and set new affix
+        for _,affix_type in pairs(item_affix) do
+            for _,affix in pairs(affix_type.data) do
+                local checkbox_name = tostring(affix_type.name) .. '_affix_' .. tostring(affix.sno_id)
+                if new_affix_set[checkbox_name] then
+                    elements[checkbox_name]:set(true)
+                else
+                    elements[checkbox_name]:set(false)
+                end
+            end
+        end
+    else
+        utils.log('error in import file' .. filename)
+    end
+    io.close(file)
+    utils.log('export ' .. filename .. ' done')
+end
+function utils.export_filters(elements,is_backup)
+    local selected_affix = {}
+    for _,affix_type in pairs(item_affix) do
+        for _,affix in pairs(affix_type.data) do
+            local checkbox_name = tostring(affix_type.name) .. '_affix_' .. tostring(affix.sno_id)
+            if elements[checkbox_name]:get() then
+                selected_affix[#selected_affix+1] = checkbox_name
+            end
+        end
+    end
+    local filename = get_export_filename(is_backup)
+    local file, err = io.open(filename,'w')
+    if not file then
+        utils.log('error opening file' .. filename)
+    end
+    io.output(file)
+    io.write(json.encode(selected_affix))
+    io.close(file)
+
+    utils.log('export ' .. filename .. ' done')
+end
 function utils.export_actors()
+    -- debounce second
+    local current_time = get_time_since_inject()
+    if utils.last_dump_time + 1 >= current_time then return end
+
     local actors = actors_manager:get_all_actors()
-    local player_pos = get_player_position()
     local data = {}
     for _, actor in pairs(actors) do
         local name = actor:get_skin_name()
@@ -379,12 +421,9 @@ function utils.export_actors()
     io.output(file)
     io.write(json.encode(data))
     io.close(file)
-
     utils.last_dump_time = current_time
-    return
 end
-
-function utils.dump_inventory_info()
+function utils.export_inventory_info()
     -- debounce second
     local current_time = get_time_since_inject()
     if utils.last_dump_time + 1 >= current_time then return end
@@ -421,68 +460,19 @@ function utils.dump_inventory_info()
         end
         items_info[#items_info+1] = item_info
     end
-    utils.log(json.encode(items_info))
-    -- can write to file too
+    local filename = get_plugin_root_path()
+    filename = filename .. 'data\\export'
+    filename = filename .. '\\items-'
+    filename = filename .. os.time(os.date('!*t'))
+    filename = filename .. '.json'
+    local file, err = io.open(filename,'w')
+    if not file then
+        utils.log('error opening file' .. filename)
+    end
+    io.output(file)
+    io.write(json.encode(items_info))
+    io.close(file)
     utils.last_dump_time = current_time
-    return
-end
-
-function utils.player_in_zone(zname)
-    return get_current_world():get_current_zone_name() == zname
-end
-
-function utils.get_npc(name)
-    local actors = actors_manager:get_all_actors()
-    for _, actor in pairs(actors) do
-        local actor_name = actor:get_skin_name()
-        if actor_name == name then
-            return actor
-        end
-    end
-    return nil
-end
-
-function utils.get_blacksmith()
-    return utils.get_npc(utils.npc_enum['BLACKSMITH'])
-end
-
-function utils.get_vendor(use_alt)
-    if use_alt then 
-        return utils.get_npc(utils.npc_enum['WEAPON'])
-    end
-    return utils.get_npc(utils.npc_enum['SILVERSMITH'])
-end
-
-function utils.get_npc_location(name)
-    return utils.npc_loc_enum[name]
-end
-
-function utils.get_blacksmith_location()
-    return utils.get_npc_location('BLACKSMITH')
-end
-
-function utils.get_vendor_location(use_alt)
-    if use_alt then 
-        return utils.get_npc_location('WEAPON')
-    end
-    return utils.get_npc_location('SILVERSMITH')
-end
-
-function utils.distance_to(target)
-    local player_pos = get_player_position()
-    local target_pos
-
-    if target.get_position then
-        target_pos = target:get_position()
-    elseif target.x then
-        target_pos = target
-    end
-
-    return player_pos:dist_to(target_pos)
-end
-
-function utils.is_same_position(pos1, pos2)
-    return pos1:x() == pos2:x() and pos1:y() == pos2:y() and pos1:z() == pos2:z()
 end
 
 for _,types in pairs(item_types) do

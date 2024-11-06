@@ -1,4 +1,5 @@
 local plugin_label = 'alfred_the_butler'
+
 local settings = require 'core.settings'
 local task_manager = {}
 local tasks = {}
@@ -8,11 +9,9 @@ local finished_time = 0
 function task_manager.set_finished_time(time)
     finished_time = time
 end
-
 function task_manager.get_finished_time()
     return finished_time
 end
-
 function task_manager.register_task(task)
     table.insert(tasks, task)
 end
@@ -23,7 +22,6 @@ function task_manager.execute_tasks()
     if current_core_time - last_call_time < 0.1 then
         return -- quick ej slide frames
     end
-
     last_call_time = current_core_time
 
     for _, task in ipairs(tasks) do
