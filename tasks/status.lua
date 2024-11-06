@@ -76,7 +76,7 @@ function task.Execute()
     --     tracker.sell_done 
     -- then
     --     -- teleport back
-    else if settings.allow_external and tracker.external_trigger then
+    elseif settings.allow_external and tracker.external_trigger then
         tracker.trigger_tasks = true
         tracker.salvage_done = false
         tracker.salvage_failed = false
