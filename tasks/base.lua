@@ -1,4 +1,5 @@
 local plugin_label = 'alfred_the_butler'
+
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
@@ -70,7 +71,6 @@ function base.new_task()
         then
             player_stuck = true
         end
-
         task.last_location = player_position
 
         if task.status == task.status_enum['MOVING'] and
@@ -146,6 +146,7 @@ function base.new_task()
             task.extend.failed()
         end
     end
+
     return task
 end
 

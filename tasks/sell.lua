@@ -1,13 +1,12 @@
 local plugin_label = 'alfred_the_butler'
+
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
-local gui = require 'gui'
 local explorerlite = require 'core.explorerlite'
 local base_task = require 'tasks.base'
 
 local task = base_task.new_task()
-local extend = {}
 local status_enum = {
     IDLE = 'Idle',
     EXECUTE = 'Selling',
@@ -17,21 +16,19 @@ local status_enum = {
     FAILED = 'Failed to sell'
 }
 
+local extend = {}
 function extend.get_npc()
     return utils.get_vendor(false)
 end
-
 function extend.move()
     local npc_location = utils.get_vendor_location(false)
     explorerlite:set_custom_target(npc_location)
     explorerlite:move_to_target()
 end
-
 function extend.interact()
     local npc = extend.get_npc()
     if npc then interact_vendor(npc) end
 end
-
 function extend.execute()
     local local_player = get_local_player()
     if not local_player then return end
@@ -42,7 +39,6 @@ function extend.execute()
         end
     end
 end
-
 function extend.reset()
     local local_player = get_local_player()
     if not local_player then return end
@@ -53,15 +49,12 @@ function extend.reset()
     explorerlite:set_custom_target(new_position)
     explorerlite:move_to_target()
 end
-
 function extend.is_done()
     return tracker.sell_count == 0
 end
-
 function extend.done()
     tracker.sell_done = true
 end
-
 function extend.failed()
     tracker.sell_failed = true
 end
@@ -82,6 +75,7 @@ task.shouldExecute = function ()
     then
         return true
     end
+
     return false
 end
 

@@ -1,13 +1,12 @@
 local plugin_label = 'alfred_the_butler'
+
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
-local gui = require 'gui'
 local explorerlite = require 'core.explorerlite'
 local base_task = require 'tasks.base'
 
 local task = base_task.new_task()
-local extend = {}
 local status_enum = {
     IDLE = 'Idle',
     EXECUTE = 'Salvaging',
@@ -17,21 +16,19 @@ local status_enum = {
     FAILED = 'Failed to salvage'
 }
 
+local extend = {}
 function extend.get_npc()
     return utils.get_blacksmith()
 end
-
 function extend.move()
     local npc_location = utils.get_blacksmith_location()
     explorerlite:set_custom_target(npc_location)
     explorerlite:move_to_target()
 end
-
 function extend.interact()
     local npc = extend.get_npc()
     if npc then interact_vendor(npc) end
 end
-
 function extend.execute()
     local local_player = get_local_player()
     if not local_player then return end
@@ -42,7 +39,6 @@ function extend.execute()
         end
     end
 end
-
 function extend.reset()
     local local_player = get_local_player()
     if not local_player then return end
@@ -53,15 +49,12 @@ function extend.reset()
     explorerlite:set_custom_target(new_position)
     explorerlite:move_to_target()
 end
-
 function extend.is_done()
     return tracker.salvage_count == 0
 end
-
 function extend.done()
     tracker.salvage_done = true
 end
-
 function extend.failed()
     tracker.salvage_failed = true
 end
@@ -69,7 +62,6 @@ end
 task.name = 'salvage'
 task.extend = extend
 task.status_enum = status_enum
-
 task.shouldExecute = function ()
     if tracker.trigger_tasks == false then
         task.retry = 0
