@@ -73,7 +73,7 @@ local function get_export_filename(is_backup)
         filename = filename .. '\\alfred-backup-'
     else
         filename = filename .. '\\alfred-'
-    end        
+    end
     filename = filename .. os.time(os.date('!*t'))
     filename = filename .. '.json'
     return filename
@@ -156,7 +156,7 @@ function utils.get_blacksmith()
     return utils.get_npc(utils.npc_enum['BLACKSMITH'])
 end
 function utils.get_vendor(use_alt)
-    if use_alt then 
+    if use_alt then
         return utils.get_npc(utils.npc_enum['WEAPON'])
     end
     return utils.get_npc(utils.npc_enum['SILVERSMITH'])
@@ -168,7 +168,7 @@ function utils.get_blacksmith_location()
     return utils.get_npc_location('BLACKSMITH')
 end
 function utils.get_vendor_location(use_alt)
-    if use_alt then 
+    if use_alt then
         return utils.get_npc_location('WEAPON')
     end
     return utils.get_npc_location('SILVERSMITH')
@@ -198,7 +198,7 @@ function utils.get_greater_affix_count(display_name)
 end
 function utils.is_max_aspect(affix)
     local affix_id = affix.affix_name_hash
-    if item_aspect[affix_id] and affix:get_roll() == affix:get_roll_max() then 
+    if item_aspect[affix_id] and affix:get_roll() == affix:get_roll_max() then
         return true
     end
     return false
@@ -242,13 +242,13 @@ function utils.get_item_type(item)
     return "unknown"
 end
 function utils.is_salvage_or_sell(item,action)
+    local item_id = item:get_sno_id()
     if item:is_locked() or utils.mythics[item_id] ~= nil then
         return false
     end
     local display_name = item:get_display_name()
     local ancestral_ga_count = utils.get_greater_affix_count(display_name)
-    
-    local item_id = item:get_sno_id()
+
     local is_unique = false
     if item:get_rarity() == 6 then
         is_unique = true
@@ -261,7 +261,7 @@ function utils.is_salvage_or_sell(item,action)
             return true
         elseif not is_unique and utils.settings.item_legendary_or_lower == action then
             return true
-        else 
+        else
             return false
         end
     end
@@ -295,7 +295,7 @@ function utils.is_salvage_or_sell(item,action)
             end
         end
     end
-    if (utils.settings.ancestral_filter and 
+    if (utils.settings.ancestral_filter and
         ancestral_affix_count < utils.settings.ancestral_affix_count) or
         ancestral_ga_count < utils.settings.ancestral_ga_count
     then
@@ -404,8 +404,8 @@ function utils.export_actors()
         local position = actor:get_position()
         data[#data+1] = {
             ['name'] = name,
-            ['x'] = position:x(), 
-            ['y'] = position:y(), 
+            ['x'] = position:x(),
+            ['y'] = position:y(),
             ['z'] = position:z()
         }
     end

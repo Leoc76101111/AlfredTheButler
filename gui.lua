@@ -33,10 +33,10 @@ local function render_affix_checkbox(name,data)
             if class == 'all' or class == utils.get_character_class() then
                 local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
                 local search_string = string.lower(gui.elements[search_name]:get())
-                if search_string ~= '' and 
-                    (string.lower(affix.name):match(search_string) or 
+                if search_string ~= '' and
+                    (string.lower(affix.name):match(search_string) or
                     string.lower(affix.description):match(search_string) or
-                    string.lower(affix.sno_id):match(search_string)) 
+                    string.lower(affix.sno_id):match(search_string))
                 then
                     gui.elements[checkbox_name]:render(affix.name, affix.description)
                 elseif gui.elements[checkbox_name]:get() then
