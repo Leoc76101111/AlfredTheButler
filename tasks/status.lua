@@ -59,7 +59,7 @@ function task.Execute()
     if not local_player then
         return
     end
-    local current_time = get_time_since_inject()
+
     local status = all_task_done()
     if status.complete then
         utils.reset_all_task()
@@ -75,8 +75,9 @@ function task.Execute()
         end
     end
 
-    if tracker.last_reset + settings.timeout < current_time and
-        ((settings.allow_external and tracker.external_trigger) or
+    if tracker.timeout then
+        task.status = status_enum['TIMEOUT']
+    elseif ((settings.allow_external and tracker.external_trigger) or
         tracker.inventory_full or tracker.manual_trigger)
     then
         tracker.manual_trigger = false
@@ -84,8 +85,6 @@ function task.Execute()
         task.status = status_enum['WAITING']
         -- -- uncomment if you want to collect item data before salvage/sell
         -- utils.export_inventory_info()
-    elseif tracker.last_reset + settings.timeout >= current_time then
-        task.status = status_enum['TIMEOUT']
     else
         task.status = status_enum['IDLE']
     end

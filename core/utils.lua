@@ -143,6 +143,7 @@ function utils.player_in_zone(zname)
 end
 function utils.reset_all_task()
     tracker.last_reset = 0
+    tracker.timeout = false
     tracker.salvage_failed = false
     tracker.sell_failed = false
     tracker.salvage_done = false

@@ -2,6 +2,7 @@ local plugin_label = 'alfred_the_butler'
 
 local tracker = {
     name                               = plugin_label,
+    timeout                            = false,
     inventory_full                     = false,
     inventory_limit                    = 0,
     inventory_hard_limit               = 33,
