@@ -21,7 +21,8 @@ local tracker = {
     external_trigger_callback          = nil,
     external_pause                     = false,
     external_trigger_teleport          = false,
-    external_trigger_teleport_callback = nil
+    external_trigger_teleport_callback = nil,
+    manual_trigger                     = false
 }
 
 return tracker

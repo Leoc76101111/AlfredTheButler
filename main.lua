@@ -18,7 +18,7 @@ local function main_pulse()
     -- not (settings.enabled and settings.get_keybind_state())
     if not local_player or not settings.enabled then
         return
-    elseif not settings.get_keybind_state() and not tracker.external_trigger then
+    elseif not settings.get_keybind_state() and not tracker.external_trigger and not tracker.manual_trigger then
         return
     end
     if orbwalker.get_orb_mode() ~= 3 then
@@ -36,6 +36,7 @@ local function render_pulse()
         gui.elements.manual_keybind:set(false)
         external.resume()
         utils.reset_all_task()
+        tracker.manual_trigger = true
     end
     if gui.elements.dump_keybind:get_state() == 1 then
         gui.elements.dump_keybind:set(false)
