@@ -118,12 +118,14 @@ function base.new_task()
             task.last_interaction = current_time
             task.extension.interact()
         elseif task.status == (status_prefix .. task.status_enum['INTERACTING']) and
-            task.last_interaction + task.interaction_timeout > current_time
+            task.last_interaction + task.interaction_timeout > current_time and
+            not loot_manager:is_in_vendor_screen()
         then
             task.status = status_prefix .. task.status_enum['INTERACTING']
             task.extension.interact()
         elseif task.status == (status_prefix .. task.status_enum['INTERACTING']) and
-            task.last_interaction + task.interaction_timeout < current_time
+            (loot_manager:is_in_vendor_screen() or
+            task.last_interaction + task.interaction_timeout < current_time)
         then
             task.status = status_prefix .. task.status_enum['EXECUTE']
             task.last_interaction = current_time
