@@ -43,20 +43,26 @@ local function render_pulse()
     end
 
     local current_task = task_manager.get_current_task()
+    local status = ''
     if tracker.external_caller and tracker.external_pause then
-        graphics.text_2d('Alfred Task: Paused by ' .. tracker.external_caller, vec2:new(8, 50), 20, color_white(255))
+        status = 'Paused by ' .. tracker.external_caller
     elseif not settings.get_keybind_state() and not tracker.external_caller then
-        graphics.text_2d('Alfred Task: Paused', vec2:new(8, 50), 20, color_white(255))
+        status = 'Paused'
     elseif current_task then
-        graphics.text_2d('Alfred Task: ' .. current_task.status, vec2:new(8, 50), 20, color_white(255))
+        status = current_task.status
     else
-        graphics.text_2d('Alfred Task: Unknown', vec2:new(8, 50), 20, color_white(255))
+        status = 'Unknown' .. current_task.status
     end
-    graphics.text_2d('Limit      : ' .. tracker.inventory_limit , vec2:new(8, 70), 20, color_white(255))
-    graphics.text_2d('Inventory  : ' .. tracker.inventory_count , vec2:new(8, 90), 20, color_white(255))
-    graphics.text_2d('Keep       : ' .. tracker.stash_count, vec2:new(8, 110), 20, color_white(255))
-    graphics.text_2d('Salvage    : ' .. tracker.salvage_count, vec2:new(8, 130), 20, color_white(255))
-    graphics.text_2d('Sell       : ' .. tracker.sell_count, vec2:new(8, 150), 20, color_white(255))
+    local keybind_status = 'Off'
+    if settings.get_keybind_state() then keybind_status = 'On' end
+
+    graphics.text_2d('Alfred Task : ' .. status, vec2:new(8, 50), 20, color_white(255))
+    graphics.text_2d('Keybind     : ' .. keybind_status , vec2:new(8, 70), 20, color_white(255))
+    graphics.text_2d('Limit       : ' .. tracker.inventory_limit , vec2:new(8, 90), 20, color_white(255))
+    graphics.text_2d('Inventory   : ' .. tracker.inventory_count , vec2:new(8, 110), 20, color_white(255))
+    graphics.text_2d('Keep        : ' .. tracker.stash_count, vec2:new(8, 130), 20, color_white(255))
+    graphics.text_2d('Salvage     : ' .. tracker.salvage_count, vec2:new(8, 150), 20, color_white(255))
+    graphics.text_2d('Sell        : ' .. tracker.sell_count, vec2:new(8, 170), 20, color_white(255))
 
 end
 
