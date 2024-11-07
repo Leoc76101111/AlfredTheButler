@@ -40,6 +40,8 @@ function task.shouldExecute()
         should_execute = true
     elseif settings.allow_external and tracker.external_pause then
         should_execute = true
+    elseif tracker.manual_trigger then
+        should_execute = true
     elseif not tracker.trigger_tasks then
         should_execute = true
     elseif tracker.trigger_tasks and status.failed then
@@ -61,6 +63,7 @@ function task.Execute()
     local status = all_task_done()
     if status.complete then
         utils.reset_all_task()
+        tracker.manual_trigger = false
         tracker.trigger_tasks = false
         tracker.all_task_done = true
         if settings.allow_external and tracker.external_trigger then
@@ -73,7 +76,7 @@ function task.Execute()
         end
     end
 
-    if ((settings.allow_external and tracker.external_trigger) or tracker.inventory_full)
+    if ((settings.allow_external and tracker.external_trigger) or tracker.inventory_full or tracker.manual_trigger)
         and tracker.last_reset + settings.timeout < current_time
     then
         tracker.trigger_tasks = true
