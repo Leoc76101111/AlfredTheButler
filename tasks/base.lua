@@ -57,6 +57,10 @@ function base.new_task()
         local npc_bugged = false
         local player_stuck = false
         local player_position = get_player_position()
+        local status_prefix = ""
+        if tracker.external_caller then
+            status_prefix = "(" .. tostring(tracker.external_caller) .. ") "
+        end
 
         if npc then
             local npc_pos = npc:get_position()
@@ -66,82 +70,82 @@ function base.new_task()
         end
 
         if task.last_location ~= nil and
-            task.status == task.status_enum['MOVING'] and
+            task.status == (status_prefix .. task.status_enum['MOVING']) and
             utils.is_same_position(task.last_location,player_position)
         then
             player_stuck = true
         end
         task.last_location = player_position
 
-        if task.status == task.status_enum['MOVING'] and
+        if task.extension.is_done() then
+            task.status = status_prefix .. task.status_enum['IDLE']
+            task.retry = 0
+            task.last_interaction = 0
+            task.extension.done()
+        elseif task.status == (status_prefix .. task.status_enum['MOVING']) and
             player_stuck and
             task.last_stuck_location == nil and
             task.last_interaction + task.interaction_timeout < current_time
         then
-            task.status = task.status_enum['RESETTING']
+            task.status = status_prefix .. task.status_enum['RESETTING']
             task.last_interaction = current_time
             task.retry = task.retry + 1
             task.reset_state = task.status_enum['MOVING']
             task.extension.reset()
             task.last_stuck_location = player_position
-        elseif task.status == task.status_enum['RESETTING'] and
+        elseif task.status == (status_prefix .. task.status_enum['RESETTING']) and
             task.last_interaction + task.interaction_timeout > current_time
         then
-            task.status = task.status_enum['RESETTING']
+            task.status = status_prefix .. task.status_enum['RESETTING']
             task.extension.reset()
         elseif (not npc or (not npc_bugged and utils.distance_to(npc) >= 2)) and
             task.last_interaction + task.interaction_timeout < current_time
         then
-            task.status = task.status_enum['MOVING']
+            task.status = status_prefix .. task.status_enum['MOVING']
             task.last_interaction = current_time
             task.last_stuck_location = nil
             task.extension.move()
-        elseif task.status == task.status_enum['MOVING'] and
+        elseif task.status == (status_prefix .. task.status_enum['MOVING']) and
             (not npc or (not npc_bugged and utils.distance_to(npc) >= 2)) and
             task.last_interaction + task.interaction_timeout > current_time
         then
-            task.status = task.status_enum['MOVING']
+            task.status = status_prefix .. task.status_enum['MOVING']
             task.extension.move()
         elseif (npc_bugged or (npc and utils.distance_to(npc) < 2)) and
-            task.status == task.status_enum['MOVING']
+            task.status == (status_prefix .. task.status_enum['MOVING'])
         then
-            task.status = task.status_enum['INTERACTING']
+            task.status = status_prefix .. task.status_enum['INTERACTING']
             task.last_interaction = current_time
             task.extension.interact()
-        elseif task.status == task.status_enum['INTERACTING'] and
+        elseif task.status == (status_prefix .. task.status_enum['INTERACTING']) and
             task.last_interaction + task.interaction_timeout > current_time
         then
-            task.status = task.status_enum['INTERACTING']
+            task.status = status_prefix .. task.status_enum['INTERACTING']
             task.extension.interact()
-        elseif task.status == task.status_enum['INTERACTING'] and
+        elseif task.status == (status_prefix .. task.status_enum['INTERACTING']) and
             task.last_interaction + task.interaction_timeout < current_time
         then
-            task.status = task.status_enum['EXECUTE']
+            task.status = status_prefix .. task.status_enum['EXECUTE']
             task.last_interaction = current_time
             task.extension.execute()
-        elseif task.status == task.status_enum['EXECUTE'] and
+        elseif task.status == (status_prefix .. task.status_enum['EXECUTE']) and
             task.last_interaction + task.interaction_timeout > current_time and
             not task.extension.is_done()
         then
-            task.status = task.status_enum['EXECUTE']
+            task.status = status_prefix .. task.status_enum['EXECUTE']
             task.extension.execute()
-        elseif task.status == task.status_enum['EXECUTE'] and
+        elseif task.status == (status_prefix .. task.status_enum['EXECUTE']) and
             task.last_interaction + task.interaction_timeout < current_time and
             not task.extension.is_done() and
             task.retry < task.max_retries
         then
-            task.status = task.status_enum['RESETTING']
+            task.status = status_prefix .. task.status_enum['RESETTING']
             task.last_interaction = current_time
             task.retry = task.retry + 1
             task.reset_state = task.status_enum['EXECUTE']
             task.extension.reset()
-        elseif task.extension.is_done() then
-            task.status = task.status_enum['IDLE']
-            task.retry = 0
-            task.last_interaction = 0
-            task.extension.done()
         else
-            task.status  = task.status_enum['FAILED']
+            task.status  = status_prefix .. task.status_enum['FAILED']
             task.retry = 0
             task.extension.failed()
         end

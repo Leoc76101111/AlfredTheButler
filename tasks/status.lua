@@ -25,11 +25,11 @@ local function all_task_done()
     if (tracker.sell_done or tracker.sell_failed) and
         (tracker.salvage_done or tracker.salvage_failed)
     then
-        task.complete = true
+        status.complete = true
     end
 
     if tracker.sell_failed or tracker.salvage_failed then
-        task.failed = true
+        status.failed = true
     end
     return status
 end
@@ -40,6 +40,8 @@ function task.shouldExecute()
     if not utils.player_in_zone('Scos_Cerrigar') then
         should_execute = true
     elseif settings.allow_external and tracker.external_pause then
+        should_execute = true
+    elseif not tracker.trigger_tasks then
         should_execute = true
     elseif tracker.trigger_tasks and status.failed then
         tracker.last_reset = get_time_since_inject()
@@ -58,16 +60,8 @@ function task.shouldExecute()
                 pcall(tracker.external_trigger_callback)
                 tracker.external_trigger_callback = nil
             end
-            -- if not utils.player_in_zone('Scos_Cerrigar') then
-            --     tracker.external_trigger_teleport = false
-            --     if tracker.external_trigger_teleport_callback then
-            --         pcall(tracker.external_trigger_teleport_callback)
-            --         tracker.external_trigger_teleport_callback = nil
-            --     end
-            -- end
         end
     end
-
     return should_execute
 end
 
@@ -77,25 +71,11 @@ function task.Execute()
         return
     end
 
-    local item_count = tracker.salvage_count + tracker.sell_count
     local current_time = get_time_since_inject()
     if settings.allow_external and tracker.external_pause then
         task.status = status_enum['PAUSED'] .. tostring(tracker.external_caller)
-    -- elseif settings.allow_external and 
-    --     tracker.external_trigger_teleport and 
-    --     not utils.player_in_zone('Scos_Cerrigar') and
-    --     (not tracker.salvage_done or not tracker.sell_done) 
-    -- then
-    --     -- teleport
-    -- elseif settings.allow_external and
-    --     tracker.external_trigger_teleport and
-    --     not utils.player_in_zone('Scos_Cerrigar') and
-    --     tracker.salvage_done and
-    --     tracker.sell_done 
-    -- then
-    --     -- teleport back
-    elseif (settings.allow_external and tracker.external_trigger) or
-        (item_count >= tracker.inventory_limit and tracker.last_reset + settings.timeout < current_time)
+    elseif ((settings.allow_external and tracker.external_trigger) or tracker.inventory_full)
+        and tracker.last_reset + settings.timeout < current_time
     then
         task.status = status_enum['WAITING']
         tracker.reset_all_task()
