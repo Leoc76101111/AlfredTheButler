@@ -63,7 +63,6 @@ function task.Execute()
     local status = all_task_done()
     if status.complete then
         utils.reset_all_task()
-        tracker.manual_trigger = false
         tracker.trigger_tasks = false
         tracker.all_task_done = true
         if settings.allow_external and tracker.external_trigger then
@@ -76,9 +75,11 @@ function task.Execute()
         end
     end
 
-    if ((settings.allow_external and tracker.external_trigger) or tracker.inventory_full or tracker.manual_trigger)
-        and tracker.last_reset + settings.timeout < current_time
+    if tracker.last_reset + settings.timeout < current_time and
+        ((settings.allow_external and tracker.external_trigger) or
+        tracker.inventory_full or tracker.manual_trigger)
     then
+        tracker.manual_trigger = false
         tracker.trigger_tasks = true
         task.status = status_enum['WAITING']
         -- -- uncomment if you want to collect item data before salvage/sell
