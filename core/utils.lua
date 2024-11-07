@@ -141,6 +141,14 @@ end
 function utils.player_in_zone(zname)
     return get_current_world():get_current_zone_name() == zname
 end
+function utils.reset_all_task()
+    tracker.last_reset = 0
+    tracker.salvage_failed = false
+    tracker.sell_failed = false
+    tracker.salvage_done = false
+    tracker.sell_done = false
+    tracker.all_task_done = false
+end
 
 function utils.get_npc(name)
     local actors = actors_manager:get_all_actors()
@@ -198,8 +206,18 @@ function utils.get_greater_affix_count(display_name)
 end
 function utils.is_max_aspect(affix)
     local affix_id = affix.affix_name_hash
-    if item_aspect[affix_id] and affix:get_roll() == affix:get_roll_max() then
-        return true
+    if item_aspect[affix_id] then
+        -- simple direct comparison
+        if affix:get_roll() == affix:get_roll_max() then return true end
+
+        -- dealing with int value of max_roll
+        if affix:get_roll_max() == math.floor(affix:get_roll_max()) then
+            -- 0.5 for rounding instead of floor
+            return math.floor(affix:get_roll() + 0.5) >= affix:get_roll_max()
+        end
+
+        -- dealing with decimals up to 2 places
+        return math.floor((affix:get_roll() * 100) + 0.5) >= affix:get_roll_max() * 100
     end
     return false
 end
@@ -213,17 +231,20 @@ end
 function utils.get_item_type(item)
     local name = string.lower(item:get_name())
     local offhand = {
-        "focus",
-        "book",
-        "totem",
-        "shield"
+        'focus',
+        'book',
+        'totem',
+        'shield'
     }
     local weapon = {
-        "2h",
-        "1h",
-        "quarterstaff",
-        "glaive"
+        '2h',
+        '1h',
+        'quarterstaff',
+        'glaive'
     }
+    if name:match('cache') then
+        return 'cache'
+    end
     for _,types in pairs(item_types) do
         if name:match(types) then
             return types
@@ -231,21 +252,24 @@ function utils.get_item_type(item)
     end
     for _,types in pairs(offhand) do
         if name:match(types) then
-            return "offhand"
+            return 'offhand'
         end
     end
     for _,types in pairs(weapon) do
         if name:match(types) then
-            return "weapon"
+            return 'weapon'
         end
     end
-    return "unknown"
+    return 'unknown'
 end
 function utils.is_salvage_or_sell(item,action)
     local item_id = item:get_sno_id()
-    if item:is_locked() or utils.mythics[item_id] ~= nil then
-        return false
-    end
+    if item:is_locked() or utils.mythics[item_id] ~= nil then return false end
+
+    local item_type = utils.get_item_type(item)
+    if item_type == 'cache' then return false end
+    if item_type == 'unknown' then return false end
+
     local display_name = item:get_display_name()
     local ancestral_ga_count = utils.get_greater_affix_count(display_name)
 
@@ -273,7 +297,6 @@ function utils.is_salvage_or_sell(item,action)
     local item_affixes = item:get_affixes()
     local ancestral_affix_count = 0
     local ancestral_affix_ga_count = 0
-    local item_type = utils.get_item_type(item)
     for _,affix in pairs(item_affixes) do
         if utils.settings.ancestral_keep_max_aspect and utils.is_max_aspect(affix) then
             return false
@@ -429,9 +452,10 @@ function utils.export_actors()
     utils.last_dump_time = current_time
 end
 function utils.export_inventory_info()
-    -- debounce second
+    -- debounce 10 seconds
     local current_time = get_time_since_inject()
-    if utils.last_dump_time + 1 >= current_time then return end
+    if utils.last_dump_time + 10 >= current_time then return end
+    utils.last_dump_time = current_time
     local local_player = get_local_player()
     if not local_player then return end
     local items = local_player:get_inventory_items()
@@ -452,6 +476,7 @@ function utils.export_inventory_info()
                     item_info['aspect']['roll'] = affix:get_roll()
                     item_info['aspect']['max_roll'] = affix:get_roll_max()
                     item_info['aspect']['min_roll'] = affix:get_roll_min()
+                    item_info['aspect']['is_max'] = utils.is_max_aspect(affix)
                 else
                     item_info['affix'][#item_info['affix']+1] = {
                         ['id'] = affix_id,
@@ -477,7 +502,6 @@ function utils.export_inventory_info()
     io.output(file)
     io.write(json.encode(items_info))
     io.close(file)
-    utils.last_dump_time = current_time
 end
 
 for _,types in pairs(item_types) do

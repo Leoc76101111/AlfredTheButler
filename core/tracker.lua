@@ -17,21 +17,11 @@ local tracker = {
     sell_done                          = false,
     all_task_done                      = false,
     external_caller                    = nil,
-    external_trigger                   = true,
+    external_trigger                   = false,
     external_trigger_callback          = nil,
     external_pause                     = false,
     external_trigger_teleport          = false,
     external_trigger_teleport_callback = nil
 }
-
-function tracker.reset_all_task()
-    tracker.last_reset = 0
-    tracker.trigger_tasks = true
-    tracker.salvage_failed = false
-    tracker.sell_failed = false
-    tracker.salvage_done = false
-    tracker.sell_done = false
-    tracker.all_task_done = false
-end
 
 return tracker

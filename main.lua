@@ -35,7 +35,7 @@ local function render_pulse()
     if gui.elements.manual_keybind:get_state() == 1 then
         gui.elements.manual_keybind:set(false)
         external.resume()
-        tracker.reset_all_task()
+        utils.reset_all_task()
     end
     if gui.elements.dump_keybind:get_state() == 1 then
         gui.elements.dump_keybind:set(false)
@@ -43,7 +43,9 @@ local function render_pulse()
     end
 
     local current_task = task_manager.get_current_task()
-    if not settings.get_keybind_state() and not tracker.external_caller then
+    if tracker.external_caller and tracker.external_pause then
+        graphics.text_2d('Alfred Task: Paused by ' .. tracker.external_caller, vec2:new(8, 50), 20, color_white(255))
+    elseif not settings.get_keybind_state() and not tracker.external_caller then
         graphics.text_2d('Alfred Task: Paused', vec2:new(8, 50), 20, color_white(255))
     elseif current_task then
         graphics.text_2d('Alfred Task: ' .. current_task.status, vec2:new(8, 50), 20, color_white(255))

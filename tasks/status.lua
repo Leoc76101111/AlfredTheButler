@@ -7,8 +7,7 @@ local tracker = require 'core.tracker'
 local status_enum = {
     IDLE = 'Idle',
     WAITING = 'Waiting to be in Cerrigar',
-    TIMEOUT = 'Alfred is in timeout',
-    PAUSED = 'Paused by '
+    TIMEOUT = 'Alfred is in timeout'
 }
 
 local task = {
@@ -50,7 +49,18 @@ function task.shouldExecute()
         should_execute = true
     end
 
+    return should_execute
+end
+
+function task.Execute()
+    local local_player = get_local_player()
+    if not local_player then
+        return
+    end
+    local current_time = get_time_since_inject()
+    local status = all_task_done()
     if status.complete then
+        utils.reset_all_task()
         tracker.trigger_tasks = false
         tracker.all_task_done = true
         if settings.allow_external and tracker.external_trigger then
@@ -62,23 +72,14 @@ function task.shouldExecute()
             end
         end
     end
-    return should_execute
-end
 
-function task.Execute()
-    local local_player = get_local_player()
-    if not local_player then
-        return
-    end
-
-    local current_time = get_time_since_inject()
-    if settings.allow_external and tracker.external_pause then
-        task.status = status_enum['PAUSED'] .. tostring(tracker.external_caller)
-    elseif ((settings.allow_external and tracker.external_trigger) or tracker.inventory_full)
+    if ((settings.allow_external and tracker.external_trigger) or tracker.inventory_full)
         and tracker.last_reset + settings.timeout < current_time
     then
+        tracker.trigger_tasks = true
         task.status = status_enum['WAITING']
-        tracker.reset_all_task()
+        -- -- uncomment if you want to collect item data before salvage/sell
+        -- utils.export_inventory_info()
     elseif tracker.last_reset + settings.timeout >= current_time then
         task.status = status_enum['TIMEOUT']
     else
