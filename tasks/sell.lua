@@ -69,7 +69,6 @@ task.shouldExecute = function ()
     end
     if utils.player_in_zone('Scos_Cerrigar') and
         tracker.trigger_tasks and
-        tracker.sell_count > 0 and
         not tracker.sell_failed and
         not tracker.sell_done
     then

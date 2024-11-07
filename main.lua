@@ -5,6 +5,7 @@ local utils        = require 'core.utils'
 local settings     = require 'core.settings'
 local task_manager = require 'core.task_manager'
 local tracker      = require 'core.tracker'
+local external     = require 'core.external'
 
 local local_player
 
@@ -14,7 +15,12 @@ end
 
 local function main_pulse()
     settings:update_settings()
-    if not local_player or not (settings.enabled and settings.get_keybind_state()) then return end
+    -- not (settings.enabled and settings.get_keybind_state())
+    if not local_player or not settings.enabled then
+        return
+    elseif not settings.get_keybind_state() and not tracker.external_trigger then
+        return
+    end
     if orbwalker.get_orb_mode() ~= 3 then
         orbwalker.set_clear_toggle(true);
     end
@@ -28,14 +34,16 @@ local function render_pulse()
 
     if gui.elements.manual_keybind:get_state() == 1 then
         gui.elements.manual_keybind:set(false)
+        external.resume()
         tracker.reset_all_task()
     end
     if gui.elements.dump_keybind:get_state() == 1 then
+        gui.elements.dump_keybind:set(false)
         utils.export_inventory_info()
     end
 
     local current_task = task_manager.get_current_task()
-    if not settings.get_keybind_state() then
+    if not settings.get_keybind_state() and not tracker.external_caller then
         graphics.text_2d('Alfred Task: Paused', vec2:new(8, 50), 20, color_white(255))
     elseif current_task then
         graphics.text_2d('Alfred Task: ' .. current_task.status, vec2:new(8, 50), 20, color_white(255))
@@ -68,8 +76,8 @@ on_render_menu(function ()
 end)
 on_render(render_pulse)
 
--- incase for somet reason settings is not set for utils
+-- incase for some reason settings is not set for utils
 if not utils.settings then
     utils.settings = settings
 end
-PLUGIN_alfred_the_butler = tracker.external_tracker
+PLUGIN_alfred_the_butler = external
