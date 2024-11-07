@@ -57,9 +57,9 @@ function base.new_task()
         local npc_bugged = false
         local player_stuck = false
         local player_position = get_player_position()
-        local status_prefix = ""
+        local status_prefix = ''
         if tracker.external_caller then
-            status_prefix = "(" .. tostring(tracker.external_caller) .. ") "
+            status_prefix = '(' .. tostring(tracker.external_caller) .. ') '
         end
 
         if npc then

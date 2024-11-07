@@ -1,6 +1,7 @@
 local plugin_label = 'alfred_the_butler'
 
 local tracker = require 'core.tracker'
+local utils = require 'core.utils'
 
 local external = {
     get_status = function ()
@@ -35,7 +36,6 @@ local external = {
         if callback then
             tracker.external_trigger_callback = callback
         end
-        tracker.reset_all_task()
     end,
     trigger_tasks_with_teleport = function (caller,callback)
         -- not implemented
