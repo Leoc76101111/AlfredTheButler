@@ -374,11 +374,8 @@ function utils.update_tracker_count()
     tracker.sell_count = sell_counter
     tracker.stash_count = stash_counter
     tracker.inventory_limit = utils.settings.inventory_limit
-    if (tracker.sell_count + tracker.salvage_count) >= tracker.inventory_limit then
-        tracker.inventory_full = true
-    else
-        tracker.inventory_full = false
-    end
+    tracker.inventory_full = local_player:get_item_count() == 33 or
+        (tracker.sell_count + tracker.salvage_count) >= tracker.inventory_limit
 end
 
 function utils.import_filters(elements)
