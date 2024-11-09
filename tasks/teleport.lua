@@ -34,7 +34,7 @@ function extension.execute() end
 function extension.reset()
     local local_player = get_local_player()
     if not local_player then return end
-    local new_position = vec3:new(-1651.9208984375, -598.6142578125, 36.3134765625)
+    local new_position = vec3:new(-1661.931640625, -596.4111328125, 36.90625)
     explorerlite:set_custom_target(new_position)
     explorerlite:move_to_target()
 end

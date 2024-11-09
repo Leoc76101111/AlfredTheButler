@@ -30,7 +30,8 @@ local settings = {
     ancestral_affix = {},
     ancestral_unique = {},
     aggresive_movement = false,
-    path_angle = 10
+    path_angle = 10,
+    restock_items = {}
 
 }
 
@@ -85,6 +86,15 @@ function settings:update_settings()
         local checkbox_name = 'unique_affix_' .. tostring(affix.sno_id)
         if gui.elements[checkbox_name] and gui.elements[checkbox_name]:get() then
             settings.ancestral_unique[affix.sno_id] = true
+        end
+    end
+    settings.restock_items = {}
+    if gui.elements.restock_toggle:get() then
+        for sno_id,_ in pairs(utils.get_restock_items()) do
+            local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)
+            if gui.elements[slider_name]:get() > 0 then
+                settings.restock_items[#settings.restock_items+1] = {sno_id = sno_id, max = gui.elements[slider_name]:get()}
+            end
         end
     end
 end

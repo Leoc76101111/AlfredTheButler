@@ -23,6 +23,7 @@ local function all_task_done()
     -- add stash action when stash is available
     if (tracker.sell_done or tracker.sell_failed) and
         (tracker.stash_done or tracker.stash_failed) and
+        (tracker.restock_done or tracker.restock_failed) and
         (tracker.salvage_done or tracker.salvage_failed) and
         (tracker.repair_done or tracker.repair_failed) and
         (not tracker.teleport or tracker.teleport_done or tracker.teleport_failed)
@@ -30,10 +31,10 @@ local function all_task_done()
         status.complete = true
     end
 
+    -- dont check restock or repair
     if tracker.sell_failed or
         tracker.stash_failed or
         tracker.salvage_failed or
-        tracker.repair_failed or
         tracker.teleport_failed
     then
         status.failed = true
@@ -91,10 +92,10 @@ function task.Execute()
     elseif ((settings.allow_external and tracker.external_trigger) or
         tracker.inventory_full or tracker.manual_trigger)
     then
-        -- uncomment if you want to collect item data before salvage/sell
-        if task.status ~= status_enum['WAITING'] then
-            utils.export_inventory_info()
-        end
+        -- -- uncomment if you want to collect item data before salvage/sell
+        -- if task.status ~= status_enum['WAITING'] then
+        --     utils.export_inventory_info()
+        -- end
         tracker.trigger_tasks = true
         task.status = status_enum['WAITING']
     else

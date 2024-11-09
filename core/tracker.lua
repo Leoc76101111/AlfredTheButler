@@ -28,7 +28,10 @@ local tracker = {
     teleport                  = false,
     teleport_done             = false,
     teleport_failed           = false,
-    manual_trigger            = false
+    manual_trigger            = false,
+    restock_items             = {},
+    restock_failed            = false,
+    restock_done              = false
 }
 
 return tracker
