@@ -1,12 +1,13 @@
 local plugin_label = 'alfred_the_butler'
 
+local settings = require 'core.settings'
 local tracker = require 'core.tracker'
-local utils = require 'core.utils'
 
 local external = {
     get_status = function ()
         return {
             name            = plugin_label,
+            enabled         = settings.enabled,
             inventory_full  = tracker.inventory_full,
             inventory_limit = tracker.inventory_limit,
             inventor_count  = tracker.inventor_count,
@@ -38,7 +39,6 @@ local external = {
         end
     end,
     trigger_tasks_with_teleport = function (caller,callback)
-        -- not implemented
         tracker.external_caller = caller
         tracker.external_trigger = true
         tracker.teleport = true
