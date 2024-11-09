@@ -17,11 +17,10 @@ local item_types = {
     'ring',
     'weapon',
     'offhand',
-    'unique',
 }
 local item_affix = {}
 local item_aspect = {}
-
+local item_unique = {}
 utils.npc_enum = {
     BLACKSMITH = 'TWN_Scos_Cerrigar_Crafter_Blacksmith',
     SILVERSMITH = 'TWN_Scos_Cerrigar_Vendor_Silversmith',
@@ -101,19 +100,37 @@ local function get_affixes_and_aspect(name)
         data = {}
     }
     for _,affix in pairs(data) do
-        if affix.is_aspect == false then
-            affix_group.data[#affix_group.data+1] = affix
-        else
+        if affix.is_aspect then
             item_aspect[affix.sno_id] = affix.name
+        else
+            affix_group.data[#affix_group.data+1] = affix
         end
     end
     item_affix[#item_affix+1] = affix_group
+end
+local function get_uniques()
+    local filename = get_plugin_root_path()
+    filename = filename .. 'data\\affix\\unique.json'
+    local file, err = io.open(filename,'r')
+    if not file then
+        utils.log('error opening file' .. filename)
+        return
+    end
+    io.input(file)
+    local data = json.decode(io.read())
+    io.close(file)
+    for _,item in pairs(data) do
+        item_unique[#item_unique+1] = item
+    end
 end
 function utils.get_item_affixes()
     return item_affix
 end
 function utils.get_item_aspects()
     return item_aspect
+end
+function utils.get_unique_items()
+    return item_unique
 end
 
 function utils.log(msg)
@@ -230,7 +247,6 @@ function utils.is_max_aspect(affix)
                 -- 0.5 for rounding instead of floor
                 return math.floor(affix:get_roll() + 0.5) <= affix:get_roll_min()
             end
-
             -- dealing with decimals up to 2 places
             return math.floor((affix:get_roll() * 100) + 0.5) <= affix:get_roll_min() * 100
         end
@@ -238,12 +254,13 @@ function utils.is_max_aspect(affix)
     end
     return false
 end
+function utils.is_correct_unique(item)
+    local item_id = item:get_sno_id()
+    return utils.settings.ancestral_unique[item_id]
+end
 function utils.is_correct_affix(item_type,affix)
     local affix_id = affix.affix_name_hash
-    if utils.settings.ancestral_affix[item_type][affix_id] then
-        return true
-    end
-    return false
+    return utils.settings.ancestral_affix[item_type][affix_id]
 end
 function utils.get_item_type(item)
     local name = string.lower(item:get_name())
@@ -329,26 +346,27 @@ function utils.is_salvage_or_sell(item,action)
             if utils.is_correct_affix(item_type,affix) then
                 ancestral_affix_count = ancestral_affix_count + 1
                 -- to do matching ga, might need some data collection
-            elseif is_unique and utils.is_correct_affix('unique',affix) then
-                ancestral_affix_count = ancestral_affix_count + 1
-                -- to do matching ga, might need some data collection
             end
         end
     end
-    if (utils.settings.ancestral_filter and
+    if ((utils.settings.ancestral_filter and
         ancestral_affix_count < utils.settings.ancestral_affix_count) or
-        ancestral_ga_count < utils.settings.ancestral_ga_count
+        ancestral_ga_count < utils.settings.ancestral_ga_count) and
+        utils.settings.ancestral_item_legendary == action and
+        not is_unique
     then
-        if is_unique and utils.settings.ancestral_item_unique == action then
-            return true
-        elseif not is_unique and utils.settings.ancestral_item_legendary == action then
-            return true
-        end
+        return true
     end
+    if ((utils.settings.ancestral_filter and not utils.is_correct_unique(item)) or
+        ancestral_ga_count < utils.settings.ancestral_ga_count) and
+        utils.settings.ancestral_item_legendary == action
+    then
+        return true
+    end
+
     return false
 end
 function utils.update_tracker_count()
-    local counter = 0
     local salvage_counter = 0
     local sell_counter = 0
     local stash_counter = 0
@@ -357,7 +375,6 @@ function utils.update_tracker_count()
     local items = local_player:get_inventory_items()
     for _, item in pairs(items) do
         if item then
-            counter = counter + 1
             if utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE']) then
                 salvage_counter = salvage_counter + 1
             elseif utils.is_salvage_or_sell(item,utils.item_enum['SELL']) then
@@ -369,12 +386,12 @@ function utils.update_tracker_count()
             utils.log('no item??')
         end
     end
-    tracker.inventory_count = counter
+    tracker.inventory_count = local_player:get_item_count()
     tracker.salvage_count = salvage_counter
     tracker.sell_count = sell_counter
     tracker.stash_count = stash_counter
     tracker.inventory_limit = utils.settings.inventory_limit
-    tracker.inventory_full = local_player:get_item_count() == 33 or
+    tracker.inventory_full = tracker.inventory_count == 33 or
         (tracker.sell_count + tracker.salvage_count) >= tracker.inventory_limit
 end
 
@@ -521,5 +538,6 @@ end
 for _,types in pairs(item_types) do
     get_affixes_and_aspect(types)
 end
+get_uniques()
 
 return utils
