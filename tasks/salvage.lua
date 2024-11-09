@@ -62,6 +62,8 @@ end
 task.name = 'salvage'
 task.extension = extension
 task.status_enum = status_enum
+task.has_vendor_screen = true
+
 task.shouldExecute = function ()
     if tracker.trigger_tasks == false then
         task.retry = 0

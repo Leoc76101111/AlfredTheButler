@@ -37,14 +37,15 @@ local base = {}
 function base.new_task()
     local task = {
         name = 'base',
-        status = status_enum['IDLE'],
+        status = 'initiating',
         last_interaction = 0,
         retry = 0,
         interaction_timeout = 3,
         max_retries = 2,
         last_location = nil,
         last_stuck_location = nil,
-        reset_state = nil
+        reset_state = nil,
+        has_vendor_screen = false
     }
 
     task.extension = extension
@@ -119,12 +120,12 @@ function base.new_task()
             task.extension.interact()
         elseif task.status == (status_prefix .. task.status_enum['INTERACTING']) and
             task.last_interaction + task.interaction_timeout > current_time and
-            not loot_manager:is_in_vendor_screen()
+            not (task.has_vendor_screen and loot_manager:is_in_vendor_screen())
         then
             task.status = status_prefix .. task.status_enum['INTERACTING']
             task.extension.interact()
         elseif task.status == (status_prefix .. task.status_enum['INTERACTING']) and
-            (loot_manager:is_in_vendor_screen() or
+            ((task.has_vendor_screen and loot_manager:is_in_vendor_screen()) or
             task.last_interaction + task.interaction_timeout < current_time)
         then
             task.status = status_prefix .. task.status_enum['EXECUTE']
