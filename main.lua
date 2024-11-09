@@ -18,6 +18,8 @@ local function main_pulse()
     utils.update_tracker_count()
     tracker.timeout = tracker.last_reset + settings.timeout >= get_time_since_inject()
 
+    if not local_player or not settings.enabled then return end
+
     if gui.elements.manual_keybind:get_state() == 1 then
         gui.elements.manual_keybind:set(false)
         external.resume()
@@ -30,8 +32,7 @@ local function main_pulse()
         utils.export_inventory_info()
     end
 
-    if not local_player or not settings.enabled or
-        not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then
+    if not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then
         return
     end
 
