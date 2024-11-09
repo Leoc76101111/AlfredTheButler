@@ -18,10 +18,10 @@ local status_enum = {
 
 local extension = {}
 function extension.get_npc()
-    return utils.get_portal()
+    return utils.get_npc(utils.npc_enum['PORTAL'])
 end
 function extension.move()
-    local npc_location = utils.get_portal_location()
+    local npc_location = utils.get_npc_location('PORTAL')
     explorerlite:set_custom_target(npc_location)
     explorerlite:move_to_target()
 end
@@ -66,6 +66,7 @@ task.shouldExecute = function ()
         not tracker.teleport_failed and
         not tracker.teleport_done and
         (tracker.sell_done or tracker.sell_failed) and
+        (tracker.stash_done or tracker.stash_failed) and
         (tracker.salvage_done or tracker.salvage_failed) and
         (tracker.repair_done or tracker.repair_failed)
     then
@@ -78,6 +79,7 @@ task.Execute = function ()
     if tracker.teleport and
         not utils.player_in_zone('Scos_Cerrigar') and
         not (tracker.sell_done or tracker.sell_failed) and
+        not (tracker.stash_done or tracker.stash_failed) and
         not (tracker.salvage_done or tracker.salvage_failed) and
         not (tracker.repair_done or tracker.repair_failed)
     then

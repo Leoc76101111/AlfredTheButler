@@ -30,6 +30,7 @@ local function main_pulse()
     if gui.elements.dump_keybind:get_state() == 1 then
         gui.elements.dump_keybind:set(false)
         utils.export_inventory_info()
+        -- utils.export_actors()
     end
 
     if not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then
@@ -54,7 +55,7 @@ local function render_pulse()
     elseif current_task and tracker.external_caller then
         status = '(' .. tracker.external_caller .. ' - '
         status = status .. current_task.name .. ') '
-        status = status .. current_task.status:gsub('('..tracker.external_caller..')',''):gsub('()','')
+        status = status .. current_task.status:gsub('%('..tracker.external_caller..'%)','')
     elseif current_task then
         status = '(' .. current_task.name .. ') ' .. current_task.status
     else

@@ -9,19 +9,19 @@ local base_task = require 'tasks.base'
 local task = base_task.new_task()
 local status_enum = {
     IDLE = 'Idle',
-    EXECUTE = 'Salvaging',
-    MOVING = 'Moving to blacksmith',
-    INTERACTING = 'Interacting with blacksmith',
-    RESETTING = 'Re-trying salvage',
-    FAILED = 'Failed to salvage'
+    EXECUTE = 'Keeping item in stash',
+    MOVING = 'Moving to stash',
+    INTERACTING = 'Interacting with stash',
+    RESETTING = 'Re-trying stash',
+    FAILED = 'Failed to stash'
 }
 
 local extension = {}
 function extension.get_npc()
-    return utils.get_npc(utils.npc_enum['BLACKSMITH'])
+    return utils.get_npc(utils.npc_enum['STASH'])
 end
 function extension.move()
-    local npc_location = utils.get_npc_location('BLACKSMITH')
+    local npc_location = utils.get_npc_location('STASH')
     explorerlite:set_custom_target(npc_location)
     explorerlite:move_to_target()
 end
@@ -34,15 +34,17 @@ function extension.execute()
     if not local_player then return end
     local items = local_player:get_inventory_items()
     for _, item in pairs(items) do
-        if item and utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE']) then
-            loot_manager.salvage_specific_item(item)
+        if item and not utils.is_salvage_or_sell(item,utils.item_enum['SELL']) and
+            not utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE'])
+        then
+            loot_manager.move_item_to_stash(item)
         end
     end
 end
 function extension.reset()
     local local_player = get_local_player()
     if not local_player then return end
-    local new_position = vec3:new(-1680.57421875, -597.4794921875, 37.572265625)
+    local new_position = vec3:new(-1680.7470703125, -592.1953125, 37.6484375)
     if task.reset_state == status_enum['MOVING'] then
         new_position = vec3:new(-1651.9208984375, -598.6142578125, 36.3134765625)
     end
@@ -50,16 +52,16 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    return tracker.salvage_count == 0
+    return not settings.item_use_stash or tracker.stash_count == 0
 end
 function extension.done()
-    tracker.salvage_done = true
+    tracker.stash_done = true
 end
 function extension.failed()
-    tracker.salvage_failed = true
+    tracker.stash_failed = true
 end
 
-task.name = 'salvage'
+task.name = 'stash'
 task.extension = extension
 task.status_enum = status_enum
 task.has_vendor_screen = true
@@ -70,10 +72,9 @@ task.shouldExecute = function ()
     end
     if utils.player_in_zone('Scos_Cerrigar') and
         tracker.trigger_tasks and
-        not tracker.salvage_failed and
-        not tracker.salvage_done and
-        (tracker.sell_done or tracker.sell_failed) and
-        (tracker.stash_done or tracker.stash_failed)
+        not tracker.stash_failed and
+        not tracker.stash_done and
+        (tracker.sell_done or tracker.sell_failed)
     then
         return true
     end

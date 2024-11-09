@@ -133,7 +133,7 @@ function gui.render()
         gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now if in cerrigar')
         gui.elements.use_teleport:render('Use teleport', 'use teleport for manual trigger')
     end
-    -- gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
+    gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
     gui.elements.inventory_limit_slider:render('Inventory Limit','minimum number if items before stash/salvage/sell')
     gui.elements.timeout_slider:render('Timeout','no. seconds to timeout alfred when failed to complete tasks')
     if gui.elements.explorer_tree:push('Explorer settings') then

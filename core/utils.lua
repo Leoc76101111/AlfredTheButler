@@ -35,7 +35,7 @@ utils.npc_loc_enum = {
     BLACKSMITH = vec3:new(-1685.359375, -596.5830078125, 37.8603515625),
     SILVERSMITH = vec3:new(-1676.4697265625, -581.1435546875, 37.861328125),
     WEAPON = vec3:new(-1658.69921875, -620.0205078125, 37.888671875),
-    STASH = vec3:new(-1646.4699707031, -624.84698486328, 37.839099884033),
+    STASH = vec3:new(-1684.1199951172, -592.11602783203, 37.606800079346),
     GAMBLER = vec3:new(-1675.5791015625, -599.30859375, 36.9267578125),
     ALCHEMIST = vec3:new(-1671.6494140625, -607.0947265625, 37.7255859375),
     HEALER = vec3:new(-1671.0791015625, -600.92578125, 36.9130859375),
@@ -172,6 +172,8 @@ function utils.reset_all_task()
     tracker.salvage_done = false
     tracker.repair_failed = false
     tracker.repair_done = false
+    tracker.stash_failed = false
+    tracker.stash_done = false
     tracker.all_task_done = false
 end
 
@@ -185,32 +187,8 @@ function utils.get_npc(name)
     end
     return nil
 end
-function utils.get_blacksmith()
-    return utils.get_npc(utils.npc_enum['BLACKSMITH'])
-end
-function utils.get_vendor(use_alt)
-    if use_alt then
-        return utils.get_npc(utils.npc_enum['WEAPON'])
-    end
-    return utils.get_npc(utils.npc_enum['SILVERSMITH'])
-end
-function utils.get_portal()
-    return utils.get_npc(utils.npc_enum['PORTAL'])
-end
 function utils.get_npc_location(name)
     return utils.npc_loc_enum[name]
-end
-function utils.get_blacksmith_location()
-    return utils.get_npc_location('BLACKSMITH')
-end
-function utils.get_vendor_location(use_alt)
-    if use_alt then
-        return utils.get_npc_location('WEAPON')
-    end
-    return utils.get_npc_location('SILVERSMITH')
-end
-function utils.get_portal_location()
-    return utils.get_npc_location('PORTAL')
 end
 function utils.distance_to(target)
     local player_pos = get_player_position()
