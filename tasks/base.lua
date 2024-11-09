@@ -40,7 +40,7 @@ function base.new_task()
         status = 'initiating',
         last_interaction = 0,
         retry = 0,
-        interaction_timeout = 2,
+        interaction_timeout = 3,
         max_retries = 2,
         last_location = nil,
         last_stuck_location = nil,
