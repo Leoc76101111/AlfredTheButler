@@ -5,6 +5,7 @@ local utils = require 'core.utils'
 local gui = {}
 
 local affix_types = utils.get_item_affixes()
+local unique_items = utils.get_unique_items()
 
 local function create_checkbox(value, key)
     return checkbox:new(value, get_hash(plugin_label .. '_' .. key))
@@ -24,7 +25,7 @@ end
 
 local function add_affix_search(name)
     local search_name = tostring(name) .. '_affix_search'
-    gui.elements[search_name] = input_text:new(get_hash(plugin_label .. '_search_input'))
+    gui.elements[search_name] = input_text:new(get_hash(plugin_label .. tostring(name) .. '_search_input'))
 end
 
 local function render_affix_checkbox(name,data)
@@ -116,6 +117,9 @@ for _,affix_type in pairs(affix_types) do
     add_affix_checkbox(affix_type.name, affix_type.data)
     add_affix_search(affix_type.name)
 end
+add_affix_tree('unique')
+add_affix_checkbox('unique', unique_items)
+add_affix_search('unique')
 
 function gui.render()
     if not gui.elements.main_tree:push('Alfred the Butler | Leoric | ' .. plugin_version) then return end
@@ -149,7 +153,7 @@ function gui.render()
         gui.elements.ancestral_item_unique:render('unique items', gui.item_options, 'Select what to do with unique items')
         gui.elements.ancestral_item_junk:render('junk items', gui.item_options, 'Select what to do with junk items')
         gui.elements.ancestral_keep_max_aspect:render('Keep max aspect','Keep max aspect')
-        gui.elements.ancestral_filter_toggle:render('Use affix filter', 'use affix filter')
+        gui.elements.ancestral_filter_toggle:render('Use affix/unique filter', 'use affix filter')
         if gui.elements.ancestral_filter_toggle:get() then
             if gui.elements.ancestral_filter_tree:push('General') then
                 gui.elements.ancestral_ga_count_slider:render('Min Greater Affix', 'Minimun greater affix to keep')
@@ -161,6 +165,11 @@ function gui.render()
                 gui.elements.affix_import_name:render('file name', 'file name to import', false, 'import', '')
                 gui.elements.affix_import_button:render('', 'import selected affixes from file', 0)
                 gui.elements.ancestral_filter_tree:pop()
+            end
+            if gui.elements['unique_affix_tree']:push('Unique') then
+                gui.elements['unique_affix_search']:render('Search', 'Find unique items', false, '', '')
+                render_affix_checkbox('unique', unique_items)
+                gui.elements['unique_affix_tree']:pop()
             end
             for _,affix_type in pairs(affix_types) do
                 local tree_name = tostring(affix_type.name) .. '_affix_tree'

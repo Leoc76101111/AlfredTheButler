@@ -3,6 +3,7 @@ local plugin_label = 'alfred_the_butler'
 local gui = require 'gui'
 local utils = require 'core.utils'
 local affix_types = utils.get_item_affixes()
+local unique_items = utils.get_unique_items()
 
 local settings = {
     enabled = false,
@@ -26,6 +27,7 @@ local settings = {
     ancestral_affix_count = 0,
     ancestral_affix_ga_count = 0,
     ancestral_affix = {},
+    ancestral_unique = {},
     aggresive_movement = false,
     path_angle = 10
 
@@ -64,9 +66,9 @@ function settings:update_settings()
     settings.ancestral_filter = gui.elements.ancestral_filter_toggle:get()
     settings.ancestral_affix_count = gui.elements.ancestral_affix_count_slider:get()
     settings.ancestral_affix_ga_count = gui.elements.ancestral_affix_ga_count_slider:get()
-    settings.ancestral_affix = {}
     settings.aggresive_movement = gui.elements.explorer_aggressive_movement_toggle:get()
     settings.path_angle = gui.elements.explorer_path_angle_slider:get()
+    settings.ancestral_affix = {}
     for _,affix_type in pairs(affix_types) do
         settings.ancestral_affix[affix_type.name] = {}
         for _,affix in pairs(affix_type.data) do
@@ -74,6 +76,13 @@ function settings:update_settings()
             if gui.elements[checkbox_name] and gui.elements[checkbox_name]:get() then
                 settings.ancestral_affix[affix_type.name][affix.sno_id] = true
             end
+        end
+    end
+    settings.ancestral_unique = {}
+    for _,affix in pairs(unique_items) do
+        local checkbox_name = 'unique_affix_' .. tostring(affix.sno_id)
+        if gui.elements[checkbox_name] and gui.elements[checkbox_name]:get() then
+            settings.ancestral_unique[affix.sno_id] = true
         end
     end
 end

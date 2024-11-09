@@ -16,7 +16,6 @@ end
 local function main_pulse()
     settings:update_settings()
     utils.update_tracker_count()
-    if not local_player or not settings.enabled then return end
     tracker.timeout = tracker.last_reset + settings.timeout >= get_time_since_inject()
 
     if gui.elements.manual_keybind:get_state() == 1 then
@@ -30,7 +29,8 @@ local function main_pulse()
         utils.export_inventory_info()
     end
 
-    if not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then
+    if not local_player or not settings.enabled or
+        not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then
         return
     end
 
@@ -47,7 +47,7 @@ local function render_pulse()
     local status = ''
     if tracker.external_caller and tracker.external_pause then
         status = 'Paused by ' .. tracker.external_caller
-    elseif not settings.get_keybind_state() and not tracker.external_caller then
+    elseif not settings.get_keybind_state() and not tracker.external_caller and not tracker.trigger_tasks then
         status = 'Paused'
     elseif current_task then
         status = current_task.status

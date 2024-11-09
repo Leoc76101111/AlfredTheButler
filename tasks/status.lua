@@ -40,7 +40,9 @@ function task.shouldExecute()
         should_execute = true
     elseif settings.allow_external and tracker.external_pause then
         should_execute = true
-    elseif tracker.manual_trigger then
+    elseif tracker.manual_trigger and not tracker.trigger_tasks then
+        should_execute = true
+    elseif settings.allow_external and tracker.external_trigger and not tracker.trigger_tasks then
         should_execute = true
     elseif not tracker.trigger_tasks then
         should_execute = true
@@ -62,6 +64,7 @@ function task.Execute()
 
     local status = all_task_done()
     if status.complete then
+        tracker.manual_trigger = false
         utils.reset_all_task()
         tracker.trigger_tasks = false
         tracker.all_task_done = true
@@ -80,7 +83,6 @@ function task.Execute()
     elseif ((settings.allow_external and tracker.external_trigger) or
         tracker.inventory_full or tracker.manual_trigger)
     then
-        tracker.manual_trigger = false
         tracker.trigger_tasks = true
         task.status = status_enum['WAITING']
         -- -- uncomment if you want to collect item data before salvage/sell
