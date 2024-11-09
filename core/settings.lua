@@ -8,6 +8,7 @@ local unique_items = utils.get_unique_items()
 local settings = {
     enabled = false,
     use_keybind = false,
+    use_teleport = false,
     item_use_stash = false,
     inventory_limit = 20,
     timeout = 120,
@@ -51,6 +52,7 @@ end
 function settings:update_settings()
     settings.enabled = gui.elements.main_toggle:get()
     settings.use_keybind = gui.elements.use_keybind:get()
+    settings.use_teleport = gui.elements.use_teleport:get()
     settings.item_use_stash = gui.elements.stash_toggle:get()
     settings.inventory_limit = gui.elements.inventory_limit_slider:get()
     settings.timeout = gui.elements.timeout_slider:get()

@@ -67,8 +67,9 @@ gui.elements = {
 
     use_keybind = create_checkbox(false, 'use_keybind'),
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_keybind_toggle' )),
-    manual_keybind = keybind:new(0x0B,false,get_hash(plugin_label .. '_manual_keybind')),
     dump_keybind = keybind:new(0x0c,false,get_hash(plugin_label .. '_dump_keybind')),
+    manual_keybind = keybind:new(0x0B,false,get_hash(plugin_label .. '_manual_keybind')),
+    use_teleport = create_checkbox(false, 'use_teleport'),
 
     stash_toggle = create_checkbox(false, 'stash_toggle'),
     inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. '_inventory_limit_slider')),
@@ -127,9 +128,10 @@ function gui.render()
     gui.elements.allow_external_toggle:render('allow external','allow other plugins to call alfred')
     gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot')
     if gui.elements.use_keybind:get() then
-        gui.elements.keybind_toggle:render('Toggle Keybind', 'Toggle the bot for quick enable');
-        gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now if in cerrigar')
+        gui.elements.keybind_toggle:render('Toggle Keybind', 'Toggle the bot for quick enable')
         gui.elements.dump_keybind:render('Dump items info', 'Dump all item info to log')
+        gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now if in cerrigar')
+        gui.elements.use_teleport:render('Use teleport', 'use teleport for manual trigger')
     end
     -- gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
     gui.elements.inventory_limit_slider:render('Inventory Limit','minimum number if items before stash/salvage/sell')

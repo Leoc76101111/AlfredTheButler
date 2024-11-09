@@ -41,9 +41,9 @@ local external = {
         -- not implemented
         tracker.external_caller = caller
         tracker.external_trigger = true
-        tracker.external_trigger_teleport = true
+        tracker.teleport = true
         if callback then
-            tracker.external_trigger_teleport_callback = callback
+            tracker.external_trigger_callback = callback
         end
     end,
 }

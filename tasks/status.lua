@@ -22,12 +22,18 @@ local function all_task_done()
     }
     -- add stash action when stash is available
     if (tracker.sell_done or tracker.sell_failed) and
-        (tracker.salvage_done or tracker.salvage_failed)
+        (tracker.salvage_done or tracker.salvage_failed) and
+        (tracker.repair_done or tracker.repair_failed) and
+        (not tracker.teleport or tracker.teleport_done or tracker.teleport_failed)
     then
         status.complete = true
     end
 
-    if tracker.sell_failed or tracker.salvage_failed then
+    if tracker.sell_failed or
+        tracker.salvage_failed or
+        tracker.repair_failed or
+        tracker.teleport_failed
+    then
         status.failed = true
     end
     return status
@@ -36,7 +42,7 @@ end
 function task.shouldExecute()
     local should_execute = false
     local status = all_task_done()
-    if not utils.player_in_zone('Scos_Cerrigar') then
+    if not utils.player_in_zone('Scos_Cerrigar') and (not tracker.teleport or tracker.teleport_done) then
         should_execute = true
     elseif settings.allow_external and tracker.external_pause then
         should_execute = true
@@ -83,10 +89,12 @@ function task.Execute()
     elseif ((settings.allow_external and tracker.external_trigger) or
         tracker.inventory_full or tracker.manual_trigger)
     then
+        -- -- uncomment if you want to collect item data before salvage/sell
+        -- if task.status ~= status_enum['WAITING'] then
+        --     utils.export_inventory_info()
+        -- end
         tracker.trigger_tasks = true
         task.status = status_enum['WAITING']
-        -- -- uncomment if you want to collect item data before salvage/sell
-        -- utils.export_inventory_info()
     else
         task.status = status_enum['IDLE']
     end

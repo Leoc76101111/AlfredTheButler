@@ -23,6 +23,7 @@ local function main_pulse()
         external.resume()
         utils.reset_all_task()
         tracker.manual_trigger = true
+        tracker.teleport = settings.use_teleport
     end
     if gui.elements.dump_keybind:get_state() == 1 then
         gui.elements.dump_keybind:set(false)
@@ -49,10 +50,14 @@ local function render_pulse()
         status = 'Paused by ' .. tracker.external_caller
     elseif not settings.get_keybind_state() and not tracker.external_caller and not tracker.trigger_tasks then
         status = 'Paused'
+    elseif current_task and tracker.external_caller then
+        status = '(' .. tracker.external_caller .. ' - '
+        status = status .. current_task.name .. ') '
+        status = status .. current_task.status:gsub('('..tracker.external_caller..')',''):gsub('()','')
     elseif current_task then
-        status = current_task.status
+        status = '(' .. current_task.name .. ') ' .. current_task.status
     else
-        status = 'Unknown' .. current_task.status
+        status = 'Unknown'
     end
     local keybind_status = 'Off'
     if settings.get_keybind_state() then keybind_status = 'On' end

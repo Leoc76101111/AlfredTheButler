@@ -29,6 +29,7 @@ utils.npc_enum = {
     GAMBLER = 'TWN_Scos_Cerrigar_Vendor_Gambler',
     ALCHEMIST = 'TWN_Scos_Cerrigar_Crafter_Alchemist',
     HEALER = 'TWN_Scos_Cerrigar_Service_Healer',
+    PORTAL = 'TownPortal',
 }
 utils.npc_loc_enum = {
     BLACKSMITH = vec3:new(-1685.359375, -596.5830078125, 37.8603515625),
@@ -38,6 +39,7 @@ utils.npc_loc_enum = {
     GAMBLER = vec3:new(-1675.5791015625, -599.30859375, 36.9267578125),
     ALCHEMIST = vec3:new(-1671.6494140625, -607.0947265625, 37.7255859375),
     HEALER = vec3:new(-1671.0791015625, -600.92578125, 36.9130859375),
+    PORTAL = vec3:new(-1656.7141113281, -598.21716308594, 36.28515625)
 }
 utils.item_enum = {
     KEEP = 0,
@@ -161,10 +163,15 @@ end
 function utils.reset_all_task()
     tracker.last_reset = 0
     tracker.timeout = false
-    tracker.salvage_failed = false
+    tracker.teleport = false
+    tracker.teleport_done = false
+    tracker.teleport_failed = false
     tracker.sell_failed = false
-    tracker.salvage_done = false
     tracker.sell_done = false
+    tracker.salvage_failed = false
+    tracker.salvage_done = false
+    tracker.repair_failed = false
+    tracker.repair_done = false
     tracker.all_task_done = false
 end
 
@@ -187,6 +194,9 @@ function utils.get_vendor(use_alt)
     end
     return utils.get_npc(utils.npc_enum['SILVERSMITH'])
 end
+function utils.get_portal()
+    return utils.get_npc(utils.npc_enum['PORTAL'])
+end
 function utils.get_npc_location(name)
     return utils.npc_loc_enum[name]
 end
@@ -198,6 +208,9 @@ function utils.get_vendor_location(use_alt)
         return utils.get_npc_location('WEAPON')
     end
     return utils.get_npc_location('SILVERSMITH')
+end
+function utils.get_portal_location()
+    return utils.get_npc_location('PORTAL')
 end
 function utils.distance_to(target)
     local player_pos = get_player_position()
