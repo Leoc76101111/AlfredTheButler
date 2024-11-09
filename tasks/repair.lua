@@ -12,16 +12,16 @@ local status_enum = {
     EXECUTE = 'Repairing',
     MOVING = 'Moving to blacksmith',
     INTERACTING = 'Interacting with blacksmith',
-    RESETTING = 'Re-trying salvage',
-    FAILED = 'Failed to salvage'
+    RESETTING = 'Re-trying repair',
+    FAILED = 'Failed to repair'
 }
 
 local extension = {}
 function extension.get_npc()
-    return utils.get_blacksmith()
+    return utils.get_npc(utils.npc_enum['BLACKSMITH'])
 end
 function extension.move()
-    local npc_location = utils.get_blacksmith_location()
+    local npc_location = utils.get_npc_location('BLACKSMITH')
     explorerlite:set_custom_target(npc_location)
     explorerlite:move_to_target()
 end
@@ -67,6 +67,7 @@ task.shouldExecute = function ()
         not tracker.repair_failed and
         not tracker.repair_done and
         (tracker.sell_done or tracker.sell_failed) and
+        (tracker.stash_done or tracker.stash_failed) and
         (tracker.salvage_done or tracker.salvage_failed)
     then
         return true

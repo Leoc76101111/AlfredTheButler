@@ -18,10 +18,12 @@ local status_enum = {
 
 local extension = {}
 function extension.get_npc()
-    return utils.get_vendor(false)
+    return utils.get_npc(utils.npc_enum['SILVERSMITH'])
+    -- return utils.get_npc(utils.npc_enum['WEAPON'])
 end
 function extension.move()
-    local npc_location = utils.get_vendor_location(false)
+    local npc_location = utils.get_npc_location('SILVERSMITH')
+    -- local npc_location = utils.get_npc_location('WEAPON')
     explorerlite:set_custom_target(npc_location)
     explorerlite:move_to_target()
 end

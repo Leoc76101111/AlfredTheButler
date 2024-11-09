@@ -40,7 +40,7 @@ function task_manager.get_current_task()
     return current_task
 end
 
-local task_files = {'status', 'sell', 'salvage', 'repair', 'teleport'}
+local task_files = {'status', 'sell', 'stash', 'salvage', 'repair', 'teleport'}
 for _, file in ipairs(task_files) do
     local task = require('tasks.' .. file)
     task_manager.register_task(task)
