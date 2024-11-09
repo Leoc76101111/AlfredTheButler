@@ -424,6 +424,14 @@ function utils.import_filters(elements)
                 end
             end
         end
+        for _,affix in pairs(item_unique) do
+            local checkbox_name = 'unique_affix_' .. tostring(affix.sno_id)
+            if new_affix_set[checkbox_name] then
+                elements[checkbox_name]:set(true)
+            else
+                elements[checkbox_name]:set(false)
+            end
+        end
     else
         utils.log('error in import file' .. filename)
     end
@@ -438,6 +446,12 @@ function utils.export_filters(elements,is_backup)
             if elements[checkbox_name]:get() then
                 selected_affix[#selected_affix+1] = checkbox_name
             end
+        end
+    end
+    for _,affix in pairs(item_unique) do
+        local checkbox_name = 'unique_affix_' .. tostring(affix.sno_id)
+        if elements[checkbox_name]:get() then
+            selected_affix[#selected_affix+1] = checkbox_name
         end
     end
     local filename = get_export_filename(is_backup)
