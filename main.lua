@@ -29,8 +29,8 @@ local function main_pulse()
     end
     if gui.elements.dump_keybind:get_state() == 1 then
         gui.elements.dump_keybind:set(false)
-        utils.export_inventory_info()
-        -- utils.export_actors()
+        -- utils.export_inventory_info()
+        utils.export_actors()
     end
 
     if not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then
@@ -64,14 +64,28 @@ local function render_pulse()
     local keybind_status = 'Off'
     if settings.get_keybind_state() then keybind_status = 'On' end
 
-    graphics.text_2d('Alfred Task : ' .. status, vec2:new(8, 50), 20, color_white(255))
-    graphics.text_2d('Keybind     : ' .. keybind_status , vec2:new(8, 70), 20, color_white(255))
-    graphics.text_2d('Limit       : ' .. tracker.inventory_limit , vec2:new(8, 90), 20, color_white(255))
-    graphics.text_2d('Inventory   : ' .. tracker.inventory_count , vec2:new(8, 110), 20, color_white(255))
-    graphics.text_2d('Keep        : ' .. tracker.stash_count, vec2:new(8, 130), 20, color_white(255))
-    graphics.text_2d('Salvage     : ' .. tracker.salvage_count, vec2:new(8, 150), 20, color_white(255))
-    graphics.text_2d('Sell        : ' .. tracker.sell_count, vec2:new(8, 170), 20, color_white(255))
+    local messages = {
+        'Alfred Task   : ' .. status,
+        'Keybind       : ' .. keybind_status,
+        'Limit         : ' .. tracker.inventory_limit,
+        'Inventory     : ' .. tracker.inventory_count,
+        'Keep          : ' .. tracker.stash_count,
+        'Salvage       : ' .. tracker.salvage_count,
+        'Sell          : ' .. tracker.sell_count
+    }
 
+    if #tracker.restock_items ~= 0 then
+        messages[#messages+1] = '-------------------'
+        for _,item in pairs(tracker.restock_items) do
+            messages[#messages+1] = item.name .. ' : ' .. item.count .. '/' .. item.max
+        end
+    end
+
+    local y_pos = 50
+    for _,msg in pairs(messages) do
+        graphics.text_2d(msg, vec2:new(8, y_pos), 20, color_white(255))
+        y_pos = y_pos + 20
+    end
 end
 
 on_update(function()

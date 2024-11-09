@@ -21,6 +21,9 @@ local item_types = {
 local item_affix = {}
 local item_aspect = {}
 local item_unique = {}
+local item_restock = {
+    [1866012] = {name = 'Horde Compass', item_type = 'key'}
+}
 utils.npc_enum = {
     BLACKSMITH = 'TWN_Scos_Cerrigar_Crafter_Blacksmith',
     SILVERSMITH = 'TWN_Scos_Cerrigar_Vendor_Silversmith',
@@ -134,6 +137,9 @@ end
 function utils.get_unique_items()
     return item_unique
 end
+function utils.get_restock_items()
+    return item_restock
+end
 
 function utils.log(msg)
     console.print(plugin_label .. ': ' .. tostring(msg))
@@ -174,6 +180,8 @@ function utils.reset_all_task()
     tracker.repair_done = false
     tracker.stash_failed = false
     tracker.stash_done = false
+    tracker.restock_failed = false
+    tracker.restock_done = false
     tracker.all_task_done = false
 end
 
@@ -357,6 +365,25 @@ function utils.is_salvage_or_sell(item,action)
 
     return false
 end
+function utils.get_restock_item_count(local_player,item)
+    local counter = 0
+    if item_restock[item.sno_id].item_type == 'key' then
+        local key_items = local_player:get_dungeon_key_items()
+        for _,key_item in pairs(key_items) do
+            if key_item:get_sno_id() == item.sno_id then
+                counter = counter + 1
+            end
+        end
+    elseif item_restock[item.sno_id].item_type == 'consumables' then
+        local key_items = local_player:get_consumable_items()
+        for _,key_item in pairs(key_items) do
+            if key_item:get_sno_id() == item.sno_id then
+                counter = counter + 1
+            end
+        end
+    end
+    return counter
+end
 function utils.update_tracker_count()
     local salvage_counter = 0
     local sell_counter = 0
@@ -384,6 +411,24 @@ function utils.update_tracker_count()
     tracker.inventory_limit = utils.settings.inventory_limit
     tracker.inventory_full = tracker.inventory_count == 33 or
         (tracker.sell_count + tracker.salvage_count) >= tracker.inventory_limit
+    if #utils.settings.restock_items ~= 0 then
+        for key,item in pairs(utils.settings.restock_items) do
+            local counter = utils.get_restock_item_count(local_player,item)
+            local stash_count = -1
+            if tracker.restock_items[key] and tracker.restock_items[key].stash >= 0 then
+                stash_count = tracker.restock_items[key].stash
+            end
+            tracker.restock_items[key] = {
+                sno_id = item.sno_id,
+                name = item_restock[item.sno_id].name,
+                max = item.max,
+                count = counter,
+                stash = stash_count
+            }
+        end
+    else
+        tracker.restock_items = {}
+    end
 end
 
 function utils.import_filters(elements)

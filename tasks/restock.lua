@@ -9,19 +9,19 @@ local base_task = require 'tasks.base'
 local task = base_task.new_task()
 local status_enum = {
     IDLE = 'Idle',
-    EXECUTE = 'Salvaging',
-    MOVING = 'Moving to blacksmith',
-    INTERACTING = 'Interacting with blacksmith',
-    RESETTING = 'Re-trying salvage',
-    FAILED = 'Failed to salvage'
+    EXECUTE = 'Taking item from stash',
+    MOVING = 'Moving to stash',
+    INTERACTING = 'Interacting with stash',
+    RESETTING = 'Re-trying restock',
+    FAILED = 'Failed to restock'
 }
 
 local extension = {}
 function extension.get_npc()
-    return utils.get_npc(utils.npc_enum['BLACKSMITH'])
+    return utils.get_npc(utils.npc_enum['STASH'])
 end
 function extension.move()
-    local npc_location = utils.get_npc_location('BLACKSMITH')
+    local npc_location = utils.get_npc_location('STASH')
     explorerlite:set_custom_target(npc_location)
     explorerlite:move_to_target()
 end
@@ -32,17 +32,25 @@ end
 function extension.execute()
     local local_player = get_local_player()
     if not local_player then return end
-    local items = local_player:get_inventory_items()
-    for _, item in pairs(items) do
-        if item and utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE']) then
-            loot_manager.salvage_specific_item(item)
+    local items = local_player:get_stash_items()
+
+    for key,item_data in pairs(tracker.restock_items) do
+        tracker.restock_items[key]['stash'] = 0
+        for _, item in pairs(items) do
+            if item:get_sno_id() == item_data.sno_id then
+                if item_data.count < item_data.max then
+                    loot_manager.move_item_from_stash(item)
+                else
+                    tracker.item_datas[key]['stash'] = tracker.item_datas[key]['stash'] + 1
+                end
+            end
         end
     end
 end
 function extension.reset()
     local local_player = get_local_player()
     if not local_player then return end
-    local new_position = vec3:new(-1680.57421875, -597.4794921875, 37.572265625)
+    local new_position = vec3:new(-1680.7470703125, -592.1953125, 37.6484375)
     if task.reset_state == status_enum['MOVING'] then
         new_position = vec3:new(-1651.9208984375, -598.6142578125, 36.3134765625)
     end
@@ -50,19 +58,24 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    return tracker.salvage_count == 0
+    for _,item_data in pairs(tracker.restock_items) do
+        if item_data.stash > 0 and item_data.count < item_data.max then
+            return false
+        end
+    end
+    return true
 end
 function extension.done()
-    tracker.salvage_done = true
+    tracker.restock_done = true
 end
 function extension.failed()
-    tracker.salvage_failed = true
+    tracker.restock_failed = true
 end
 
-task.name = 'salvage'
+task.name = 'restock'
 task.extension = extension
 task.status_enum = status_enum
-task.has_vendor_screen = true
+task.max_retries = 0
 
 task.shouldExecute = function ()
     if tracker.trigger_tasks == false then
@@ -70,11 +83,10 @@ task.shouldExecute = function ()
     end
     if utils.player_in_zone('Scos_Cerrigar') and
         tracker.trigger_tasks and
-        not tracker.salvage_failed and
-        not tracker.salvage_done and
+        not tracker.restock_failed and
+        not tracker.restock_done and
         (tracker.sell_done or tracker.sell_failed) and
-        (tracker.stash_done or tracker.stash_failed) and
-        (tracker.restock_done or tracker.restock_failed)
+        (tracker.stash_done or tracker.stash_failed)
     then
         return true
     end

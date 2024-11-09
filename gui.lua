@@ -6,6 +6,7 @@ local gui = {}
 
 local affix_types = utils.get_item_affixes()
 local unique_items = utils.get_unique_items()
+local restock_items = utils.get_restock_items()
 
 local function create_checkbox(value, key)
     return checkbox:new(value, get_hash(plugin_label .. '_' .. key))
@@ -73,7 +74,7 @@ gui.elements = {
 
     stash_toggle = create_checkbox(false, 'stash_toggle'),
     inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. '_inventory_limit_slider')),
-    timeout_slider = slider_int:new(10, 600, 120, get_hash(plugin_label .. '_timeout_slider')),
+    timeout_slider = slider_int:new(10, 120, 10, get_hash(plugin_label .. '_timeout_slider')),
 
     item_tree = tree_node:new(1),
     item_legendary_or_lower = combo_box:new(1, get_hash(plugin_label .. '_item_legendary_or_lower')),
@@ -103,9 +104,6 @@ gui.elements = {
     gamble_tree = tree_node:new(1),
     gamble_toggle = create_checkbox(false, 'gamble_toggle'),
 
-    repair_tree = tree_node:new(1),
-    repair_toggle = create_checkbox(false, 'repair_toggle'),
-
     explorer_tree = tree_node:new(1),
     explorer_path_angle_slider = slider_int:new(0, 360, 10, get_hash(plugin_label .. '_explorer_path_angle_slider')),
     explorer_aggressive_movement_toggle = create_checkbox(true, 'explorer_aggressive_movement_toggle'),
@@ -121,6 +119,10 @@ end
 add_affix_tree('unique')
 add_affix_checkbox('unique', unique_items)
 add_affix_search('unique')
+for sno_id,_ in pairs(restock_items) do
+    local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)
+    gui.elements[slider_name] = slider_int:new(0, 33, 0, get_hash(slider_name))
+end
 
 function gui.render()
     if not gui.elements.main_tree:push('Alfred the Butler | Leoric | ' .. plugin_version) then return end
@@ -187,15 +189,18 @@ function gui.render()
     end
     -- if gui.elements.restock_tree:push('Restock') then
     --     gui.elements.restock_toggle:render('Restocking', 'Enable restocking items')
+    --     if gui.elements.restock_toggle:get() then
+    --         for sno_id,item in pairs(restock_items) do
+    --             local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)
+    --             gui.elements[slider_name]:render(item.name,'Restock up to ')
+    --         end
+    --     end
     --     gui.elements.restock_tree:pop()
     -- end
+
     -- if gui.elements.gamble_tree:push('Gamble') then
     --     gui.elements.gamble_toggle:render('Gambling', 'Enable gambling items')
     --     gui.elements.gamble_tree:pop()
-    -- end
-    -- if gui.elements.repair_tree:push('Repair') then
-    --     gui.elements.repair_toggle:render('Repairing', 'Enable repairing items')
-    --     gui.elements.repair_tree:pop()
     -- end
     gui.elements.main_tree:pop()
 end
