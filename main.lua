@@ -14,9 +14,9 @@ local function update_locals()
 end
 
 local function main_pulse()
-    if not local_player or not settings.enabled then return end
     settings:update_settings()
     utils.update_tracker_count()
+    if not local_player or not settings.enabled then return end
     tracker.timeout = tracker.last_reset + settings.timeout >= get_time_since_inject()
 
     if gui.elements.manual_keybind:get_state() == 1 then
@@ -43,7 +43,6 @@ end
 
 local function render_pulse()
     if not local_player or not settings.enabled then return end
-    utils.update_tracker_count()
     local current_task = task_manager.get_current_task()
     local status = ''
     if tracker.external_caller and tracker.external_pause then
