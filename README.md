@@ -11,6 +11,10 @@ Affix settings are exportable and importable under general settings
 Alfred exposes an external collection of functions via global variable `PLUGIN_alfred_the_butler`.
 Also in the task folder, there is an `external-template.lua` as a sample on how to call alfred from other plugins.
 
+## TO-DO
+- add more info to this readme
+- add restock capabilities for compasses, boss mats, etc
+
 ## Credits
 - Letrico - general help, bouncing ideas, my faq XD
 - Zewx - explorerlite is written by Zewx in the piteer plugin and is being used in alfred
