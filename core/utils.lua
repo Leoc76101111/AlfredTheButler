@@ -414,7 +414,7 @@ function utils.update_tracker_count()
     if #utils.settings.restock_items ~= 0 then
         for key,item in pairs(utils.settings.restock_items) do
             local counter = utils.get_restock_item_count(local_player,item)
-            local stash_count = -1
+            local stash_count = 9999
             if tracker.restock_items[key] and tracker.restock_items[key].stash >= 0 then
                 stash_count = tracker.restock_items[key].stash
             end

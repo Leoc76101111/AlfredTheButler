@@ -29,8 +29,8 @@ local function main_pulse()
     end
     if gui.elements.dump_keybind:get_state() == 1 then
         gui.elements.dump_keybind:set(false)
-        -- utils.export_inventory_info()
-        utils.export_actors()
+        utils.export_inventory_info()
+        -- utils.export_actors()
     end
 
     if not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then
