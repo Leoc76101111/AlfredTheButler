@@ -22,8 +22,20 @@ local item_affix = {}
 local item_aspect = {}
 local item_unique = {}
 local item_restock = {
-    [1866012] = {name = 'Horde Compass', item_type = 'key'}
+    {sno_id = 1866012, name = 'Horde Compass', item_type = 'key', max = 33, min = 1},
+    {sno_id = 1489420, name = 'Malignant Heart', item_type = 'consumables', max = 1650, min = 4},
+    {sno_id = 1502128, name = 'Living Steel', item_type = 'consumables', max = 1650, min = 12},
+    {sno_id = 1518053, name = 'Distilled Fear', item_type = 'consumables', max = 1650, min = 12},
+    {sno_id = 1522891, name = 'Exquisite Blood', item_type = 'consumables', max = 1650, min = 12},
+    {sno_id = 1524917, name = 'Mucus-Slick Egg', item_type = 'consumables', max = 850, min = 2},
+    {sno_id = 1524924, name = 'Shard of Agony', item_type = 'consumables', max = 850, min = 2},
+    {sno_id = 1810144, name = 'Sandscorched Shackles', item_type = 'consumables', max = 850, min = 2},
+    {sno_id = 1812685, name = 'Pincushioned Doll', item_type = 'consumables', max = 850, min = 2},
 }
+local item_restock_by_id = {}
+for _,item in pairs(item_restock) do
+    item_restock_by_id[item.sno_id] = item
+end
 utils.npc_enum = {
     BLACKSMITH = 'TWN_Scos_Cerrigar_Crafter_Blacksmith',
     SILVERSMITH = 'TWN_Scos_Cerrigar_Vendor_Silversmith',
@@ -48,6 +60,10 @@ utils.item_enum = {
     KEEP = 0,
     SALVAGE = 1,
     SELL = 2
+}
+utils.restock_enum = {
+    ACTIVE = 0,
+    PASSIVE = 1
 }
 
 utils.mythics = {
@@ -167,6 +183,22 @@ function utils.player_in_zone(zname)
     return get_current_world():get_current_zone_name() == zname
 end
 function utils.reset_all_task()
+    local previous = {}
+    for key,data in pairs(tracker) do
+        if key == 'previous' then
+        elseif key == 'restock_items' then
+            previous[key] = {}
+            for key2,data2 in pairs(data) do
+                previous[key][key2] = {}
+                for key3,data3 in pairs(data2) do
+                    previous[key][key2][key3] = data3
+                end
+            end
+        else
+            previous[key] = data
+        end
+    end
+    tracker.previous = previous
     tracker.last_reset = 0
     tracker.timeout = false
     tracker.teleport = false
@@ -367,18 +399,26 @@ function utils.is_salvage_or_sell(item,action)
 end
 function utils.get_restock_item_count(local_player,item)
     local counter = 0
-    if item_restock[item.sno_id].item_type == 'key' then
+    if item_restock_by_id[item.sno_id].item_type == 'key' then
         local key_items = local_player:get_dungeon_key_items()
         for _,key_item in pairs(key_items) do
+            local item_count = key_item:get_stack_count()
+            if item_count == 0 then
+                item_count = 1
+            end
             if key_item:get_sno_id() == item.sno_id then
-                counter = counter + 1
+                counter = counter + item_count
             end
         end
-    elseif item_restock[item.sno_id].item_type == 'consumables' then
+    elseif item_restock_by_id[item.sno_id].item_type == 'consumables' then
         local key_items = local_player:get_consumable_items()
         for _,key_item in pairs(key_items) do
+            local item_count = key_item:get_stack_count()
+            if item_count == 0 then
+                item_count = 1
+            end
             if key_item:get_sno_id() == item.sno_id then
-                counter = counter + 1
+                counter = counter + item_count
             end
         end
     end
@@ -411,6 +451,19 @@ function utils.update_tracker_count()
     tracker.inventory_limit = utils.settings.inventory_limit
     tracker.inventory_full = tracker.inventory_count == 33 or
         (tracker.sell_count + tracker.salvage_count) >= tracker.inventory_limit
+
+    -- clean up tracker
+    if #utils.settings.restock_items ~= #tracker.restock_items then
+        local new_tracker_item = {}
+        for _,tracker_item in pairs(tracker.restock_items) do
+            for _,item in pairs(utils.settings.restock_items) do
+                if item.sno_id == tracker_item.sno_id then
+                    new_tracker_item[#new_tracker_item+1] = tracker_item
+                end
+            end
+        end
+        tracker.restock_items = new_tracker_item
+    end
     if #utils.settings.restock_items ~= 0 then
         for key,item in pairs(utils.settings.restock_items) do
             local counter = utils.get_restock_item_count(local_player,item)
@@ -420,7 +473,8 @@ function utils.update_tracker_count()
             end
             tracker.restock_items[key] = {
                 sno_id = item.sno_id,
-                name = item_restock[item.sno_id].name,
+                name = item.name,
+                min = item.min,
                 max = item.max,
                 count = counter,
                 stash = stash_count
@@ -549,25 +603,25 @@ function utils.export_inventory_info()
             item_info['type'] = utils.get_item_type(item)
             item_info['affix'] = {}
             item_info['aspect'] = {}
-            for _,affix in pairs(item:get_affixes()) do
-                local affix_id = affix.affix_name_hash
-                if item_aspect[affix_id] then
-                    item_info['aspect']['id'] = affix_id
-                    item_info['aspect']['name'] = affix:get_name()
-                    item_info['aspect']['roll'] = affix:get_roll()
-                    item_info['aspect']['max_roll'] = affix:get_roll_max()
-                    item_info['aspect']['min_roll'] = affix:get_roll_min()
-                    item_info['aspect']['is_max'] = utils.is_max_aspect(affix)
-                else
-                    item_info['affix'][#item_info['affix']+1] = {
-                        ['id'] = affix_id,
-                        ['name'] = affix:get_name(),
-                        ['roll'] = affix:get_roll(),
-                        ['max_roll'] = affix:get_roll_max(),
-                        ['min_roll'] = affix:get_roll_min()
-                    }
-                end
-            end
+            -- for _,affix in pairs(item:get_affixes()) do
+            --     local affix_id = affix.affix_name_hash
+            --     if item_aspect[affix_id] then
+            --         item_info['aspect']['id'] = affix_id
+            --         item_info['aspect']['name'] = affix:get_name()
+            --         item_info['aspect']['roll'] = affix:get_roll()
+            --         item_info['aspect']['max_roll'] = affix:get_roll_max()
+            --         item_info['aspect']['min_roll'] = affix:get_roll_min()
+            --         item_info['aspect']['is_max'] = utils.is_max_aspect(affix)
+            --     else
+            --         item_info['affix'][#item_info['affix']+1] = {
+            --             ['id'] = affix_id,
+            --             ['name'] = affix:get_name(),
+            --             ['roll'] = affix:get_roll(),
+            --             ['max_roll'] = affix:get_roll_max(),
+            --             ['min_roll'] = affix:get_roll_min()
+            --         }
+            --     end
+            -- end
         end
         items_info[#items_info+1] = item_info
     end
@@ -583,6 +637,28 @@ function utils.export_inventory_info()
     io.output(file)
     io.write(json.encode(items_info))
     io.close(file)
+end
+function utils.dump_tracker_info(tracker_data)
+    if tracker_data.previous then
+        utils.log('----------')
+        utils.log('previous:')
+        utils.dump_tracker_info(tracker_data.previous)
+        utils.log('----------')
+        utils.log('current:')
+    end
+    for key,data in pairs(tracker_data) do
+        if key == 'previous' then
+        elseif key == 'restock_items' then
+            utils.log(key)
+            for key2,data2 in pairs(data) do
+                for key3,data3 in pairs(data2) do
+                    utils.log(key .. '>' .. key2 .. '>' .. key3 .. ':' .. tostring(data3))
+                end
+            end
+        else
+            utils.log(key .. ':' .. tostring(data))
+        end
+    end
 end
 
 for _,types in pairs(item_types) do

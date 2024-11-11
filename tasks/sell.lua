@@ -34,6 +34,7 @@ end
 function extension.execute()
     local local_player = get_local_player()
     if not local_player then return end
+    tracker.last_task = task.name
     local items = local_player:get_inventory_items()
     for _, item in pairs(items) do
         if item and utils.is_salvage_or_sell(item,utils.item_enum['SELL']) then

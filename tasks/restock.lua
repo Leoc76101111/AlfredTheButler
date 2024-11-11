@@ -16,6 +16,14 @@ local status_enum = {
     FAILED = 'Failed to restock'
 }
 
+local function is_inventory_max(type)
+    if type == 'key' then
+        return #get_local_player():get_dungeon_key_items() == 33
+    elseif type == 'consumables' then
+        return get_local_player():get_consumable_count() == 33
+    end
+end
+
 local extension = {}
 function extension.get_npc()
     return utils.get_npc(utils.npc_enum['STASH'])
@@ -32,19 +40,31 @@ end
 function extension.execute()
     local local_player = get_local_player()
     if not local_player then return end
+    tracker.last_task = task.name
     local items = local_player:get_stash_items()
 
     for key,item_data in pairs(tracker.restock_items) do
-        tracker.restock_items[key]['stash'] = 0
+        local need_counter = item_data.max - item_data.count
+        local stash_counter = 0
         for _, item in pairs(items) do
             if item:get_sno_id() == item_data.sno_id then
-                if item_data.count < item_data.max then
+                local item_count = item:get_stack_count()
+                if item_count == 0 then
+                    item_count = 1
+                end
+                if need_counter > 0 and not is_inventory_max(item_data.item_type) then
+                    -- move 3 times because sometimes it get stuck
                     loot_manager.move_item_from_stash(item)
+                    loot_manager.move_item_from_stash(item)
+                    loot_manager.move_item_from_stash(item)
+                    need_counter = need_counter - item_count
+                    task.last_interaction = get_time_since_inject()
                 else
-                    tracker.item_datas[key]['stash'] = tracker.item_datas[key]['stash'] + 1
+                    stash_counter = stash_counter + item_count
                 end
             end
         end
+        tracker.restock_items[key]['stash'] = stash_counter
     end
 end
 function extension.reset()
@@ -58,12 +78,15 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
+    local is_done = true
     for _,item_data in pairs(tracker.restock_items) do
-        if item_data.stash > 0 and item_data.count < item_data.max then
-            return false
+        if not is_inventory_max(item_data.item_type) and
+            item_data.stash > 0 and item_data.count < item_data.max
+        then
+            is_done = false
         end
     end
-    return true
+    return is_done
 end
 function extension.done()
     tracker.restock_done = true
