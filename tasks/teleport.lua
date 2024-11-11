@@ -64,6 +64,7 @@ task.name = 'teleport'
 task.extension = extension
 task.status_enum = status_enum
 task.has_vendor_screen = true
+task.max_retries = 5
 
 task.shouldExecute = function ()
     if tracker.trigger_tasks == false then
