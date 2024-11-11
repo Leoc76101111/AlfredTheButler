@@ -329,7 +329,7 @@ function utils.get_item_type(item)
 end
 function utils.is_salvage_or_sell(item,action)
     local item_id = item:get_sno_id()
-    if item:is_locked() or utils.mythics[item_id] ~= nil then return false end
+    if item:is_locked() or utils.mythics[tostring(item_id)] ~= nil then return false end
 
     local item_type = utils.get_item_type(item)
     if item_type == 'cache' then return false end
