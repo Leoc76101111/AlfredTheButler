@@ -38,7 +38,11 @@ function extension.execute()
         if item and not utils.is_salvage_or_sell(item,utils.item_enum['SELL']) and
             not utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE'])
         then
+            -- move 3 times because sometimes it get stuck
             loot_manager.move_item_to_stash(item)
+            loot_manager.move_item_to_stash(item)
+            loot_manager.move_item_to_stash(item)
+            task.last_interaction = get_time_since_inject()
         end
     end
 end
