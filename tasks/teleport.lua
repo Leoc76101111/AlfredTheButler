@@ -29,7 +29,10 @@ function extension.interact()
     local npc = extension.get_npc()
     if npc then interact_object(npc) end
 end
-function extension.execute() end
+function extension.execute()
+    local npc = extension.get_npc()
+    if npc then interact_object(npc) end
+end
 
 function extension.reset()
     local local_player = get_local_player()
