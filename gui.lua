@@ -91,7 +91,7 @@ gui.elements = {
     ancestral_item_unique = combo_box:new(1, get_hash(plugin_label .. '_ancestral_item_unique')),
     ancestral_item_junk = combo_box:new(1, get_hash(plugin_label .. '_ancestral_item_junk')),
     ancestral_keep_max_aspect = create_checkbox(true, 'max_aspect'),
-    ancestral_ga_count_slider = slider_int:new(0, 3, 1, get_hash(plugin_label .. '_ga_slider')),
+    ancestral_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_ga_slider')),
     ancestral_filter_toggle = create_checkbox(false, 'use_filter'),
 
     ancestral_filter_tree = tree_node:new(2),
