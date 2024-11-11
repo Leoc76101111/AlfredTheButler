@@ -12,7 +12,8 @@ local status_enum = {
 
 local task = {
     name = 'Status',
-    status = status_enum['IDLE']
+    status = status_enum['IDLE'],
+    teleport_trigger_time = nil,
 }
 
 local function all_task_done()
@@ -71,10 +72,12 @@ function task.Execute()
         return
     end
 
+    local restock_trigger = false
     local status = all_task_done()
     if status.complete then
-        tracker.manual_trigger = false
         utils.reset_all_task()
+        task.teleport_trigger_time = nil
+        tracker.manual_trigger = false
         tracker.trigger_tasks = false
         tracker.all_task_done = true
         if settings.allow_external and tracker.external_trigger then
@@ -87,19 +90,42 @@ function task.Execute()
         end
     end
 
+    if #tracker.restock_items > 0 then
+        for _,item_data in pairs(tracker.restock_items) do
+            if item_data.stash > 0 and item_data.count < item_data.min then
+                restock_trigger = true
+            end
+        end
+    end
+
+
     if tracker.timeout then
         task.status = status_enum['TIMEOUT']
     elseif ((settings.allow_external and tracker.external_trigger) or
-        tracker.inventory_full or tracker.manual_trigger)
+        tracker.inventory_full or tracker.manual_trigger) or restock_trigger
     then
         -- -- uncomment if you want to collect item data before salvage/sell
         -- if task.status ~= status_enum['WAITING'] then
         --     utils.export_inventory_info()
         -- end
+        if restock_trigger and
+            settings.restock_type == utils.restock_enum['ACTIVE'] and
+            settings.restock_use_teleport and
+            task.teleport_trigger_time == nil
+        then
+            task.teleport_trigger_time = get_time_since_inject()
+        elseif restock_trigger and
+            settings.restock_type == utils.restock_enum['ACTIVE'] and
+            settings.restock_use_teleport and
+            task.teleport_trigger_time + settings.restock_teleport_delay < get_time_since_inject()
+        then
+            tracker.teleport = true
+        end
         tracker.trigger_tasks = true
         task.status = status_enum['WAITING']
     else
         task.status = status_enum['IDLE']
+        tracker.last_task = task.name
     end
 end
 

@@ -61,6 +61,11 @@ gui.item_options = {
     'Sell'
 }
 
+gui.restock_options = {
+    'Active',
+    'Passive',
+}
+
 gui.elements = {
     main_tree = tree_node:new(0),
     main_toggle = create_checkbox(false, 'main_toggle'),
@@ -70,7 +75,7 @@ gui.elements = {
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_keybind_toggle' )),
     dump_keybind = keybind:new(0x0c,false,get_hash(plugin_label .. '_dump_keybind')),
     manual_keybind = keybind:new(0x0B,false,get_hash(plugin_label .. '_manual_keybind')),
-    use_teleport = create_checkbox(false, 'use_teleport'),
+    manual_use_teleport = create_checkbox(false, 'manual_use_teleport'),
 
     stash_toggle = create_checkbox(false, 'stash_toggle'),
     inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. '_inventory_limit_slider')),
@@ -100,6 +105,9 @@ gui.elements = {
 
     restock_tree = tree_node:new(1),
     restock_toggle = create_checkbox(false, 'restock_toggle'),
+    restock_type = combo_box:new(1, get_hash(plugin_label .. '_restock_type')),
+    restock_use_teleport = create_checkbox(false, 'restock_use_teleport'),
+    restock_teleport_delay =  slider_int:new(0, 300, 60, get_hash(plugin_label .. '_restock_teleport_delay')),
 
     gamble_tree = tree_node:new(1),
     gamble_toggle = create_checkbox(false, 'gamble_toggle'),
@@ -119,9 +127,9 @@ end
 add_affix_tree('unique')
 add_affix_checkbox('unique', unique_items)
 add_affix_search('unique')
-for sno_id,_ in pairs(restock_items) do
-    local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)
-    gui.elements[slider_name] = slider_int:new(0, 33, 0, get_hash(slider_name))
+for _,item in pairs(restock_items) do
+    local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
+    gui.elements[slider_name] = slider_int:new(0, item.max, 0, get_hash(slider_name))
 end
 
 function gui.render()
@@ -131,9 +139,9 @@ function gui.render()
     gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot')
     if gui.elements.use_keybind:get() then
         gui.elements.keybind_toggle:render('Toggle Keybind', 'Toggle the bot for quick enable')
-        gui.elements.dump_keybind:render('Dump items info', 'Dump all item info to log')
+        gui.elements.dump_keybind:render('Dump tracker info', 'Dump all tracker info to log')
         gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now if in cerrigar')
-        gui.elements.use_teleport:render('Use teleport', 'use teleport for manual trigger')
+        gui.elements.manual_use_teleport:render('Use teleport', 'use teleport for manual trigger')
     end
     gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
     gui.elements.inventory_limit_slider:render('Inventory Limit','minimum number if items before stash/salvage/sell')
@@ -187,16 +195,21 @@ function gui.render()
         end
         gui.elements.ancestral_item_tree:pop()
     end
-    -- if gui.elements.restock_tree:push('Restock') then
-    --     gui.elements.restock_toggle:render('Restocking', 'Enable restocking items')
-    --     if gui.elements.restock_toggle:get() then
-    --         for sno_id,item in pairs(restock_items) do
-    --             local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)
-    --             gui.elements[slider_name]:render(item.name,'Restock up to ')
-    --         end
-    --     end
-    --     gui.elements.restock_tree:pop()
-    -- end
+    if gui.elements.restock_tree:push('Restock') then
+        gui.elements.restock_toggle:render('Restocking', 'Enable restocking items')
+        if gui.elements.restock_toggle:get() then
+            gui.elements.restock_type:render('Mode',gui.restock_options,'Active mode will trigger if drop below min, Passive mode will wait for other tasks')
+            if gui.elements.restock_type:get() == utils.restock_enum['ACTIVE'] then
+                gui.elements.restock_use_teleport:render('Use teleport', 'use teleport for active mode')
+                gui.elements.restock_teleport_delay:render('Teleport delay', 'delay so you can kill bosses')
+            end
+            for _,item in pairs(restock_items) do
+                local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
+                gui.elements[slider_name]:render(item.name, 'Maximum to have in inventory')
+            end
+        end
+        gui.elements.restock_tree:pop()
+    end
 
     -- if gui.elements.gamble_tree:push('Gamble') then
     --     gui.elements.gamble_toggle:render('Gambling', 'Enable gambling items')

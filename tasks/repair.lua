@@ -32,6 +32,7 @@ end
 function extension.execute()
     local local_player = get_local_player()
     if not local_player then return end
+    tracker.last_task = task.name
     local npc = extension.get_npc()
     loot_manager.interact_with_vendor_and_repair_all(npc)
 end

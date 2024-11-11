@@ -5,7 +5,6 @@ local tracker = {
     timeout                   = false,
     inventory_full            = false,
     inventory_limit           = 0,
-    inventory_hard_limit      = 33,
     inventory_count           = 0,
     salvage_count             = 0,
     sell_count                = 0,
@@ -31,7 +30,9 @@ local tracker = {
     manual_trigger            = false,
     restock_items             = {},
     restock_failed            = false,
-    restock_done              = false
+    restock_done              = false,
+    last_task                 = 'status',
+    previous                  = {}
 }
 
 return tracker
