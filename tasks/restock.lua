@@ -16,6 +16,9 @@ local status_enum = {
     FAILED = 'Failed to restock'
 }
 
+local debounce_time = nil
+local debounce_timeout = 1
+
 local function is_inventory_max(type)
     if type == 'key' then
         return #get_local_player():get_dungeon_key_items() == 33
@@ -38,6 +41,8 @@ function extension.interact()
     if npc then interact_vendor(npc) end
 end
 function extension.execute()
+    if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
+    debounce_time = get_time_since_inject()
     local local_player = get_local_player()
     if not local_player then return end
     tracker.last_task = task.name
