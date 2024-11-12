@@ -486,6 +486,7 @@ function utils.update_tracker_count()
                 name = item.name,
                 min = item.min,
                 max = item.max,
+                item_type = item_restock_by_id[item.sno_id],
                 count = counter,
                 stash = stash_count
             }
