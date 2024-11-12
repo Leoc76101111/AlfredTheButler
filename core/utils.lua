@@ -613,25 +613,25 @@ function utils.export_inventory_info()
             item_info['type'] = utils.get_item_type(item)
             item_info['affix'] = {}
             item_info['aspect'] = {}
-            -- for _,affix in pairs(item:get_affixes()) do
-            --     local affix_id = affix.affix_name_hash
-            --     if item_aspect[affix_id] then
-            --         item_info['aspect']['id'] = affix_id
-            --         item_info['aspect']['name'] = affix:get_name()
-            --         item_info['aspect']['roll'] = affix:get_roll()
-            --         item_info['aspect']['max_roll'] = affix:get_roll_max()
-            --         item_info['aspect']['min_roll'] = affix:get_roll_min()
-            --         item_info['aspect']['is_max'] = utils.is_max_aspect(affix)
-            --     else
-            --         item_info['affix'][#item_info['affix']+1] = {
-            --             ['id'] = affix_id,
-            --             ['name'] = affix:get_name(),
-            --             ['roll'] = affix:get_roll(),
-            --             ['max_roll'] = affix:get_roll_max(),
-            --             ['min_roll'] = affix:get_roll_min()
-            --         }
-            --     end
-            -- end
+            for _,affix in pairs(item:get_affixes()) do
+                local affix_id = affix.affix_name_hash
+                if item_aspect[affix_id] then
+                    item_info['aspect']['id'] = affix_id
+                    item_info['aspect']['name'] = affix:get_name()
+                    item_info['aspect']['roll'] = affix:get_roll()
+                    item_info['aspect']['max_roll'] = affix:get_roll_max()
+                    item_info['aspect']['min_roll'] = affix:get_roll_min()
+                    item_info['aspect']['is_max'] = utils.is_max_aspect(affix)
+                else
+                    item_info['affix'][#item_info['affix']+1] = {
+                        ['id'] = affix_id,
+                        ['name'] = affix:get_name(),
+                        ['roll'] = affix:get_roll(),
+                        ['max_roll'] = affix:get_roll_max(),
+                        ['min_roll'] = affix:get_roll_min()
+                    }
+                end
+            end
         end
         items_info[#items_info+1] = item_info
     end
