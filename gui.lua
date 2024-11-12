@@ -155,8 +155,8 @@ function gui.render()
         gui.elements.explorer_tree:pop()
     end
     if gui.elements.item_tree:push('Non-Ancestral') then
-        gui.elements.item_legendary_or_lower:render('non-unique items', gui.item_options, 'Select what to do with non-ancestral non-unique legendary items')
         gui.elements.item_unique:render('unique items', gui.item_options, 'Select what to do with non-ancestral unique items')
+        gui.elements.item_legendary_or_lower:render('non-unique items', gui.item_options, 'Select what to do with non-ancestral non-unique legendary items')
         gui.elements.item_junk:render('junk items', gui.item_options, 'Select what to do with junk items')
         gui.elements.item_tree:pop()
     end
@@ -166,9 +166,9 @@ function gui.render()
             gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
             gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
         end
-        gui.elements.ancestral_item_legendary:render('non-unique items', gui.item_options, 'Select what to do with non-unique legendary items')
-        gui.elements.ancestral_item_unique:render('unique items', gui.item_options, 'Select what to do with unique items')
         gui.elements.ancestral_item_mythic:render('mythic items', gui.item_options, 'Select what to do with mythic items')
+        gui.elements.ancestral_item_unique:render('unique items', gui.item_options, 'Select what to do with unique items')
+        gui.elements.ancestral_item_legendary:render('legendary items', gui.item_options, 'Select what to do with non-unique legendary items')
         gui.elements.ancestral_item_junk:render('junk items', gui.item_options, 'Select what to do with junk items')
         gui.elements.ancestral_keep_max_aspect:render('Keep max aspect','Keep max aspect')
         gui.elements.ancestral_filter_toggle:render('Use affix/unique filter', 'use affix filter')
