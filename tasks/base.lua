@@ -95,7 +95,7 @@ function base.new_task()
             task.extension.reset()
             task.last_stuck_location = player_position
         elseif task.status == (status_prefix .. task.status_enum['RESETTING']) and
-            task.last_interaction + task.interaction_timeout > current_time
+            task.last_interaction + task.interaction_timeout >= current_time
         then
             task.status = status_prefix .. task.status_enum['RESETTING']
             task.extension.reset()
@@ -108,7 +108,7 @@ function base.new_task()
             task.extension.move()
         elseif task.status == (status_prefix .. task.status_enum['MOVING']) and
             (not npc or (not npc_bugged and utils.distance_to(npc) >= 2)) and
-            task.last_interaction + task.interaction_timeout > current_time
+            task.last_interaction + task.interaction_timeout >= current_time
         then
             task.status = status_prefix .. task.status_enum['MOVING']
             task.extension.move()
@@ -119,7 +119,7 @@ function base.new_task()
             task.last_interaction = current_time
             task.extension.interact()
         elseif task.status == (status_prefix .. task.status_enum['INTERACTING']) and
-            task.last_interaction + task.interaction_timeout > current_time and
+            task.last_interaction + task.interaction_timeout >= current_time and
             not (task.has_vendor_screen and loot_manager:is_in_vendor_screen())
         then
             task.status = status_prefix .. task.status_enum['INTERACTING']
@@ -132,7 +132,7 @@ function base.new_task()
             task.last_interaction = current_time
             task.extension.execute()
         elseif task.status == (status_prefix .. task.status_enum['EXECUTE']) and
-            task.last_interaction + task.interaction_timeout > current_time and
+            task.last_interaction + task.interaction_timeout >= current_time and
             not task.extension.is_done()
         then
             task.status = status_prefix .. task.status_enum['EXECUTE']
