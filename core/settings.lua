@@ -21,9 +21,12 @@ local settings = {
     item_junk = utils.item_enum['SALVAGE'],
     ancestral_item_legendary = utils.item_enum['SALVAGE'],
     ancestral_item_unique = utils.item_enum['SELL'],
+    ancestral_item_mythic = utils.item_enum['KEEP'],
     ancestral_item_junk = utils.item_enum['SALVAGE'],
     ancestral_keep_max_aspect = true,
     ancestral_ga_count = 0,
+    ancestral_unique_ga_count = 0,
+    ancestral_mythic_ga_count = 0,
     ancestral_filter = false,
     ancestral_affix_count = 0,
     ancestral_affix_ga_count = 0,
@@ -35,7 +38,6 @@ local settings = {
     restock_type = utils.restock_enum['PASSIVE'],
     restock_use_teleport = false,
     restock_teleport_delay = 30,
-
 }
 
 function settings.get_keybind_state()
@@ -66,9 +68,12 @@ function settings:update_settings()
     settings.item_junk = gui.elements.item_junk:get()
     settings.ancestral_item_legendary = gui.elements.ancestral_item_legendary:get()
     settings.ancestral_item_unique = gui.elements.ancestral_item_unique:get()
+    settings.ancestral_item_mythic = gui.elements.ancestral_item_mythic:get()
     settings.ancestral_item_junk = gui.elements.ancestral_item_junk:get()
     settings.ancestral_keep_max_aspect = gui.elements.ancestral_keep_max_aspect:get()
     settings.ancestral_ga_count = gui.elements.ancestral_ga_count_slider:get()
+    settings.ancestral_unique_ga_count = gui.elements.ancestral_unique_ga_count_slider:get()
+    settings.ancestral_mythic_ga_count = gui.elements.ancestral_mythic_ga_count_slider:get()
     settings.ancestral_filter = gui.elements.ancestral_filter_toggle:get()
     settings.ancestral_affix_count = gui.elements.ancestral_affix_count_slider:get()
     settings.ancestral_affix_ga_count = gui.elements.ancestral_affix_ga_count_slider:get()

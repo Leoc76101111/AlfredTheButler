@@ -90,8 +90,11 @@ gui.elements = {
     ancestral_item_legendary = combo_box:new(1, get_hash(plugin_label .. '_ancestral_item_legendary')),
     ancestral_item_unique = combo_box:new(1, get_hash(plugin_label .. '_ancestral_item_unique')),
     ancestral_item_junk = combo_box:new(1, get_hash(plugin_label .. '_ancestral_item_junk')),
+    ancestral_item_mythic = combo_box:new(0, get_hash(plugin_label .. '_ancestral_item_mythic')),
     ancestral_keep_max_aspect = create_checkbox(true, 'max_aspect'),
-    ancestral_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_ga_slider')),
+    ancestral_ga_count_slider = slider_int:new(0, 3, 1, get_hash(plugin_label .. '_ga_slider')),
+    ancestral_unique_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_unique_ga_slider')),
+    ancestral_mythic_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_mythic_ga_slider')),
     ancestral_filter_toggle = create_checkbox(false, 'use_filter'),
 
     ancestral_filter_tree = tree_node:new(2),
@@ -159,16 +162,21 @@ function gui.render()
     end
     if gui.elements.ancestral_item_tree:push('Ancestral') then
         if not gui.elements.ancestral_filter_toggle:get() then
-            gui.elements.ancestral_ga_count_slider:render('Min Greater Affix', 'Minimun greater affix to keep')
+            gui.elements.ancestral_mythic_ga_count_slider:render('Mythic Greater Affix', 'Minimum greater affix to keep for mythic')
+            gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
+            gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
         end
         gui.elements.ancestral_item_legendary:render('non-unique items', gui.item_options, 'Select what to do with non-unique legendary items')
         gui.elements.ancestral_item_unique:render('unique items', gui.item_options, 'Select what to do with unique items')
+        gui.elements.ancestral_item_mythic:render('mythic items', gui.item_options, 'Select what to do with mythic items')
         gui.elements.ancestral_item_junk:render('junk items', gui.item_options, 'Select what to do with junk items')
         gui.elements.ancestral_keep_max_aspect:render('Keep max aspect','Keep max aspect')
         gui.elements.ancestral_filter_toggle:render('Use affix/unique filter', 'use affix filter')
         if gui.elements.ancestral_filter_toggle:get() then
             if gui.elements.ancestral_filter_tree:push('General') then
-                gui.elements.ancestral_ga_count_slider:render('Min Greater Affix', 'Minimun greater affix to keep')
+                gui.elements.ancestral_mythic_ga_count_slider:render('Mythic Greater Affix', 'Minimum greater affix to keep for mythic')
+                gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
+                gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
                 gui.elements.ancestral_affix_count_slider:render('Min matching Affix', 'Minimum matching affix to keep')
                 -- gui.elements.ancestral_affix_ga_count_slider:render('Min matching GA', 'Minimum matching greater affix')
                 gui.elements.seperator:render('',{'Export'},'')

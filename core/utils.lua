@@ -329,7 +329,7 @@ function utils.get_item_type(item)
 end
 function utils.is_salvage_or_sell(item,action)
     local item_id = item:get_sno_id()
-    if item:is_locked() or utils.mythics[tostring(item_id)] ~= nil then return false end
+    if item:is_locked() then return false end
 
     local item_type = utils.get_item_type(item)
     if item_type == 'cache' then return false end
@@ -380,21 +380,31 @@ function utils.is_salvage_or_sell(item,action)
             end
         end
     end
-    if ((utils.settings.ancestral_filter and
-        ancestral_affix_count < utils.settings.ancestral_affix_count) or
-        ancestral_ga_count < utils.settings.ancestral_ga_count) and
+    
+    -- legendaries
+    if not is_unique and utils.mythics[tostring(item_id)] == nil and
         utils.settings.ancestral_item_legendary == action and
-        not is_unique
+        (ancestral_ga_count < utils.settings.ancestral_ga_count or
+        (utils.settings.ancestral_filter and
+        ancestral_affix_count < utils.settings.ancestral_affix_count))
     then
         return true
     end
-    if ((utils.settings.ancestral_filter and not utils.is_correct_unique(item)) or
-        ancestral_ga_count < utils.settings.ancestral_ga_count) and
-        utils.settings.ancestral_item_legendary == action
+    -- uniques
+    if is_unique and utils.mythics[tostring(item_id)] == nil and
+        utils.settings.ancestral_item_unique == action and
+        (ancestral_ga_count < utils.settings.ancestral_unique_ga_count or
+        (utils.settings.ancestral_filter and not utils.is_correct_unique(item)))
     then
         return true
     end
-
+    -- mythics
+    if not is_unique and utils.mythics[tostring(item_id)] ~= nil and
+        utils.settings.ancestral_item_mythic == action and
+        ancestral_ga_count < utils.settings.ancestral_mythic_ga_count
+    then
+        return true
+    end
     return false
 end
 function utils.get_restock_item_count(local_player,item)
