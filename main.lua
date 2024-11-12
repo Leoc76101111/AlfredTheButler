@@ -51,7 +51,7 @@ local function render_pulse()
         status = 'Paused by ' .. tracker.external_caller
     elseif not settings.get_keybind_state() and not tracker.external_caller and not tracker.trigger_tasks then
         status = 'Paused'
-    elseif current_task and tracker.external_caller then
+    elseif current_task and settings.allow_external and tracker.external_caller then
         status = '(' .. tracker.external_caller .. ' - '
         status = status .. current_task.name .. ') '
         status = status .. current_task.status:gsub('%('..tracker.external_caller..'%)','')
