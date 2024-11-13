@@ -17,7 +17,7 @@ local status_enum = {
 }
 
 local debounce_time = nil
-local debounce_timeout = 1
+local debounce_timeout = 3
 
 local function is_inventory_max(type)
     if type == 'key' then
@@ -64,6 +64,7 @@ function extension.execute()
                     loot_manager.move_item_from_stash(item)
                     need_counter = need_counter - item_count
                     task.last_interaction = get_time_since_inject()
+                    debounce_time = get_time_since_inject()
                 else
                     stash_counter = stash_counter + item_count
                 end

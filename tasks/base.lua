@@ -37,7 +37,7 @@ local base = {}
 function base.new_task()
     local task = {
         name = 'base',
-        status = 'initiating',
+        status = status_enum['IDLE'],
         last_interaction = 0,
         retry = 0,
         interaction_timeout = 3,
@@ -113,7 +113,8 @@ function base.new_task()
             task.status = status_prefix .. task.status_enum['MOVING']
             task.extension.move()
         elseif (npc_bugged or (npc and utils.distance_to(npc) < 2)) and
-            task.status == (status_prefix .. task.status_enum['MOVING'])
+            (task.status == (status_prefix .. task.status_enum['MOVING']) or
+            task.status == (status_prefix .. task.status_enum['IDLE']))
         then
             task.status = status_prefix .. task.status_enum['INTERACTING']
             task.last_interaction = current_time
@@ -148,9 +149,9 @@ function base.new_task()
             task.reset_state = task.status_enum['EXECUTE']
             task.extension.reset()
         else
+            task.extension.failed()
             task.status  = status_prefix .. task.status_enum['FAILED']
             task.retry = 0
-            task.extension.failed()
         end
     end
 

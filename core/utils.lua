@@ -348,7 +348,9 @@ function utils.is_salvage_or_sell(item,action)
             return true
         elseif is_unique and utils.settings.item_unique == action then
             return true
-        elseif not is_unique and utils.settings.item_legendary_or_lower == action then
+        elseif not item:is_junk() and not is_unique and
+            utils.settings.item_legendary_or_lower == action 
+        then
             return true
         else
             return false
@@ -381,8 +383,8 @@ function utils.is_salvage_or_sell(item,action)
         end
     end
     
-    -- legendaries
-    if not is_unique and utils.mythics[tostring(item_id)] == nil and
+    -- legendaries (not junk, not unique, not mythic)
+    if not item:is_junk() and not is_unique and utils.mythics[tostring(item_id)] == nil and
         utils.settings.ancestral_item_legendary == action and
         (ancestral_ga_count < utils.settings.ancestral_ga_count or
         (utils.settings.ancestral_filter and
@@ -390,16 +392,16 @@ function utils.is_salvage_or_sell(item,action)
     then
         return true
     end
-    -- uniques
-    if is_unique and utils.mythics[tostring(item_id)] == nil and
+    -- uniques (not junk, is unique, not mythic)
+    if not item:is_junk() and is_unique and utils.mythics[tostring(item_id)] == nil and
         utils.settings.ancestral_item_unique == action and
         (ancestral_ga_count < utils.settings.ancestral_unique_ga_count or
         (utils.settings.ancestral_filter and not utils.is_correct_unique(item)))
     then
         return true
     end
-    -- mythics
-    if not is_unique and utils.mythics[tostring(item_id)] ~= nil and
+    -- mythics (not junk, not unique, is mythic)
+    if not item:is_junk() and not is_unique and utils.mythics[tostring(item_id)] ~= nil and
         utils.settings.ancestral_item_mythic == action and
         ancestral_ga_count < utils.settings.ancestral_mythic_ga_count
     then
@@ -458,9 +460,7 @@ function utils.update_tracker_count()
     tracker.salvage_count = salvage_counter
     tracker.sell_count = sell_counter
     tracker.stash_count = stash_counter
-    tracker.inventory_limit = utils.settings.inventory_limit
-    tracker.inventory_full = tracker.inventory_count == 33 or
-        (tracker.sell_count + tracker.salvage_count) >= tracker.inventory_limit
+    tracker.inventory_full = tracker.inventory_count == 33
 
     -- clean up tracker
     if #utils.settings.restock_items ~= #tracker.restock_items then

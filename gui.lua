@@ -69,18 +69,14 @@ gui.restock_options = {
 gui.elements = {
     main_tree = tree_node:new(0),
     main_toggle = create_checkbox(false, 'main_toggle'),
-    allow_external_toggle = create_checkbox(false, 'allow_external_toggle'),
 
     use_keybind = create_checkbox(false, 'use_keybind'),
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_keybind_toggle' )),
-    dump_keybind = keybind:new(0x0c,false,get_hash(plugin_label .. '_dump_keybind')),
-    manual_keybind = keybind:new(0x0B,false,get_hash(plugin_label .. '_manual_keybind')),
-    manual_use_teleport = create_checkbox(false, 'manual_use_teleport'),
+    dump_keybind = keybind:new(0x0A,false,get_hash(plugin_label .. '_dump_keybind')),
+    manual_keybind = keybind:new(0x0A,false,get_hash(plugin_label .. '_manual_keybind')),
 
     stash_toggle = create_checkbox(false, 'stash_toggle'),
-    inventory_limit_slider = slider_int:new(1, 33, 20, get_hash(plugin_label .. '_inventory_limit_slider')),
-    timeout_slider = slider_int:new(10, 120, 10, get_hash(plugin_label .. '_timeout_slider')),
-
+    
     item_tree = tree_node:new(1),
     item_legendary_or_lower = combo_box:new(1, get_hash(plugin_label .. '_item_legendary_or_lower')),
     item_unique = combo_box:new(2, get_hash(plugin_label .. '_item_unique')),
@@ -107,9 +103,7 @@ gui.elements = {
     affix_import_name = input_text:new(get_hash(plugin_label .. '_affix_import_button')),
 
     restock_tree = tree_node:new(1),
-    restock_toggle = create_checkbox(false, 'restock_toggle'),
     restock_type = combo_box:new(1, get_hash(plugin_label .. '_restock_type')),
-    restock_use_teleport = create_checkbox(false, 'restock_use_teleport'),
     restock_teleport_delay =  slider_int:new(0, 300, 60, get_hash(plugin_label .. '_restock_teleport_delay')),
 
     gamble_tree = tree_node:new(1),
@@ -138,17 +132,13 @@ end
 function gui.render()
     if not gui.elements.main_tree:push('Alfred the Butler | Leoric | ' .. plugin_version) then return end
     gui.elements.main_toggle:render('Enable', 'Enable alfred')
-    gui.elements.allow_external_toggle:render('allow external','allow other plugins to call alfred')
     gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot')
     if gui.elements.use_keybind:get() then
         gui.elements.keybind_toggle:render('Toggle Keybind', 'Toggle the bot for quick enable')
         gui.elements.dump_keybind:render('Dump tracker info', 'Dump all tracker info to log')
-        gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now if in cerrigar')
-        gui.elements.manual_use_teleport:render('Use teleport', 'use teleport for manual trigger')
+        gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now')
     end
     gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
-    gui.elements.inventory_limit_slider:render('Inventory Limit','minimum number if items before stash/salvage/sell')
-    gui.elements.timeout_slider:render('Timeout','no. seconds to timeout alfred when failed to complete tasks')
     if gui.elements.explorer_tree:push('Explorer settings') then
         gui.elements.explorer_path_angle_slider:render("Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
         gui.elements.explorer_aggressive_movement_toggle:render("Aggresive movement","move directly to the target")
@@ -161,16 +151,16 @@ function gui.render()
         gui.elements.item_tree:pop()
     end
     if gui.elements.ancestral_item_tree:push('Ancestral') then
-        if not gui.elements.ancestral_filter_toggle:get() then
-            gui.elements.ancestral_mythic_ga_count_slider:render('Mythic Greater Affix', 'Minimum greater affix to keep for mythic')
-            gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
-            gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
-        end
         gui.elements.ancestral_item_mythic:render('mythic items', gui.item_options, 'Select what to do with mythic items')
         gui.elements.ancestral_item_unique:render('unique items', gui.item_options, 'Select what to do with unique items')
         gui.elements.ancestral_item_legendary:render('legendary items', gui.item_options, 'Select what to do with non-unique legendary items')
         gui.elements.ancestral_item_junk:render('junk items', gui.item_options, 'Select what to do with junk items')
         gui.elements.ancestral_keep_max_aspect:render('Keep max aspect','Keep max aspect')
+        if not gui.elements.ancestral_filter_toggle:get() then
+            gui.elements.ancestral_mythic_ga_count_slider:render('Mythic Greater Affix', 'Minimum greater affix to keep for mythic')
+            gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
+            gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
+        end
         gui.elements.ancestral_filter_toggle:render('Use affix/unique filter', 'use affix filter')
         if gui.elements.ancestral_filter_toggle:get() then
             if gui.elements.ancestral_filter_tree:push('General') then
@@ -204,17 +194,13 @@ function gui.render()
         gui.elements.ancestral_item_tree:pop()
     end
     if gui.elements.restock_tree:push('Restock') then
-        gui.elements.restock_toggle:render('Restocking', 'Enable restocking items')
-        if gui.elements.restock_toggle:get() then
-            gui.elements.restock_type:render('Mode',gui.restock_options,'Active mode will trigger if drop below min, Passive mode will wait for other tasks')
-            if gui.elements.restock_type:get() == utils.restock_enum['ACTIVE'] then
-                gui.elements.restock_use_teleport:render('Use teleport', 'use teleport for active mode')
-                gui.elements.restock_teleport_delay:render('Teleport delay', 'delay so you can kill bosses')
-            end
-            for _,item in pairs(restock_items) do
-                local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
-                gui.elements[slider_name]:render(item.name, 'Maximum to have in inventory')
-            end
+        gui.elements.restock_type:render('Mode',gui.restock_options,'Active mode will trigger if drop below min, Passive mode will wait for other tasks')
+        if gui.elements.restock_type:get() == utils.restock_enum['ACTIVE'] then
+            gui.elements.restock_teleport_delay:render('Teleport delay', 'delay so you can kill bosses')
+        end
+        for _,item in pairs(restock_items) do
+            local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
+            gui.elements[slider_name]:render(item.name, 'Maximum to have in inventory')
         end
         gui.elements.restock_tree:pop()
     end

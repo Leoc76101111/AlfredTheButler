@@ -27,8 +27,7 @@ function task.shouldExecute()
         -- alfred will retry once timeout is over
         if status.enabled and
             status.inventory_full and
-            (status.sell_count > 0 or status.salvage_count > 0) and
-            not status.timeout
+            (status.sell_count > 0 or status.salvage_count > 0)
         then
             return true
         elseif task.status == status_enum['WAITING'] then

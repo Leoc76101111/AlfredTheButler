@@ -110,13 +110,11 @@ function task.Execute()
         -- end
         if restock_trigger and
             settings.restock_type == utils.restock_enum['ACTIVE'] and
-            settings.restock_use_teleport and
             task.teleport_trigger_time == nil
         then
             task.teleport_trigger_time = get_time_since_inject()
         elseif restock_trigger and
             settings.restock_type == utils.restock_enum['ACTIVE'] and
-            settings.restock_use_teleport and
             task.teleport_trigger_time + settings.restock_teleport_delay < get_time_since_inject()
         then
             tracker.teleport = true

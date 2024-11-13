@@ -4,7 +4,6 @@ local tracker = {
     name                      = plugin_label,
     timeout                   = false,
     inventory_full            = false,
-    inventory_limit           = 0,
     inventory_count           = 0,
     salvage_count             = 0,
     sell_count                = 0,

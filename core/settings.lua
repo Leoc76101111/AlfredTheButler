@@ -8,11 +8,9 @@ local unique_items = utils.get_unique_items()
 local settings = {
     enabled = false,
     use_keybind = false,
-    manual_use_teleport = false,
     item_use_stash = false,
-    inventory_limit = 20,
-    timeout = 120,
-    allow_external = false,
+    timeout = 0,
+    allow_external = true,
     -- item_magic = utils.item_enum['SALVAGE'],
     -- item_rare = utils.item_enum['SALVAGE'],
     -- item_legendary = utils.item_enum['SALVAGE'],
@@ -36,7 +34,6 @@ local settings = {
     path_angle = 10,
     restock_items = {},
     restock_type = utils.restock_enum['PASSIVE'],
-    restock_use_teleport = false,
     restock_teleport_delay = 30,
 }
 
@@ -58,11 +55,7 @@ end
 function settings:update_settings()
     settings.enabled = gui.elements.main_toggle:get()
     settings.use_keybind = gui.elements.use_keybind:get()
-    settings.manual_use_teleport = gui.elements.manual_use_teleport:get()
     settings.item_use_stash = gui.elements.stash_toggle:get()
-    settings.inventory_limit = gui.elements.inventory_limit_slider:get()
-    settings.timeout = gui.elements.timeout_slider:get()
-    settings.allow_external = gui.elements.allow_external_toggle:get()
     settings.item_legendary_or_lower = gui.elements.item_legendary_or_lower:get()
     settings.item_unique = gui.elements.item_unique:get()
     settings.item_junk = gui.elements.item_junk:get()
@@ -97,21 +90,18 @@ function settings:update_settings()
         end
     end
     settings.restock_items = {}
-    if gui.elements.restock_toggle:get() then
-        settings.restock_type = gui.elements.restock_type:get()
-        settings.restock_use_teleport = gui.elements.restock_use_teleport:get()
-        settings.restock_teleport_delay = gui.elements.restock_teleport_delay:get()
-        for _,item in pairs(utils.get_restock_items()) do
-            local sno_id = item.sno_id
-            local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)
-            if gui.elements[slider_name]:get() > 0 then
-                settings.restock_items[#settings.restock_items+1] = {
-                    sno_id = sno_id,
-                    name = item.name,
-                    max = gui.elements[slider_name]:get(),
-                    min = item.min
-                }
-            end
+    settings.restock_type = gui.elements.restock_type:get()
+    settings.restock_teleport_delay = gui.elements.restock_teleport_delay:get()
+    for _,item in pairs(utils.get_restock_items()) do
+        local sno_id = item.sno_id
+        local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)
+        if gui.elements[slider_name]:get() > 0 then
+            settings.restock_items[#settings.restock_items+1] = {
+                sno_id = sno_id,
+                name = item.name,
+                max = gui.elements[slider_name]:get(),
+                min = item.min
+            }
         end
     end
 end

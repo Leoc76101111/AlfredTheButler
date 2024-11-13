@@ -17,7 +17,7 @@ local status_enum = {
 }
 
 local debounce_time = nil
-local debounce_timeout = 1
+local debounce_timeout = 3
 
 local extension = {}
 function extension.get_npc()
@@ -48,6 +48,7 @@ function extension.execute()
             loot_manager.move_item_to_stash(item)
             loot_manager.move_item_to_stash(item)
             task.last_interaction = get_time_since_inject()
+            debounce_time = get_time_since_inject()
         end
     end
 end
