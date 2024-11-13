@@ -7,6 +7,9 @@ local external = {
     get_status = function ()
         return {
             name            = plugin_label,
+            teleport        = tracker.teleport,
+            teleport_done   = tracker.teleport_done,
+            teleport_failed = tracker.teleport_failed,
             enabled         = settings.enabled,
             inventory_full  = tracker.inventory_full,
             inventory_count  = tracker.inventory_count,
