@@ -47,7 +47,15 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    return auto_play.get_objective() ~= objective.repair
+    local local_player = get_local_player()
+    if not local_player then return false end
+    local items = local_player:get_equipped_items()
+    for _, item in pairs(items) do
+        if item:get_durability() < 50 then
+            return true
+        end
+    end
+    return false
 end
 function extension.done()
     tracker.repair_done = true
