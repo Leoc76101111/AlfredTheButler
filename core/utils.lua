@@ -271,15 +271,15 @@ function utils.is_max_aspect(affix)
             return math.floor((affix:get_roll() * 100) + 0.5) >= affix:get_roll_max() * 100
         else
             -- simple direct comparison
-            if affix:get_roll() == affix:get_roll_min() then return true end
+            if affix:get_roll() == affix:get_roll_max() then return true end
 
             -- dealing with int value of min_roll
-            if affix:get_roll_min() == math.floor(affix:get_roll_min()) then
+            if affix:get_roll_max() == math.floor(affix:get_roll_max()) then
                 -- 0.5 for rounding instead of floor
-                return math.floor(affix:get_roll() + 0.5) <= affix:get_roll_min()
+                return math.floor(affix:get_roll() + 0.5) <= affix:get_roll_max()
             end
             -- dealing with decimals up to 2 places
-            return math.floor((affix:get_roll() * 100) + 0.5) <= affix:get_roll_min() * 100
+            return math.floor((affix:get_roll() * 100) + 0.5) <= affix:get_roll_max() * 100
         end
 
     end
