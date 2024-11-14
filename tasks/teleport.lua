@@ -15,7 +15,13 @@ local status_enum = {
     RESETTING = 'Re-trying teleport',
     FAILED = 'Failed to teleport'
 }
-
+local debounce_time = nil
+local debounce_timeout = 3
+local function teleport_with_debounce()
+    if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
+    debounce_time = get_time_since_inject()
+    teleport_to_waypoint(0x76D58)
+end
 local extension = {}
 function extension.get_npc()
     return utils.get_npc(utils.npc_enum['PORTAL'])
@@ -99,7 +105,7 @@ task.Execute = function ()
         not (tracker.repair_done or tracker.repair_failed)
     then
         task.status = status_enum['EXECUTE']
-        teleport_to_waypoint(0x76D58)
+        teleport_with_debounce()
     else
         task.baseExecute()
     end
