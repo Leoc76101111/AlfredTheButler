@@ -33,8 +33,7 @@ function extension.execute()
     local local_player = get_local_player()
     if not local_player then return end
     tracker.last_task = task.name
-    local npc = extension.get_npc()
-    loot_manager.interact_with_vendor_and_repair_all(npc)
+    loot_manager.repair_all_items()
 end
 function extension.reset()
     local local_player = get_local_player()
@@ -48,14 +47,15 @@ function extension.reset()
 end
 function extension.is_done()
     local local_player = get_local_player()
-    if not local_player then return false end
+    if not local_player then return true end
+    local is_done = true
     local items = local_player:get_equipped_items()
     for _, item in pairs(items) do
         if item:get_durability() < 50 then
-            return true
+            is_done = false
         end
     end
-    return false
+    return is_done
 end
 function extension.done()
     tracker.repair_done = true
@@ -67,6 +67,8 @@ end
 task.name = 'repair'
 task.extension = extension
 task.status_enum = status_enum
+task.has_vendor_screen = true
+
 task.shouldExecute = function ()
     if tracker.trigger_tasks == false then
         task.retry = 0
