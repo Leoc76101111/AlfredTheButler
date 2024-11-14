@@ -70,7 +70,6 @@ function settings:update_settings()
     settings.ancestral_filter = gui.elements.ancestral_filter_toggle:get()
     settings.ancestral_affix_count = gui.elements.ancestral_affix_count_slider:get()
     settings.ancestral_affix_ga_count = gui.elements.ancestral_affix_ga_count_slider:get()
-    settings.aggresive_movement = gui.elements.explorer_aggressive_movement_toggle:get()
     settings.path_angle = gui.elements.explorer_path_angle_slider:get()
     settings.ancestral_affix = {}
     for _,affix_type in pairs(affix_types) do

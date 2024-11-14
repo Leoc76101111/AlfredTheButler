@@ -111,7 +111,6 @@ gui.elements = {
 
     explorer_tree = tree_node:new(1),
     explorer_path_angle_slider = slider_int:new(0, 360, 10, get_hash(plugin_label .. '_explorer_path_angle_slider')),
-    explorer_aggressive_movement_toggle = create_checkbox(true, 'explorer_aggressive_movement_toggle'),
 
     seperator = combo_box:new(0, get_hash(plugin_label .. '_seperator')),
 }
@@ -141,7 +140,6 @@ function gui.render()
     gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
     if gui.elements.explorer_tree:push('Explorer settings') then
         gui.elements.explorer_path_angle_slider:render("Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
-        gui.elements.explorer_aggressive_movement_toggle:render("Aggresive movement","move directly to the target")
         gui.elements.explorer_tree:pop()
     end
     if gui.elements.item_tree:push('Non-Ancestral') then
