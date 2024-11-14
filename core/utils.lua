@@ -215,6 +215,7 @@ function utils.reset_all_task()
     tracker.restock_failed = false
     tracker.restock_done = false
     tracker.all_task_done = false
+    tracker.stash_socketables = false
 end
 
 function utils.get_npc(name)

@@ -32,7 +32,8 @@ local tracker = {
     restock_done              = false,
     restock_count             = 0,
     last_task                 = 'status',
-    previous                  = {}
+    previous                  = {},
+    stash_socketables         = false,
 }
 
 return tracker

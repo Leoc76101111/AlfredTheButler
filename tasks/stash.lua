@@ -120,8 +120,12 @@ function extension.is_done()
             material_stashed = false
         end
     end
+    local socketable_stashed = true
+    if tracker.stash_socketables then
+        socketable_stashed = #get_local_player():get_socketable_items() == 0
+    end
     return (not settings.item_use_stash or tracker.stash_count == 0) and
-        (not settings.stash_all_socketables or #get_local_player():get_socketable_items() == 0) and
+        (not settings.stash_all_socketables or socketable_stashed) and
         (not settings.stash_extra_materials or material_stashed)
 end
 function extension.done()

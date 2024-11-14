@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = 'v1.1.2'
+local plugin_version = 'v1.1.3-beta'
 
 local utils = require 'core.utils'
 local gui = {}
@@ -198,7 +198,7 @@ function gui.render()
         if gui.elements.restock_type:get() == utils.restock_enum['ACTIVE'] then
             gui.elements.restock_teleport_delay:render('Teleport delay', 'delay so you can kill bosses')
         end
-        gui.elements.stash_all_socketables:render('Stash all socketables', 'Stash all socketables')
+        gui.elements.stash_all_socketables:render('Stash all socketables', 'Stash all socketables when socketables inventory is full')
         gui.elements.stash_extra_materials:render('Stash extras materials', 'Stash any boss materials or compass > max')
         for _,item in pairs(restock_items) do
             local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
