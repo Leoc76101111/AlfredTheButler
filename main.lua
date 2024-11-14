@@ -25,7 +25,9 @@ local function main_pulse()
         external.resume()
         utils.reset_all_task()
         tracker.manual_trigger = true
-        tracker.teleport = true
+        if not utils.player_in_zone('Scos_Cerrigar') then
+            tracker.teleport = true
+        end
     end
     if gui.elements.dump_keybind:get_state() == 1 then
         gui.elements.dump_keybind:set(false)

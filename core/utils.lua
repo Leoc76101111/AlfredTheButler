@@ -27,10 +27,10 @@ local item_restock = {
     {sno_id = 1502128, name = 'Living Steel', item_type = 'consumables', max = 1650, min = 12},
     {sno_id = 1518053, name = 'Distilled Fear', item_type = 'consumables', max = 1650, min = 12},
     {sno_id = 1522891, name = 'Exquisite Blood', item_type = 'consumables', max = 1650, min = 12},
-    {sno_id = 1524917, name = 'Mucus-Slick Egg', item_type = 'consumables', max = 850, min = 2},
-    {sno_id = 1524924, name = 'Shard of Agony', item_type = 'consumables', max = 850, min = 2},
-    {sno_id = 1810144, name = 'Sandscorched Shackles', item_type = 'consumables', max = 850, min = 2},
-    {sno_id = 1812685, name = 'Pincushioned Doll', item_type = 'consumables', max = 850, min = 2},
+    {sno_id = 1524917, name = 'Mucus-Slick Egg', item_type = 'consumables', max = 800, min = 2},
+    {sno_id = 1524924, name = 'Shard of Agony', item_type = 'consumables', max = 800, min = 2},
+    {sno_id = 1810144, name = 'Sandscorched Shackles', item_type = 'consumables', max = 800, min = 2},
+    {sno_id = 1812685, name = 'Pincushioned Doll', item_type = 'consumables', max = 800, min = 2},
 }
 local item_restock_by_id = {}
 for _,item in pairs(item_restock) do
@@ -609,6 +609,7 @@ function utils.export_inventory_info()
     local local_player = get_local_player()
     if not local_player then return end
     local items = local_player:get_inventory_items()
+    -- local items = local_player:get_equipped_items()
     local items_info = {}
     for _, item in pairs(items) do
         local item_info = {}
@@ -616,6 +617,7 @@ function utils.export_inventory_info()
             item_info['name'] = item:get_display_name()
             item_info['id'] = item:get_sno_id()
             item_info['type'] = utils.get_item_type(item)
+            item_info['durability'] = item:get_durability()
             item_info['affix'] = {}
             item_info['aspect'] = {}
             for _,affix in pairs(item:get_affixes()) do
