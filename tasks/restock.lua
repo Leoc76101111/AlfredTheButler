@@ -17,7 +17,7 @@ local status_enum = {
 }
 
 local debounce_time = nil
-local debounce_timeout = 3
+local debounce_timeout = 1
 
 local function is_inventory_max(type)
     if type == 'key' then

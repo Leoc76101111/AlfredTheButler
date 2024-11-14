@@ -17,7 +17,7 @@ local status_enum = {
 }
 
 local debounce_time = nil
-local debounce_timeout = 3
+local debounce_timeout = 1
 
 local extension = {}
 function extension.get_npc()
@@ -114,8 +114,12 @@ function extension.is_done()
     end
     local material_stashed = true
     for _,item_data in pairs(tracker.restock_items) do
-        if (item_data.item_type == 'consumables' and item_data.count - 50 >= item_data.max) or
-            (item_data.item_type == 'key' and item_data.count - 1 >= item_data.max)
+        if (item_data.item_type == 'consumables' and
+            item_data.count - 50 >= item_data.max and
+            tracker.stash_boss_materials) or
+            (item_data.item_type == 'key' and
+            item_data.count - 1 >= item_data.max and
+            tracker.stash_compasses)
         then
             material_stashed = false
         end

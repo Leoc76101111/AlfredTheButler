@@ -107,6 +107,12 @@ function task.Execute()
         if #get_local_player():get_socketable_items() == 33 then
             tracker.stash_socketables = true
         end
+        if #get_local_player():get_consumable_items() == 33 then
+            tracker.stash_boss_materials = true
+        end
+        if #get_local_player():get_dungeon_key_items() == 33 then
+            tracker.stash_compasses = true
+        end
         if restock_trigger and
             settings.restock_type == utils.restock_enum['ACTIVE'] and
             task.teleport_trigger_time == nil

@@ -34,6 +34,8 @@ local tracker = {
     last_task                 = 'status',
     previous                  = {},
     stash_socketables         = false,
+    stash_compasses           = false,
+    stash_boss_materials      = false,
 }
 
 return tracker
