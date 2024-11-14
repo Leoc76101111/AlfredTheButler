@@ -77,7 +77,9 @@ local function render_pulse()
     if #tracker.restock_items ~= 0 then
         messages[#messages+1] = '-------------------'
         for _,item in pairs(tracker.restock_items) do
-            messages[#messages+1] = item.name .. ' : ' .. item.count .. '/' .. item.max
+            if item.max >= item.min then
+                messages[#messages+1] = item.name .. ' : ' .. item.count .. '/' .. item.max
+            end
         end
     end
 

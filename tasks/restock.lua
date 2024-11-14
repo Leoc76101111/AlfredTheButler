@@ -41,17 +41,17 @@ function extension.interact()
     if npc then interact_vendor(npc) end
 end
 function extension.execute()
-    if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
-    debounce_time = get_time_since_inject()
     local local_player = get_local_player()
     if not local_player then return end
+    if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
+    debounce_time = get_time_since_inject()
     tracker.last_task = task.name
     local items = local_player:get_stash_items()
 
     for key,item_data in pairs(tracker.restock_items) do
         local need_counter = item_data.max - item_data.count
         local stash_counter = 0
-        for _, item in pairs(items) do
+        for _,item in pairs(items) do
             if item:get_sno_id() == item_data.sno_id then
                 local item_count = item:get_stack_count()
                 if item_count == 0 then
@@ -63,12 +63,12 @@ function extension.execute()
                     loot_manager.move_item_from_stash(item)
                     loot_manager.move_item_from_stash(item)
                     need_counter = need_counter - item_count
-                    task.last_interaction = get_time_since_inject()
-                    debounce_time = get_time_since_inject()
                 else
                     stash_counter = stash_counter + item_count
                 end
             end
+            task.last_interaction = get_time_since_inject()
+            debounce_time = get_time_since_inject()
         end
         tracker.restock_items[key]['stash'] = stash_counter
     end
@@ -84,15 +84,7 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    local is_done = true
-    for _,item_data in pairs(tracker.restock_items) do
-        if not is_inventory_max(item_data.item_type) and
-            item_data.stash > 0 and item_data.count < item_data.max
-        then
-            is_done = false
-        end
-    end
-    return is_done
+    return tracker.restock_count == 0
 end
 function extension.done()
     tracker.restock_done = true

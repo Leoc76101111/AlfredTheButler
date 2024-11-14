@@ -35,6 +35,8 @@ local settings = {
     restock_items = {},
     restock_type = utils.restock_enum['PASSIVE'],
     restock_teleport_delay = 30,
+    stash_all_socketables = false,
+    stash_extra_materials = false,
 }
 
 function settings.get_keybind_state()
@@ -91,17 +93,17 @@ function settings:update_settings()
     settings.restock_items = {}
     settings.restock_type = gui.elements.restock_type:get()
     settings.restock_teleport_delay = gui.elements.restock_teleport_delay:get()
+    settings.stash_all_socketables = gui.elements.stash_all_socketables:get()
+    settings.stash_extra_materials = gui.elements.stash_extra_materials:get()
     for _,item in pairs(utils.get_restock_items()) do
         local sno_id = item.sno_id
         local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)
-        if gui.elements[slider_name]:get() > 0 then
-            settings.restock_items[#settings.restock_items+1] = {
-                sno_id = sno_id,
-                name = item.name,
-                max = gui.elements[slider_name]:get(),
-                min = item.min
-            }
-        end
+        settings.restock_items[#settings.restock_items+1] = {
+            sno_id = sno_id,
+            name = item.name,
+            max = gui.elements[slider_name]:get(),
+            min = item.min
+        }
     end
 end
 

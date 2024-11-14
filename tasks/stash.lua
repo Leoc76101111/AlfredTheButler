@@ -33,13 +33,13 @@ function extension.interact()
     if npc then interact_vendor(npc) end
 end
 function extension.execute()
-    if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
-    debounce_time = get_time_since_inject()
     local local_player = get_local_player()
     if not local_player then return end
+    if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
+    debounce_time = get_time_since_inject()
     tracker.last_task = task.name
     local items = local_player:get_inventory_items()
-    for _, item in pairs(items) do
+    for _,item in pairs(items) do
         if item and not utils.is_salvage_or_sell(item,utils.item_enum['SELL']) and
             not utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE'])
         then
@@ -47,9 +47,53 @@ function extension.execute()
             loot_manager.move_item_to_stash(item)
             loot_manager.move_item_to_stash(item)
             loot_manager.move_item_to_stash(item)
+        end
+        task.last_interaction = get_time_since_inject()
+        debounce_time = get_time_since_inject()
+    end
+    if settings.stash_extra_materials then
+        local restock_items = utils.get_restock_items_from_tracker()
+        local consumeable_items = local_player:get_consumable_items()
+        for _,item in pairs(consumeable_items) do
+            if restock_items[tostring(item:get_sno_id())] ~= nil then
+                local current = restock_items[tostring(item:get_sno_id())]
+                if current.count - item:get_stack_count() >= current.max or current.max < current.min then
+                    -- move 3 times because sometimes it get stuck
+                    loot_manager.move_item_to_stash(item)
+                    loot_manager.move_item_to_stash(item)
+                    loot_manager.move_item_to_stash(item)
+                    restock_items[tostring(item:get_sno_id())].count = current.count - item:get_stack_count()
+                end
+            end
             task.last_interaction = get_time_since_inject()
             debounce_time = get_time_since_inject()
         end
+        local key_items = local_player:get_dungeon_key_items()
+        for _,item in pairs(key_items) do
+            if restock_items[tostring(item:get_sno_id())] ~= nil then
+                local current = restock_items[tostring(item:get_sno_id())]
+                if current.count - 1 >= current.max or current.max < current.min then
+                    -- move 3 times because sometimes it get stuck
+                    loot_manager.move_item_to_stash(item)
+                    loot_manager.move_item_to_stash(item)
+                    loot_manager.move_item_to_stash(item)
+                    restock_items[tostring(item:get_sno_id())].count = current.count - 1
+                end
+            end
+            task.last_interaction = get_time_since_inject()
+            debounce_time = get_time_since_inject()
+        end
+    end
+    if settings.stash_all_socketables then
+        local socket_items = local_player:get_socketable_items()
+        for _,item in pairs(socket_items) do
+            -- move 3 times because sometimes it get stuck
+            loot_manager.move_item_to_stash(item)
+            loot_manager.move_item_to_stash(item)
+            loot_manager.move_item_to_stash(item)
+        end
+        task.last_interaction = get_time_since_inject()
+        debounce_time = get_time_since_inject()
     end
 end
 function extension.reset()
@@ -63,7 +107,22 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    return not settings.item_use_stash or tracker.stash_count == 0
+    if task.status == status_enum['EXECUTE'] and
+        #get_local_player():get_stash_items() == 300
+    then
+        return true
+    end
+    local material_stashed = true
+    for _,item_data in pairs(tracker.restock_items) do
+        if (item_data.item_type == 'consumables' and item_data.count - 50 >= item_data.max) or
+            (item_data.item_type == 'key' and item_data.count - 1 >= item_data.max)
+        then
+            material_stashed = false
+        end
+    end
+    return (not settings.item_use_stash or tracker.stash_count == 0) and
+        (not settings.stash_all_socketables or #get_local_player():get_socketable_items() == 0) and
+        (not settings.stash_extra_materials or material_stashed)
 end
 function extension.done()
     tracker.stash_done = true

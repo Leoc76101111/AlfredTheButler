@@ -90,12 +90,8 @@ function task.Execute()
         end
     end
 
-    if #tracker.restock_items > 0 then
-        for _,item_data in pairs(tracker.restock_items) do
-            if item_data.stash > 0 and item_data.count < item_data.min then
-                restock_trigger = true
-            end
-        end
+    if tracker.restock_count > 0 then
+        restock_trigger = true
     end
 
 

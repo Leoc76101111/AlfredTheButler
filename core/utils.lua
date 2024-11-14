@@ -475,6 +475,7 @@ function utils.update_tracker_count()
         tracker.restock_items = new_tracker_item
     end
     tracker.restock_count = 0
+    local restock_count = 0
     if #utils.settings.restock_items ~= 0 then
         for key,item in pairs(utils.settings.restock_items) do
             local counter = utils.get_restock_item_count(local_player,item)
@@ -491,13 +492,21 @@ function utils.update_tracker_count()
                 count = counter,
                 stash = stash_count
             }
-            if counter < item.min then
-                tracker.restock_count = tracker.restock_count +1
+            if stash_count > 0 and counter < item.min and item.min < item.max then
+                restock_count = restock_count +1
             end
         end
     else
         tracker.restock_items = {}
     end
+    tracker.restock_count = restock_count
+end
+function utils.get_restock_items_from_tracker()
+    local restock_item_by_id = {}
+    for _,item in pairs(tracker.restock_items) do
+        restock_item_by_id[tostring(item.sno_id)] = item
+    end
+    return restock_item_by_id
 end
 
 function utils.import_filters(elements)

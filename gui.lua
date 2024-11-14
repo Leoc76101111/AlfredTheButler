@@ -76,7 +76,7 @@ gui.elements = {
     manual_keybind = keybind:new(0x0A,false,get_hash(plugin_label .. '_manual_keybind')),
 
     stash_toggle = create_checkbox(false, 'stash_toggle'),
-    
+
     item_tree = tree_node:new(1),
     item_legendary_or_lower = combo_box:new(1, get_hash(plugin_label .. '_item_legendary_or_lower')),
     item_unique = combo_box:new(2, get_hash(plugin_label .. '_item_unique')),
@@ -105,6 +105,8 @@ gui.elements = {
     restock_tree = tree_node:new(1),
     restock_type = combo_box:new(1, get_hash(plugin_label .. '_restock_type')),
     restock_teleport_delay =  slider_int:new(0, 300, 60, get_hash(plugin_label .. '_restock_teleport_delay')),
+    stash_all_socketables = create_checkbox(false, 'stash_all_socketables'),
+    stash_extra_materials = create_checkbox(false, 'stash_extra_materials'),
 
     gamble_tree = tree_node:new(1),
     gamble_toggle = create_checkbox(false, 'gamble_toggle'),
@@ -196,6 +198,8 @@ function gui.render()
         if gui.elements.restock_type:get() == utils.restock_enum['ACTIVE'] then
             gui.elements.restock_teleport_delay:render('Teleport delay', 'delay so you can kill bosses')
         end
+        gui.elements.stash_all_socketables:render('Stash all socketables', 'Stash all socketables')
+        gui.elements.stash_extra_materials:render('Stash extras materials', 'Stash any boss materials or compass > max')
         for _,item in pairs(restock_items) do
             local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
             gui.elements[slider_name]:render(item.name, 'Maximum to have in inventory')
