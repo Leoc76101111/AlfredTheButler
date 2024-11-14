@@ -115,7 +115,8 @@ function extension.is_done()
     local material_stashed = true
     for _,item_data in pairs(tracker.restock_items) do
         if (item_data.item_type == 'consumables' and
-            item_data.count - 50 >= item_data.max and
+            (item_data.count - 50 >= item_data.max or
+            item_data.max < item_data.min and item_data.count > 0) and
             tracker.stash_boss_materials) or
             (item_data.item_type == 'key' and
             item_data.count - 1 >= item_data.max and

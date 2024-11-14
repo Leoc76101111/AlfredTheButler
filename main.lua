@@ -8,6 +8,8 @@ local tracker      = require 'core.tracker'
 local external     = require 'core.external'
 
 local local_player
+local debounce_time = nil
+local debounce_timeout = 1
 
 local function update_locals()
     local_player = get_local_player()
@@ -21,6 +23,8 @@ local function main_pulse()
     if not local_player or not settings.enabled then return end
 
     if gui.elements.manual_keybind:get_state() == 1 then
+        if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
+        debounce_time = get_time_since_inject()
         gui.elements.manual_keybind:set(false)
         external.resume()
         utils.reset_all_task()
@@ -30,6 +34,8 @@ local function main_pulse()
         end
     end
     if gui.elements.dump_keybind:get_state() == 1 then
+        if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
+        debounce_time = get_time_since_inject()
         gui.elements.dump_keybind:set(false)
         utils.dump_tracker_info(tracker)
     end
