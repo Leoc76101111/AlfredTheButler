@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = 'v1.1.3-beta'
+local plugin_version = 'v1.1.3'
 
 local utils = require 'core.utils'
 local gui = {}
