@@ -104,14 +104,16 @@ function task.Execute()
         -- if task.status ~= status_enum['WAITING'] then
         --     utils.export_inventory_info()
         -- end
-        if #get_local_player():get_socketable_items() == 33 then
+        if settings.stash_all_socketables and #get_local_player():get_socketable_items() == 33 then
             tracker.stash_socketables = true
         end
-        if #get_local_player():get_consumable_items() == 33 then
-            tracker.stash_boss_materials = true
-        end
-        if #get_local_player():get_dungeon_key_items() == 33 then
-            tracker.stash_compasses = true
+        if settings.stash_extra_materials then
+            if #get_local_player():get_consumable_items() == 33 then
+                tracker.stash_boss_materials = true
+            end
+            if #get_local_player():get_dungeon_key_items() == 33 then
+                tracker.stash_compasses = true
+            end
         end
         if restock_trigger and
             settings.restock_type == utils.restock_enum['ACTIVE'] and
