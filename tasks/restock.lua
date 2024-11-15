@@ -16,8 +16,9 @@ local status_enum = {
     FAILED = 'Failed to restock'
 }
 
-local debounce_time = nil
+local debounce_time = get_time_since_inject()
 local debounce_timeout = 1
+local execute_restock = false
 
 local function is_inventory_max(type)
     if type == 'key' then
@@ -47,15 +48,16 @@ function extension.execute()
     debounce_time = get_time_since_inject()
     tracker.last_task = task.name
     local items = local_player:get_stash_items()
-
     for key,item_data in pairs(tracker.restock_items) do
         local need_counter = item_data.max - item_data.count
+        local stash_counter = 0
         for _,item in pairs(items) do
             if item:get_sno_id() == item_data.sno_id then
                 local item_count = item:get_stack_count()
                 if item_count == 0 then
                     item_count = 1
                 end
+                stash_counter = stash_counter + item_count
                 if need_counter > 0 and not is_inventory_max(item_data.item_type) then
                     -- move 3 times because sometimes it get stuck
                     loot_manager.move_item_from_stash(item)
@@ -67,21 +69,7 @@ function extension.execute()
             task.last_interaction = get_time_since_inject()
             debounce_time = get_time_since_inject()
         end
-        if item_data.max - item_data.count <= 0 then
-            local stash_counter = 0
-            for _,item in pairs(items) do
-                if item:get_sno_id() == item_data.sno_id then
-                    local item_count = item:get_stack_count()
-                    if item_count == 0 then
-                        item_count = 1
-                    end
-                    stash_counter = stash_counter + item_count
-                end
-                task.last_interaction = get_time_since_inject()
-                debounce_time = get_time_since_inject()
-            end
-            tracker.restock_items[key]['stash'] = stash_counter
-        end
+        tracker.restock_items[key]['stash'] = stash_counter
     end
 end
 function extension.reset()
@@ -95,15 +83,24 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    return tracker.restock_count == 0 and
-        (debounce_time == nil or
-        debounce_time + debounce_timeout < get_time_since_inject())
+    local restock_done = true
+    if execute_restock then
+        for _,item_data in pairs(tracker.restock_items) do
+            if item_data.max > item_data.count and item_data.stash > 0 then
+                restock_done = false
+            end
+        end
+    end
+    return (tracker.restock_count == 0 and not execute_restock) or
+        (execute_restock and restock_done)
 end
 function extension.done()
     tracker.restock_done = true
+    execute_restock = false
 end
 function extension.failed()
     tracker.restock_failed = true
+    execute_restock = false
 end
 function extension.is_in_vendor_screen()
     return #get_local_player():get_stash_items() > 0
@@ -125,6 +122,9 @@ task.shouldExecute = function ()
         (tracker.sell_done or tracker.sell_failed) and
         (tracker.stash_done or tracker.stash_failed)
     then
+        if tracker.restock_count > 0 then
+            execute_restock = true
+        end
         return true
     end
     return false
