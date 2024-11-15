@@ -53,38 +53,42 @@ function extension.execute()
     end
     if settings.stash_extra_materials then
         local restock_items = utils.get_restock_items_from_tracker()
-        local consumeable_items = local_player:get_consumable_items()
-        for _,item in pairs(consumeable_items) do
-            if restock_items[tostring(item:get_sno_id())] ~= nil then
-                local current = restock_items[tostring(item:get_sno_id())]
-                if current.count - item:get_stack_count() >= current.max or current.max < current.min then
-                    -- move 3 times because sometimes it get stuck
-                    loot_manager.move_item_to_stash(item)
-                    loot_manager.move_item_to_stash(item)
-                    loot_manager.move_item_to_stash(item)
-                    restock_items[tostring(item:get_sno_id())].count = current.count - item:get_stack_count()
+        if tracker.stash_boss_materials then
+            local consumeable_items = local_player:get_consumable_items()
+            for _,item in pairs(consumeable_items) do
+                if restock_items[tostring(item:get_sno_id())] ~= nil then
+                    local current = restock_items[tostring(item:get_sno_id())]
+                    if current.count - item:get_stack_count() >= current.max or current.max < current.min then
+                        -- move 3 times because sometimes it get stuck
+                        loot_manager.move_item_to_stash(item)
+                        loot_manager.move_item_to_stash(item)
+                        loot_manager.move_item_to_stash(item)
+                        restock_items[tostring(item:get_sno_id())].count = current.count - item:get_stack_count()
+                    end
                 end
+                task.last_interaction = get_time_since_inject()
+                debounce_time = get_time_since_inject()
             end
-            task.last_interaction = get_time_since_inject()
-            debounce_time = get_time_since_inject()
         end
-        local key_items = local_player:get_dungeon_key_items()
-        for _,item in pairs(key_items) do
-            if restock_items[tostring(item:get_sno_id())] ~= nil then
-                local current = restock_items[tostring(item:get_sno_id())]
-                if current.count - 1 >= current.max or current.max < current.min then
-                    -- move 3 times because sometimes it get stuck
-                    loot_manager.move_item_to_stash(item)
-                    loot_manager.move_item_to_stash(item)
-                    loot_manager.move_item_to_stash(item)
-                    restock_items[tostring(item:get_sno_id())].count = current.count - 1
+        if tracker.stash_compasses then
+            local key_items = local_player:get_dungeon_key_items()
+            for _,item in pairs(key_items) do
+                if restock_items[tostring(item:get_sno_id())] ~= nil then
+                    local current = restock_items[tostring(item:get_sno_id())]
+                    if current.count - 1 >= current.max or current.max < current.min then
+                        -- move 3 times because sometimes it get stuck
+                        loot_manager.move_item_to_stash(item)
+                        loot_manager.move_item_to_stash(item)
+                        loot_manager.move_item_to_stash(item)
+                        restock_items[tostring(item:get_sno_id())].count = current.count - 1
+                    end
                 end
+                task.last_interaction = get_time_since_inject()
+                debounce_time = get_time_since_inject()
             end
-            task.last_interaction = get_time_since_inject()
-            debounce_time = get_time_since_inject()
         end
     end
-    if settings.stash_all_socketables then
+    if settings.stash_all_socketables and tracker.stash_socketables then
         local socket_items = local_player:get_socketable_items()
         for _,item in pairs(socket_items) do
             -- move 3 times because sometimes it get stuck
