@@ -50,7 +50,6 @@ function extension.execute()
 
     for key,item_data in pairs(tracker.restock_items) do
         local need_counter = item_data.max - item_data.count
-        local stash_counter = 0
         for _,item in pairs(items) do
             if item:get_sno_id() == item_data.sno_id then
                 local item_count = item:get_stack_count()
@@ -63,14 +62,26 @@ function extension.execute()
                     loot_manager.move_item_from_stash(item)
                     loot_manager.move_item_from_stash(item)
                     need_counter = need_counter - item_count
-                else
-                    stash_counter = stash_counter + item_count
                 end
             end
             task.last_interaction = get_time_since_inject()
             debounce_time = get_time_since_inject()
         end
-        tracker.restock_items[key]['stash'] = stash_counter
+        if item_data.max - item_data.count <= 0 then
+            local stash_counter = 0
+            for _,item in pairs(items) do
+                if item:get_sno_id() == item_data.sno_id then
+                    local item_count = item:get_stack_count()
+                    if item_count == 0 then
+                        item_count = 1
+                    end
+                    stash_counter = stash_counter + item_count
+                end
+                task.last_interaction = get_time_since_inject()
+                debounce_time = get_time_since_inject()
+            end
+            tracker.restock_items[key]['stash'] = stash_counter
+        end
     end
 end
 function extension.reset()
@@ -84,13 +95,18 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    return tracker.restock_count == 0
+    return tracker.restock_count == 0 and
+        (debounce_time == nil or
+        debounce_time + debounce_timeout < get_time_since_inject())
 end
 function extension.done()
     tracker.restock_done = true
 end
 function extension.failed()
     tracker.restock_failed = true
+end
+function extension.is_in_vendor_screen()
+    return #get_local_player():get_stash_items() > 0
 end
 
 task.name = 'restock'

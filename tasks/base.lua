@@ -16,6 +16,7 @@ local extension = {
     is_done = function () return false end,
     done = function () end,
     failed = function () end,
+    is_in_vendor_screen = function () return false end
 }
 
 -- status_enum needs to be overwritten
@@ -45,7 +46,6 @@ function base.new_task()
         last_location = nil,
         last_stuck_location = nil,
         reset_state = nil,
-        has_vendor_screen = false
     }
 
     task.extension = extension
@@ -121,12 +121,12 @@ function base.new_task()
             task.extension.interact()
         elseif task.status == (status_prefix .. task.status_enum['INTERACTING']) and
             task.last_interaction + task.interaction_timeout >= current_time and
-            not (task.has_vendor_screen and loot_manager:is_in_vendor_screen())
+            not (task.extension.is_in_vendor_screen())
         then
             task.status = status_prefix .. task.status_enum['INTERACTING']
             task.extension.interact()
         elseif task.status == (status_prefix .. task.status_enum['INTERACTING']) and
-            ((task.has_vendor_screen and loot_manager:is_in_vendor_screen()) or
+            (task.extension.is_in_vendor_screen() or
             task.last_interaction + task.interaction_timeout < current_time)
         then
             task.status = status_prefix .. task.status_enum['EXECUTE']

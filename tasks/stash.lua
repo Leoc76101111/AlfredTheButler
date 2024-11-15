@@ -143,6 +143,9 @@ end
 function extension.failed()
     tracker.stash_failed = true
 end
+function extension.is_in_vendor_screen()
+    return #get_local_player():get_stash_items() > 0
+end
 
 task.name = 'stash'
 task.extension = extension

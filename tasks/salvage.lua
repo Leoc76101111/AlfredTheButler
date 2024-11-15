@@ -59,11 +59,13 @@ end
 function extension.failed()
     tracker.salvage_failed = true
 end
+function extension.is_in_vendor_screen()
+    return loot_manager:is_in_vendor_screen()
+end
 
 task.name = 'salvage'
 task.extension = extension
 task.status_enum = status_enum
-task.has_vendor_screen = true
 
 task.shouldExecute = function ()
     if tracker.trigger_tasks == false then

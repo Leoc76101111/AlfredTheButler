@@ -65,11 +65,11 @@ end
 function extension.failed()
     tracker.teleport_failed = true
 end
+function extension.is_in_vendor_screen() return false end
 
 task.name = 'teleport'
 task.extension = extension
 task.status_enum = status_enum
-task.has_vendor_screen = true
 task.max_retries = 5
 
 task.shouldExecute = function ()
