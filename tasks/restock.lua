@@ -19,6 +19,7 @@ local status_enum = {
 local debounce_time = get_time_since_inject()
 local debounce_timeout = 1
 local execute_restock = false
+local stash_item_count = -1
 
 local function is_inventory_max(type)
     if type == 'key' then
@@ -86,7 +87,10 @@ function extension.is_done()
     local restock_done = true
     if execute_restock then
         for _,item_data in pairs(tracker.restock_items) do
-            if item_data.max > item_data.count and item_data.stash > 0 then
+            if item_data.max > item_data.count and
+                item_data.stash > 0 and
+                not is_inventory_max(item_data.item_type)
+            then
                 restock_done = false
             end
         end
@@ -97,13 +101,21 @@ end
 function extension.done()
     tracker.restock_done = true
     execute_restock = false
+    stash_item_count = -1
 end
 function extension.failed()
     tracker.restock_failed = true
     execute_restock = false
+    stash_item_count = -1
 end
 function extension.is_in_vendor_screen()
-    return #get_local_player():get_stash_items() > 0
+    local is_in_vendor_screen = false
+    local stash_count = #get_local_player():get_stash_items()
+    if stash_count > 0 and stash_item_count == stash_count then
+        is_in_vendor_screen = true
+    end
+    stash_item_count = stash_count
+    return is_in_vendor_screen
 end
 
 task.name = 'restock'
