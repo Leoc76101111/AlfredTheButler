@@ -385,7 +385,7 @@ function utils.is_salvage_or_sell(item,action)
             end
         end
     end
-    
+
     -- legendaries (not junk, not unique, not mythic)
     if not item:is_junk() and not is_unique and utils.mythics[tostring(item_id)] == nil and
         utils.settings.ancestral_item_legendary == action and
@@ -439,12 +439,16 @@ function utils.get_restock_item_count(local_player,item)
     end
     return counter
 end
+function utils.is_mounted()
+    local local_player = get_local_player()
+    return local_player:get_attribute(attributes.CURRENT_MOUNT) < 0
+end
 function utils.update_tracker_count()
     local salvage_counter = 0
     local sell_counter = 0
     local stash_counter = 0
     local local_player = get_local_player()
-    if not local_player then return end
+    if not local_player or utils.is_mounted() then return end
     local items = local_player:get_inventory_items()
     for _, item in pairs(items) do
         if item then
@@ -482,7 +486,7 @@ function utils.update_tracker_count()
     if #utils.settings.restock_items ~= 0 then
         for key,item in pairs(utils.settings.restock_items) do
             local counter = utils.get_restock_item_count(local_player,item)
-            local stash_count = 9999
+            local stash_count = 99999
             if tracker.restock_items[key] and tracker.restock_items[key].stash >= 0 then
                 stash_count = tracker.restock_items[key].stash
             end
@@ -632,6 +636,7 @@ function utils.export_inventory_info()
             item_info['durability'] = item:get_durability()
             item_info['affix'] = {}
             item_info['aspect'] = {}
+            item_info['attributes'] = {}
             for _,affix in pairs(item:get_affixes()) do
                 local affix_id = affix.affix_name_hash
                 if item_aspect[affix_id] then
@@ -647,9 +652,12 @@ function utils.export_inventory_info()
                         ['name'] = affix:get_name(),
                         ['roll'] = affix:get_roll(),
                         ['max_roll'] = affix:get_roll_max(),
-                        ['min_roll'] = affix:get_roll_min()
+                        ['min_roll'] = affix:get_roll_min(),
                     }
                 end
+            end
+            for key,attr in pairs(attributes) do
+                item_info['attributes'][key] = item:get_attribute(attr)
             end
         end
         items_info[#items_info+1] = item_info
