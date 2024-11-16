@@ -219,6 +219,11 @@ function utils.reset_all_task()
     tracker.stash_compasses = false
     tracker.stash_boss_materials = false
 end
+function utils.reset_restock_stash_count()
+    for key,_ in pairs(tracker.restock_items) do
+        tracker.restock_items[key].stash = 99999
+    end
+end
 
 function utils.get_npc(name)
     local actors = actors_manager:get_all_actors()
@@ -469,42 +474,39 @@ function utils.update_tracker_count()
     tracker.stash_count = stash_counter
     tracker.inventory_full = tracker.inventory_count == 33
 
-    -- clean up tracker
-    if #utils.settings.restock_items ~= #tracker.restock_items then
-        local new_tracker_item = {}
-        for _,tracker_item in pairs(tracker.restock_items) do
-            for _,item in pairs(utils.settings.restock_items) do
-                if item.sno_id == tracker_item.sno_id then
-                    new_tracker_item[#new_tracker_item+1] = tracker_item
-                end
-            end
-        end
-        tracker.restock_items = new_tracker_item
-    end
     tracker.restock_count = 0
     local restock_count = 0
-    if #utils.settings.restock_items ~= 0 then
-        for key,item in pairs(utils.settings.restock_items) do
-            local counter = utils.get_restock_item_count(local_player,item)
-            local stash_count = 99999
-            if tracker.restock_items[key] and tracker.restock_items[key].stash >= 0 then
-                stash_count = tracker.restock_items[key].stash
-            end
-            tracker.restock_items[key] = {
-                sno_id = item.sno_id,
-                name = item.name,
-                min = item.min,
-                max = item.max,
-                item_type = item_restock_by_id[item.sno_id].item_type,
-                count = counter,
-                stash = stash_count
-            }
-            if stash_count > 0 and counter < item.min and item.min < item.max then
-                restock_count = restock_count +1
+    for key,item in pairs(utils.settings.restock_items) do
+        local counter = utils.get_restock_item_count(local_player,item)
+        local stash_count = 99999
+        if tracker.restock_items[key] and tracker.restock_items[key].stash >= 0 then
+            stash_count = tracker.restock_items[key].stash
+        end
+        local max = item.max
+        local override = {
+            caller = nil,
+            max = -1
+        }
+        if tracker.restock_items[key] and tracker.restock_items[key].override then
+            override = tracker.restock_items[key].override
+            if override.caller ~= nil then
+                max = override.max
             end
         end
-    else
-        tracker.restock_items = {}
+        tracker.restock_items[key] = {
+            sno_id = item.sno_id,
+            name = item.name,
+            min = item.min,
+            max = max,
+            item_type = item_restock_by_id[item.sno_id].item_type,
+            count = counter,
+            stash = stash_count,
+            override = override,
+            settings_max = item.max
+        }
+        if stash_count > 0 and counter < item.min and item.min < max then
+            restock_count = restock_count +1
+        end
     end
     tracker.restock_count = restock_count
 end
@@ -689,7 +691,12 @@ function utils.dump_tracker_info(tracker_data)
             utils.log(key)
             for key2,data2 in pairs(data) do
                 for key3,data3 in pairs(data2) do
-                    utils.log(key .. '>' .. key2 .. '>' .. key3 .. ':' .. tostring(data3))
+                    if key3  == 'override' then
+                        utils.log(key .. '>' .. key2 .. '>' .. key3 .. '>caller:' .. tostring(data3.caller))
+                        utils.log(key .. '>' .. key2 .. '>' .. key3 .. '>max:' .. tostring(data3.max))
+                    else
+                        utils.log(key .. '>' .. key2 .. '>' .. key3 .. ':' .. tostring(data3))
+                    end
                 end
             end
         else

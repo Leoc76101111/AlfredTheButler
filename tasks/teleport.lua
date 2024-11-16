@@ -17,9 +17,13 @@ local status_enum = {
 }
 local debounce_time = nil
 local debounce_timeout = 3
+local original_zone = nil
 local function teleport_with_debounce()
     if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
     debounce_time = get_time_since_inject()
+    if get_current_world():get_current_zone_name() ~= '[sno none]' then
+        original_zone = get_current_world():get_current_zone_name()
+    end
     teleport_to_waypoint(0x76D58)
 end
 local extension = {}
@@ -57,13 +61,15 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    return not utils.player_in_zone('Scos_Cerrigar')
+    return utils.player_in_zone(original_zone)
 end
 function extension.done()
     tracker.teleport_done = true
+    original_zone = nil
 end
 function extension.failed()
     tracker.teleport_failed = true
+    original_zone = nil
 end
 function extension.is_in_vendor_screen() return false end
 

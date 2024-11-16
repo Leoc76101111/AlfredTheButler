@@ -27,6 +27,7 @@ local function main_pulse()
         debounce_time = get_time_since_inject()
         gui.elements.manual_keybind:set(false)
         external.resume()
+        utils.reset_restock_stash_count()
         utils.reset_all_task()
         tracker.manual_trigger = true
         if not utils.player_in_zone('Scos_Cerrigar') then
@@ -38,6 +39,7 @@ local function main_pulse()
         debounce_time = get_time_since_inject()
         gui.elements.dump_keybind:set(false)
         utils.dump_tracker_info(tracker)
+        -- utils.export_inventory_info()
     end
 
     if not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then

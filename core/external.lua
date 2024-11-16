@@ -1,5 +1,6 @@
 local plugin_label = 'alfred_the_butler'
 
+local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
 
@@ -40,6 +41,7 @@ local external = {
         if callback then
             tracker.external_trigger_callback = callback
         end
+        utils.log('task triggered by ' .. tostring(caller))
     end,
     trigger_tasks_with_teleport = function (caller,callback)
         tracker.external_caller = caller
@@ -48,6 +50,63 @@ local external = {
         if callback then
             tracker.external_trigger_callback = callback
         end
+        utils.log('task triggered by ' .. tostring(caller))
     end,
+    get_restock_items = function ()
+        return tracker.restock_items
+    end,
+    override_restock_item = function (caller, id, value)
+        if caller ~= nil and type(value) == "number" then
+            for key,item in pairs(tracker.restock_items) do
+                if item.sno_id == id then
+                    tracker.restock_items[key].override = {
+                        caller = caller,
+                        max = value
+                    }
+                    utils.log('override '.. tostring(id) .. ' set by ' .. tostring(caller))
+                    return true
+                end
+            end
+        end
+        utils.log('override failed by ' .. tostring(caller))
+        return false
+    end,
+    clear_override = function (caller, id)
+        if caller ~= nil then
+            for key,item in pairs(tracker.restock_items) do
+                if item.sno_id == id then
+                    tracker.restock_items[key].override = {
+                        caller = nil,
+                        max = -1
+                    }
+                    utils.log('override '.. tostring(id) .. ' unset by ' .. tostring(caller))
+                    return true
+                end
+            end
+        end
+        utils.log('clear override failed by ' .. tostring(caller))
+        return false
+    end,
+    update_stash_count = function (caller, id, value)
+        if caller ~= nil and type(value) == "number" then
+            for key,item in pairs(tracker.restock_items) do
+                if item.sno_id == id then
+                    tracker.restock_items[key].stash = value
+                    utils.log('stash count '.. tostring(id) .. ' updated by ' .. tostring(caller))
+                    return true
+                end
+            end
+        end
+        utils.log('stash count update failed by ' .. tostring(caller))
+        return false
+    end
+    -- add_restock_item = function (caller, id, type, min, max)
+    --     utils.log(caller)
+    --     utils.log(id)
+    --     utils.log(type)
+    --     utils.log(min)
+    --     utils.log(max)
+    --     return false
+    -- end,
 }
 return external
