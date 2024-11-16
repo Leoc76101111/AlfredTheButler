@@ -1,5 +1,5 @@
 # Alfred the butler
-#### V1.1.7
+#### V1.1.8
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
@@ -47,6 +47,8 @@ select what to do with non-ancestral items by types and marked as junk
 - mode active/passive
   - active mode will trigger teleport and restock if item when item runs out
   - teleport delay -- number of seconds to wait before initiating teleport when in active mode
+  - stock all socketables -- if socketables inventory is full, will stash all of them
+  - stock extra materials -- if key/consumeable inventory is full, will stash extra boss materials and compasses
   - sliders for maximum amount of item to restock up to
     - set to 0 if u do not want to restock that item
 
