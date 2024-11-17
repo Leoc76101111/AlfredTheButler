@@ -448,14 +448,10 @@ function utils.is_mounted()
     local local_player = get_local_player()
     return local_player:get_attribute(attributes.CURRENT_MOUNT) < 0
 end
-local update_debounce_time = nil
+local update_debounce_time = get_time_since_inject()
 local update_debounce_timeout = 1
-function utils.update_tracker_count()
-    local local_player = get_local_player()
-    if not local_player or utils.is_mounted() then return end
-    if update_debounce_time ~= nil and
-        update_debounce_time + update_debounce_timeout < get_time_since_inject()
-    then return end
+function utils.update_tracker_count(local_player)
+    if update_debounce_time + update_debounce_timeout > get_time_since_inject() then return end
     update_debounce_time = get_time_since_inject()
 
 
