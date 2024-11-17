@@ -22,7 +22,9 @@ local function main_pulse()
     settings:update_settings()
     utils.update_tracker_count()
     tracker.timeout = tracker.last_reset + settings.timeout >= get_time_since_inject()
-    keybind_data:set(gui.elements.keybind_toggle:get_state() == 1)
+    if keybind_data:get() ~= (gui.elements.keybind_toggle:get_state() == 1) then
+        keybind_data:set(gui.elements.keybind_toggle:get_state() == 1)
+    end
 
     if not local_player or not settings.enabled then return end
 
