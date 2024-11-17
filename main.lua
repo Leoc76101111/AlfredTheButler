@@ -11,8 +11,8 @@ local drawing      = require 'core.drawing'
 local local_player
 local debounce_time = nil
 local debounce_timeout = 1
-local keybind_data = checkbox:new(false, get_hash(plugin_label .. '_keybind_data'))
-gui.elements.keybind_toggle:set(keybind_data:get())
+-- local keybind_data = checkbox:new(false, get_hash(plugin_label .. '_keybind_data'))
+-- gui.elements.keybind_toggle:set(keybind_data:get())
 
 local function update_locals()
     local_player = get_local_player()
@@ -22,16 +22,16 @@ local function main_pulse()
     settings:update_settings()
     utils.update_tracker_count()
     tracker.timeout = tracker.last_reset + settings.timeout >= get_time_since_inject()
-    if keybind_data:get() ~= (gui.elements.keybind_toggle:get_state() == 1) then
-        keybind_data:set(gui.elements.keybind_toggle:get_state() == 1)
-    end
+    -- if keybind_data:get() ~= (gui.elements.keybind_toggle:get_state() == 1) then
+    --     keybind_data:set(gui.elements.keybind_toggle:get_state() == 1)
+    -- end
 
     if not local_player or not settings.enabled then return end
 
     if gui.elements.manual_keybind:get_state() == 1 then
+        gui.elements.manual_keybind:set(false)
         if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
         debounce_time = get_time_since_inject()
-        gui.elements.manual_keybind:set(false)
         external.resume()
         utils.reset_restock_stash_count()
         utils.reset_all_task()
@@ -41,9 +41,9 @@ local function main_pulse()
         end
     end
     if gui.elements.dump_keybind:get_state() == 1 then
+        gui.elements.dump_keybind:set(false)
         if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
         debounce_time = get_time_since_inject()
-        gui.elements.dump_keybind:set(false)
         utils.dump_tracker_info(tracker)
         -- utils.export_inventory_info()
     end
