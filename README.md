@@ -57,8 +57,6 @@ Alfred exposes an external collection of functions via global variable `PLUGIN_a
 Also in the task folder, there is an `external-template.lua` as a sample on how to call alfred from other plugins.
 
 ## Known issues
-- on rare occasion alfred decides to stand infront of portal and not go back in
-- lag spike between stash/restock and salvage that causes salvage to temporally failed and retry salvage
 - sometimes alfred go derp and refuses to walk to npc properly, this should resolve itself when it retries
 
 ## Credits
