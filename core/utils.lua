@@ -448,26 +448,46 @@ function utils.is_mounted()
     local local_player = get_local_player()
     return local_player:get_attribute(attributes.CURRENT_MOUNT) < 0
 end
+local update_debounce_time = nil
+local update_debounce_timeout = 1
 function utils.update_tracker_count()
+    local local_player = get_local_player()
+    if not local_player or utils.is_mounted() then return end
+    if update_debounce_time ~= nil and
+        update_debounce_time + update_debounce_timeout < get_time_since_inject()
+    then return end
+    update_debounce_time = get_time_since_inject()
+
+
+    local items = local_player:get_inventory_items()
+    local cached_inventory = {}
     local salvage_counter = 0
     local sell_counter = 0
     local stash_counter = 0
-    local local_player = get_local_player()
-    if not local_player or utils.is_mounted() then return end
-    local items = local_player:get_inventory_items()
     for _, item in pairs(items) do
         if item then
-            if utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE']) then
+            local is_salvage = utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE'])
+            local is_sell = utils.is_salvage_or_sell(item,utils.item_enum['SELL'])
+            local is_stash = not is_salvage and not is_sell
+
+            if is_salvage then
                 salvage_counter = salvage_counter + 1
-            elseif utils.is_salvage_or_sell(item,utils.item_enum['SELL']) then
+            elseif is_sell then
                 sell_counter = sell_counter + 1
             else
                 stash_counter = stash_counter + 1
             end
+            cached_inventory[#cached_inventory+1] = {
+                is_salvage = is_salvage,
+                is_sell = is_sell,
+                is_stash = is_stash,
+                item = item
+            }
         else
             utils.log('no item??')
         end
     end
+    tracker.cached_inventory = cached_inventory
     tracker.inventory_count = local_player:get_item_count()
     tracker.salvage_count = salvage_counter
     tracker.sell_count = sell_counter
@@ -686,7 +706,7 @@ function utils.dump_tracker_info(tracker_data)
         utils.log('current:')
     end
     for key,data in pairs(tracker_data) do
-        if key == 'previous' then
+        if key == 'previous' or key == 'cached_inventory' then
         elseif key == 'restock_items' then
             utils.log(key)
             for key2,data2 in pairs(data) do

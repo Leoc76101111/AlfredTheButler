@@ -65,3 +65,4 @@ Also in the task folder, there is an `external-template.lua` as a sample on how 
 - Letrico - general help, bouncing ideas, my faq XD
 - Zewx - explorerlite is written by Zewx in the piteer plugin and is being used in alfred
 - Lanvi - pre-release general testing and feedback
+- Pinguu - drawing boxes based on filters

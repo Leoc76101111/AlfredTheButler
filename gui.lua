@@ -114,6 +114,17 @@ gui.elements = {
     explorer_tree = tree_node:new(1),
     explorer_path_angle_slider = slider_int:new(0, 360, 10, get_hash(plugin_label .. '_explorer_path_angle_slider')),
 
+    drawing_tree = tree_node:new(1),
+    draw_status = create_checkbox(true, 'draw_status'),
+    draw_stash = create_checkbox(false, 'draw_stash'),
+    draw_sell = create_checkbox(false, 'draw_sell'),
+    draw_salvage = create_checkbox(false, 'draw_salvage'),
+    draw_box_space = slider_float:new(0, 1.0, 1.0, get_hash(plugin_label .. "draw_box_space")),
+    draw_offset_x = slider_int:new(0, 150, 54, get_hash(plugin_label .. "draw_offset_x")),
+    draw_offset_y = slider_int:new(0, 150, 75, get_hash(plugin_label .. "draw_offset_y")),
+    draw_box_height = slider_int:new(0, 100, 79, get_hash(plugin_label .. "draw_box_height")),
+    draw_box_width = slider_int:new(0, 100, 52, get_hash(plugin_label .. "draw_box_width")),
+
     seperator = combo_box:new(0, get_hash(plugin_label .. '_seperator')),
 }
 
@@ -140,23 +151,47 @@ function gui.render()
         gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now')
     end
     gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
+    if gui.elements.drawing_tree:push('Display settings') then
+        gui.elements.draw_status:render('Draw status', 'Draw status info on screen')
+        gui.elements.draw_stash:render('Draw Keep items', 'Draw green box around items that alfred will keep/stash')
+        if gui.elements.draw_stash:get() then
+            render_menu_header('Items to keep/stash are drawn with green box')
+        end
+        gui.elements.draw_salvage:render('Draw Salvage items', 'Draw red box around items that alfred will salvage')
+        if gui.elements.draw_salvage:get() then
+            render_menu_header('Items to salvage are drawn with red box')
+        end
+        gui.elements.draw_sell:render('Draw Sell items', 'Draw blue box around items that alfred will sell')
+        if gui.elements.draw_sell:get() then
+            render_menu_header('Items to sell are drawn with blue box')
+        end
+        gui.elements.draw_box_space:render("Box Spacing", "", 1)
+        gui.elements.draw_offset_x:render("Slot Offset X", "Adjust slot offset X")
+        gui.elements.draw_offset_y:render("Slot Offset Y", "Adjust slot offset Y")
+        gui.elements.draw_box_height:render("Box Height Slider", "Adjust box height")
+        gui.elements.draw_box_width:render("Box Width Slider", "Adjust box width")
+        gui.elements.drawing_tree:pop()
+    end
     if gui.elements.explorer_tree:push('Explorer settings') then
         gui.elements.explorer_path_angle_slider:render("Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
         gui.elements.explorer_tree:pop()
     end
     if gui.elements.item_tree:push('Non-Ancestral') then
+        render_menu_header('Select the default action for the following item types for non-ancestral items')
         gui.elements.item_unique:render('unique items', gui.item_options, 'Select what to do with non-ancestral unique items')
         gui.elements.item_legendary_or_lower:render('non-unique items', gui.item_options, 'Select what to do with non-ancestral non-unique legendary items')
         gui.elements.item_junk:render('junk items', gui.item_options, 'Select what to do with junk items')
         gui.elements.item_tree:pop()
     end
     if gui.elements.ancestral_item_tree:push('Ancestral') then
+        render_menu_header('Select the default action for the following item types for ancestral items')
         gui.elements.ancestral_item_mythic:render('mythic items', gui.item_options, 'Select what to do with mythic items')
         gui.elements.ancestral_item_unique:render('unique items', gui.item_options, 'Select what to do with unique items')
         gui.elements.ancestral_item_legendary:render('legendary items', gui.item_options, 'Select what to do with non-unique legendary items')
         gui.elements.ancestral_item_junk:render('junk items', gui.item_options, 'Select what to do with junk items')
         gui.elements.ancestral_keep_max_aspect:render('Keep max aspect','Keep max aspect')
         if not gui.elements.ancestral_filter_toggle:get() then
+            render_menu_header('Select the number of greater affixes on items you want to keep (override the default actions above to keep)')
             gui.elements.ancestral_mythic_ga_count_slider:render('Mythic Greater Affix', 'Minimum greater affix to keep for mythic')
             gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
             gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
@@ -164,6 +199,7 @@ function gui.render()
         gui.elements.ancestral_filter_toggle:render('Use affix/unique filter', 'use affix filter')
         if gui.elements.ancestral_filter_toggle:get() then
             if gui.elements.ancestral_filter_tree:push('General') then
+                render_menu_header('Select the number of greater affixes and matching affixes on items you want to keep (override the default actions above to keep)')
                 gui.elements.ancestral_mythic_ga_count_slider:render('Mythic Greater Affix', 'Minimum greater affix to keep for mythic')
                 gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
                 gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
@@ -194,12 +230,20 @@ function gui.render()
         gui.elements.ancestral_item_tree:pop()
     end
     if gui.elements.restock_tree:push('Restock') then
+        render_menu_header('Active mode allows alfred to initiate a teleport to restock.')
         gui.elements.restock_type:render('Mode',gui.restock_options,'Active mode will trigger if drop below min, Passive mode will wait for other tasks')
         if gui.elements.restock_type:get() == utils.restock_enum['ACTIVE'] then
             gui.elements.restock_teleport_delay:render('Teleport delay', 'delay so you can kill bosses')
         end
         gui.elements.stash_all_socketables:render('Stash all socketables', 'Stash all socketables when socketables inventory is full')
+        if gui.elements.stash_all_socketables:get() then
+            render_menu_header('Stash all socketables when alfred is stashing equipment if socketables inventory is full')
+        end
         gui.elements.stash_extra_materials:render('Stash extras materials', 'Stash any boss materials or compass > max')
+        if gui.elements.stash_extra_materials:get() then
+            render_menu_header('Stash extra boss materials when alfred is stashing equipment if consumeables inventory is full')
+            render_menu_header('Stash extra compasses when alfred is stashing equipment if key inventory is full')
+        end
         for _,item in pairs(restock_items) do
             local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
             gui.elements[slider_name]:render(item.name, 'Maximum to have in inventory')

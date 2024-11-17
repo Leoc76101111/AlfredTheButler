@@ -6,10 +6,13 @@ local settings     = require 'core.settings'
 local task_manager = require 'core.task_manager'
 local tracker      = require 'core.tracker'
 local external     = require 'core.external'
+local drawing      = require 'core.drawing'
 
 local local_player
 local debounce_time = nil
 local debounce_timeout = 1
+local keybind_data = checkbox:new(false, get_hash(plugin_label .. '_keybind_data'))
+gui.elements.keybind_toggle:set(keybind_data:get())
 
 local function update_locals()
     local_player = get_local_player()
@@ -19,6 +22,7 @@ local function main_pulse()
     settings:update_settings()
     utils.update_tracker_count()
     tracker.timeout = tracker.last_reset + settings.timeout >= get_time_since_inject()
+    keybind_data:set(gui.elements.keybind_toggle:get_state() == 1)
 
     if not local_player or not settings.enabled then return end
 
@@ -55,46 +59,16 @@ end
 
 local function render_pulse()
     if not local_player or not settings.enabled then return end
-    local current_task = task_manager.get_current_task()
-    local status = ''
-    if tracker.external_caller and tracker.external_pause then
-        status = 'Paused by ' .. tracker.external_caller
-    elseif not settings.get_keybind_state() and not tracker.external_caller and not tracker.trigger_tasks then
-        status = 'Paused'
-    elseif current_task and settings.allow_external and tracker.external_caller then
-        status = '(' .. tracker.external_caller .. ' - '
-        status = status .. current_task.name .. ') '
-        status = status .. current_task.status:gsub('%('..tracker.external_caller..'%)','')
-    elseif current_task then
-        status = '(' .. current_task.name .. ') ' .. current_task.status
-    else
-        status = 'Unknown'
+
+    if gui.elements.draw_status:get() then
+        drawing.draw_status()
     end
-    local keybind_status = 'Off'
-    if settings.get_keybind_state() then keybind_status = 'On' end
-
-    local messages = {
-        'Alfred Task   : ' .. status,
-        'Keybind       : ' .. keybind_status,
-        'Inventory     : ' .. tracker.inventory_count,
-        'Keep          : ' .. tracker.stash_count,
-        'Salvage       : ' .. tracker.salvage_count,
-        'Sell          : ' .. tracker.sell_count
-    }
-
-    if #tracker.restock_items ~= 0 then
-        messages[#messages+1] = '-------------------'
-        for _,item in pairs(tracker.restock_items) do
-            if item.max >= item.min then
-                messages[#messages+1] = item.name .. ' : ' .. item.count .. '/' .. item.max
-            end
-        end
-    end
-
-    local y_pos = 50
-    for _,msg in pairs(messages) do
-        graphics.text_2d(msg, vec2:new(8, y_pos), 20, color_white(255))
-        y_pos = y_pos + 20
+    if is_inventory_open() and get_open_inventory_bag() == 0 and
+        (gui.elements.draw_stash:get() or
+        gui.elements.draw_sell:get() or
+        gui.elements.draw_salvage:get())
+    then
+        drawing.draw_inventory_boxes()
     end
 end
 
