@@ -65,6 +65,7 @@ Also in the task folder, there is an `external-template.lua` as a sample on how 
 
 ## Known issues
 - sometimes alfred go derp and refuses to walk to npc properly, this should resolve itself when it retries
+- some aspects are giving false positive, mainly those that have multiple data (e.g. frost stride). for now, alfred is treating them as real max aspect to not accidentally sell/salvage a max one
 
 ## Credits
 - Letrico - general help, bouncing ideas, my faq XD
