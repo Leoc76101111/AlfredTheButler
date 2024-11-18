@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = 'v1.2.2'
+local plugin_version = 'v1.2.3'
 
 local utils = require 'core.utils'
 local gui = {}
@@ -120,6 +120,8 @@ gui.elements = {
     draw_sell = create_checkbox(false, 'draw_sell'),
     draw_salvage = create_checkbox(false, 'draw_salvage'),
     draw_box_space = slider_float:new(0, 1.0, 1.0, get_hash(plugin_label .. "draw_box_space")),
+    draw_start_offset_x = slider_int:new(-50, 50, 0, get_hash(plugin_label .. "draw_start_offset_x")),
+    draw_start_offset_y = slider_int:new(-50, 50, 0, get_hash(plugin_label .. "draw_start_offset_y")),
     draw_offset_x = slider_int:new(0, 150, 54, get_hash(plugin_label .. "draw_offset_x")),
     draw_offset_y = slider_int:new(0, 150, 75, get_hash(plugin_label .. "draw_offset_y")),
     draw_box_height = slider_int:new(0, 100, 79, get_hash(plugin_label .. "draw_box_height")),
@@ -166,6 +168,8 @@ function gui.render()
             render_menu_header('Items to sell are drawn with pink box')
         end
         gui.elements.draw_box_space:render("Box Spacing", "", 1)
+        gui.elements.draw_start_offset_x:render("Start Offset X", "Adjust starting offset X")
+        gui.elements.draw_start_offset_y:render("Start Offset Y", "Adjust start offset Y")
         gui.elements.draw_offset_x:render("Slot Offset X", "Adjust slot offset X")
         gui.elements.draw_offset_y:render("Slot Offset Y", "Adjust slot offset Y")
         gui.elements.draw_box_height:render("Box Height Slider", "Adjust box height")

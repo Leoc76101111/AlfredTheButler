@@ -10,8 +10,8 @@ local function get_affix_screen_position(item) -- (credits QQT)
     local row, col = item:get_inventory_row(), item:get_inventory_column()
     local screen_width, screen_height = get_screen_width(), get_screen_height()
 
-    local inventory_start_x = screen_width * 0.661
-    local inventory_start_y = screen_height * 0.667
+    local inventory_start_x = screen_width * 0.661 + gui.elements.draw_start_offset_x:get()
+    local inventory_start_y = screen_height * 0.667 + gui.elements.draw_start_offset_y:get()
     local slot_width = gui.elements.draw_offset_x:get()
     local slot_height = gui.elements.draw_offset_y:get()
     local space_between_items_x = gui.elements.draw_box_space:get()
