@@ -355,7 +355,9 @@ function utils.is_salvage_or_sell_with_data(item,action)
     end
     -- non ancestral
     if ancestral_ga_count <= 0 then
-        if item:is_junk() and utils.settings.item_junk == action then
+        if item:is_locked() then
+            return false, 0, false
+        elseif item:is_junk() and utils.settings.item_junk == action then
             return true, 0, false
         elseif item:is_junk() then
             return false, 0, false
