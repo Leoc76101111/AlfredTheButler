@@ -1,9 +1,9 @@
 # Alfred the butler
-#### V1.2.1
+#### V1.2.2
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
-Alfred also does near-instant sell and near-instant salvage, it will likely sell/salvage before you even see the inventory page open. It will still obey your filter settings (both GA count and affix/unique filterst)
+Alfred also does near-instant sell and near-instant salvage, it will likely sell/salvage before you even see the inventory page open. It will still obey your filter settings (both GA count and affix/unique filters)
 
 ## Description
 Alfred is your personal butler in Cerrigar. He is capable of stashing, salvaging and selling items based on your settings. He is also capable of restock boss summon materials as well as infernal horde compasses. Additionally, he will also display status of your inventory on top left of your screen and you can see how many items alfred will stash/keep, salvage or sell as well as count/max boss summon materials and infernal horde compasses that you instruct alfred to restock.
@@ -22,6 +22,13 @@ there are 4 trigger conditions that can get alfred to do tasks:
   - dump tracker info -- debug usage
   - manual trigger -- make alfred do task now (will teleport to cerrigar if not there)
 - Keep item in stash -- toggle to stash non-salvage non-sell inventory items (equipments only)
+### Display settings
+- Draw Status -- to enable the status on top left of screen
+- Draw Keep Items -- draw blue box around items that is set to keep in inventory
+- Draw Sell Items -- draw pink box around items that is set to sell in inventory
+- Draw Salvage Items -- draw orange box around items that is set to salvage in inventory
+- Various box sizing and offset settings to adjust depending on screen size similar to affix filter
+
 ### Explorer settings
 explorer settings similar to piteer (recommended to keep as default)
 

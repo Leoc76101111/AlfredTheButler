@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = 'v1.2.1'
+local plugin_version = 'v1.2.2'
 
 local utils = require 'core.utils'
 local gui = {}
@@ -153,17 +153,17 @@ function gui.render()
     gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
     if gui.elements.drawing_tree:push('Display settings') then
         gui.elements.draw_status:render('Draw status', 'Draw status info on screen')
-        gui.elements.draw_stash:render('Draw Keep items', 'Draw green box around items that alfred will keep/stash')
+        gui.elements.draw_stash:render('Draw Keep items', 'Draw blue box around items that alfred will keep/stash')
         if gui.elements.draw_stash:get() then
-            render_menu_header('Items to keep/stash are drawn with green box')
+            render_menu_header('Items to keep/stash are drawn with blue box')
         end
-        gui.elements.draw_salvage:render('Draw Salvage items', 'Draw red box around items that alfred will salvage')
+        gui.elements.draw_salvage:render('Draw Salvage items', 'Draw orange box around items that alfred will salvage')
         if gui.elements.draw_salvage:get() then
-            render_menu_header('Items to salvage are drawn with red box')
+            render_menu_header('Items to salvage are drawn with orange box')
         end
-        gui.elements.draw_sell:render('Draw Sell items', 'Draw blue box around items that alfred will sell')
+        gui.elements.draw_sell:render('Draw Sell items', 'Draw pink box around items that alfred will sell')
         if gui.elements.draw_sell:get() then
-            render_menu_header('Items to sell are drawn with blue box')
+            render_menu_header('Items to sell are drawn with pink box')
         end
         gui.elements.draw_box_space:render("Box Spacing", "", 1)
         gui.elements.draw_offset_x:render("Slot Offset X", "Adjust slot offset X")

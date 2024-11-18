@@ -81,13 +81,27 @@ function drawing.draw_inventory_boxes()
     local items = tracker.cached_inventory
     for _,cache in pairs(items) do
         local x, y, box_width, box_height = get_affix_screen_position(cache.item)
+        local draw_affix = false
         if gui.elements.draw_stash:get() and cache.is_stash then
-            graphics.rect(vec2:new(x, y), vec2:new(x + box_width, y + box_height), color_green(255), 1, 3)
+            graphics.rect(vec2:new(x, y), vec2:new(x + box_width, y + box_height), color_blue(255), 1, 4)
+            draw_affix = true
         elseif gui.elements.draw_sell:get() and cache.is_sell then
-            graphics.rect(vec2:new(x, y), vec2:new(x + box_width, y + box_height), color_blue(255), 1, 3)
+            graphics.rect(vec2:new(x, y), vec2:new(x + box_width, y + box_height), color_pink(255), 1, 3)
+            draw_affix = true
         elseif gui.elements.draw_salvage:get() and cache.is_salvage then
-            graphics.rect(vec2:new(x, y), vec2:new(x + box_width, y + box_height), color_red(255), 1, 3)
+            graphics.rect(vec2:new(x, y), vec2:new(x + box_width, y + box_height), color_orange_red(255), 1, 3)
+            draw_affix = true
         end
+        if draw_affix then
+            if cache.is_max_aspect and cache.affix_count > 0 then
+                graphics.text_2d(tostring(cache.affix_count) .. "*", vec2:new(x + box_width - 24, y + box_height - 25), 20, color_white(255))
+            elseif cache.is_max_aspect then
+                graphics.text_2d("*", vec2:new(x + box_width - 15, y + box_height - 25), 20, color_white(255))
+            elseif cache.affix_count > 0 then
+                graphics.text_2d(tostring(cache.affix_count), vec2:new(x + box_width - 15, y + box_height - 25), 20, color_white(255))
+            end
+        end
+        
     end
 
 end

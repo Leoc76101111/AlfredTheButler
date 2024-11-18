@@ -11,6 +11,10 @@ local drawing      = require 'core.drawing'
 local local_player
 local debounce_time = nil
 local debounce_timeout = 1
+local keybind_data = checkbox:new(false, get_hash(plugin_label .. '_keybind_data'))
+if PERSISTENT_MODE ~= nil and PERSISTENT_MODE ~= false then
+    gui.elements.keybind_toggle:set(keybind_data:get())
+end
 
 local function update_locals()
     local_player = get_local_player()
@@ -18,6 +22,13 @@ end
 
 local function main_pulse()
     settings:update_settings()
+    tracker.timeout = tracker.last_reset + settings.timeout >= get_time_since_inject()
+    if PERSISTENT_MODE ~= nil and PERSISTENT_MODE ~= false  then
+        if keybind_data:get() ~= (gui.elements.keybind_toggle:get_state() == 1) then
+            keybind_data:set(gui.elements.keybind_toggle:get_state() == 1)
+        end
+    end
+
     if not local_player or not settings.enabled then return end
     utils.update_tracker_count(local_player)
 

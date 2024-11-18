@@ -336,8 +336,11 @@ function utils.get_item_type(item)
     return 'unknown'
 end
 function utils.is_salvage_or_sell(item,action)
+    local is_salvage_or_sell, _, _ = utils.is_salvage_or_sell_with_data(item, action)
+    return is_salvage_or_sell
+end
+function utils.is_salvage_or_sell_with_data(item,action)
     local item_id = item:get_sno_id()
-    if item:is_locked() then return false end
 
     local item_type = utils.get_item_type(item)
     if item_type == 'cache' then return false end
@@ -353,28 +356,28 @@ function utils.is_salvage_or_sell(item,action)
     -- non ancestral
     if ancestral_ga_count <= 0 then
         if item:is_junk() and utils.settings.item_junk == action then
-            return true
+            return true, 0, false
+        elseif item:is_junk() then
+            return false, 0, false
         elseif is_unique and utils.settings.item_unique == action then
-            return true
-        elseif not item:is_junk() and not is_unique and
-            utils.settings.item_legendary_or_lower == action 
-        then
-            return true
+            return true, 0, false
+        elseif is_unique then
+            return false, 0, false
+        elseif utils.settings.item_legendary_or_lower == action then
+            return true, 0, false
         else
-            return false
+            return false, 0, false
         end
     end
 
     -- ancestral 
-    if item:is_junk() and utils.settings.ancestral_item_junk == action then
-        return true
-    end
     local item_affixes = item:get_affixes()
     local ancestral_affix_count = 0
     local ancestral_affix_ga_count = 0
+    local is_max_aspect = false
     for _,affix in pairs(item_affixes) do
         if utils.settings.ancestral_keep_max_aspect and utils.is_max_aspect(affix) then
-            return false
+            is_max_aspect = true
         end
         if item_type == 'unknown' then
             for _,types in pairs(item_types) do
@@ -391,31 +394,40 @@ function utils.is_salvage_or_sell(item,action)
         end
     end
 
-    -- legendaries (not junk, not unique, not mythic)
-    if not item:is_junk() and not is_unique and utils.mythics[tostring(item_id)] == nil and
+    -- junk and matching action
+    if item:is_junk() and utils.settings.ancestral_item_junk == action then
+        return true, ancestral_affix_count, is_max_aspect
+    end
+    -- junk, locked, max_aspect
+    if item:is_junk() or item:is_locked() or is_max_aspect then
+        return false, ancestral_affix_count, is_max_aspect
+    end
+
+    -- legendaries (not unique, not mythic)
+    if not is_unique and utils.mythics[tostring(item_id)] == nil and
         utils.settings.ancestral_item_legendary == action and
         (ancestral_ga_count < utils.settings.ancestral_ga_count or
         (utils.settings.ancestral_filter and
         ancestral_affix_count < utils.settings.ancestral_affix_count))
     then
-        return true
+        return true, ancestral_affix_count, is_max_aspect
     end
-    -- uniques (not junk, is unique, not mythic)
-    if not item:is_junk() and is_unique and utils.mythics[tostring(item_id)] == nil and
+    -- uniques (is unique, not mythic)
+    if is_unique and utils.mythics[tostring(item_id)] == nil and
         utils.settings.ancestral_item_unique == action and
         (ancestral_ga_count < utils.settings.ancestral_unique_ga_count or
         (utils.settings.ancestral_filter and not utils.is_correct_unique(item)))
     then
-        return true
+        return true, ancestral_affix_count, is_max_aspect
     end
-    -- mythics (not junk, not unique, is mythic)
-    if not item:is_junk() and not is_unique and utils.mythics[tostring(item_id)] ~= nil and
+    -- mythics (not unique, is mythic)
+    if not is_unique and utils.mythics[tostring(item_id)] ~= nil and
         utils.settings.ancestral_item_mythic == action and
         ancestral_ga_count < utils.settings.ancestral_mythic_ga_count
     then
-        return true
+        return true, ancestral_affix_count, is_max_aspect
     end
-    return false
+    return false, ancestral_affix_count, is_max_aspect
 end
 function utils.get_restock_item_count(local_player,item)
     local counter = 0
@@ -449,7 +461,7 @@ function utils.is_mounted()
     return local_player:get_attribute(attributes.CURRENT_MOUNT) < 0
 end
 local update_debounce_time = get_time_since_inject()
-local update_debounce_timeout = 1
+local update_debounce_timeout = 0.5
 function utils.update_tracker_count(local_player)
     if update_debounce_time + update_debounce_timeout > get_time_since_inject() then return end
     update_debounce_time = get_time_since_inject()
@@ -462,7 +474,7 @@ function utils.update_tracker_count(local_player)
     local stash_counter = 0
     for _, item in pairs(items) do
         if item then
-            local is_salvage = utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE'])
+            local is_salvage, affix_count, is_max_aspect = utils.is_salvage_or_sell_with_data(item,utils.item_enum['SALVAGE'])
             local is_sell = utils.is_salvage_or_sell(item,utils.item_enum['SELL'])
             local is_stash = not is_salvage and not is_sell
 
@@ -477,6 +489,8 @@ function utils.update_tracker_count(local_player)
                 is_salvage = is_salvage,
                 is_sell = is_sell,
                 is_stash = is_stash,
+                affix_count = affix_count,
+                is_max_aspect = is_max_aspect,
                 item = item
             }
         else
