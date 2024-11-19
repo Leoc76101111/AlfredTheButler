@@ -74,7 +74,7 @@ utils.mythics = {
     ['221017'] = 'Doombringer',
     ['609820'] = 'Harlequin Crest',
     ['1275935'] = 'Melted Heart of Selig',
-    ['1306338'] = '‍Ring of Starless Skies',
+    ['1306338'] = 'Ring of Starless Skies',
     ['2059803'] = 'Shroud of False Death',
     ['1982241'] = 'Nesekem, the Herald',
     ['2059799'] = 'Heir of Perdition',
@@ -152,6 +152,18 @@ function utils.get_item_aspects()
 end
 function utils.get_unique_items()
     return item_unique
+end
+function utils.get_mythic_items()
+    local item_mythics = {}
+    for sno_id,name in pairs(utils.mythics) do
+        item_mythics[#item_mythics+1] = {
+            name = name,
+            description = name,
+            sno_id = sno_id,
+            class = {"all"}
+        }
+    end
+    return item_mythics
 end
 function utils.get_restock_items()
     return item_restock
@@ -295,7 +307,11 @@ function utils.is_max_aspect(affix)
 end
 function utils.is_correct_unique(item)
     local item_id = item:get_sno_id()
-    return utils.settings.ancestral_unique[item_id]
+    return utils.settings.ancestral_unique[tostring(item_id)] ~= nil
+end
+function utils.is_correct_mythic(item)
+    local item_id = item:get_sno_id()
+    return utils.settings.ancestral_mythic[tostring(item_id)] ~= nil
 end
 function utils.is_correct_affix(item_type,affix)
     local affix_id = affix.affix_name_hash
@@ -418,14 +434,15 @@ function utils.is_salvage_or_sell_with_data(item,action)
     if is_unique and utils.mythics[tostring(item_id)] == nil and
         utils.settings.ancestral_item_unique == action and
         (ancestral_ga_count < utils.settings.ancestral_unique_ga_count or
-        (utils.settings.ancestral_filter and not utils.is_correct_unique(item)))
+        (utils.settings.ancestral_unique_filter and not utils.is_correct_unique(item)))
     then
         return true, ancestral_affix_count, is_max_aspect
     end
     -- mythics (not unique, is mythic)
     if not is_unique and utils.mythics[tostring(item_id)] ~= nil and
         utils.settings.ancestral_item_mythic == action and
-        ancestral_ga_count < utils.settings.ancestral_mythic_ga_count
+        (ancestral_ga_count < utils.settings.ancestral_mythic_ga_count or
+        (utils.settings.ancestral_unique_filter and not utils.is_correct_mythic(item)))
     then
         return true, ancestral_affix_count, is_max_aspect
     end
@@ -561,9 +578,9 @@ function utils.import_filters(elements)
     local data = io.read()
     if pcall(function () return json.decode(data) end) then
         local new_affix = json.decode(data)
-        local new_affix_set = {}
+        local new_settings = {}
         for _,affix in pairs(new_affix) do
-            new_affix_set[affix] = true
+            new_settings[affix] = true
         end
         -- make a backup
         utils.export_filters(elements,true)
@@ -572,16 +589,24 @@ function utils.import_filters(elements)
         for _,affix_type in pairs(item_affix) do
             for _,affix in pairs(affix_type.data) do
                 local checkbox_name = tostring(affix_type.name) .. '_affix_' .. tostring(affix.sno_id)
-                if new_affix_set[checkbox_name] then
+                if new_settings[checkbox_name] then
                     elements[checkbox_name]:set(true)
                 else
                     elements[checkbox_name]:set(false)
                 end
             end
         end
-        for _,affix in pairs(item_unique) do
-            local checkbox_name = 'unique_affix_' .. tostring(affix.sno_id)
-            if new_affix_set[checkbox_name] then
+        for _,item in pairs(item_unique) do
+            local checkbox_name = 'unique_' .. tostring(item.sno_id)
+            if new_settings[checkbox_name] then
+                elements[checkbox_name]:set(true)
+            else
+                elements[checkbox_name]:set(false)
+            end
+        end
+        for _,item in pairs(utils.get_mythic_items()) do
+            local checkbox_name = 'mythic_' .. tostring(item.sno_id)
+            if new_settings[checkbox_name] then
                 elements[checkbox_name]:set(true)
             else
                 elements[checkbox_name]:set(false)
@@ -594,19 +619,25 @@ function utils.import_filters(elements)
     utils.log('export ' .. filename .. ' done')
 end
 function utils.export_filters(elements,is_backup)
-    local selected_affix = {}
+    local selected = {}
     for _,affix_type in pairs(item_affix) do
         for _,affix in pairs(affix_type.data) do
             local checkbox_name = tostring(affix_type.name) .. '_affix_' .. tostring(affix.sno_id)
             if elements[checkbox_name]:get() then
-                selected_affix[#selected_affix+1] = checkbox_name
+                selected[#selected+1] = checkbox_name
             end
         end
     end
-    for _,affix in pairs(item_unique) do
-        local checkbox_name = 'unique_affix_' .. tostring(affix.sno_id)
+    for _,item in pairs(item_unique) do
+        local checkbox_name = 'unique_' .. tostring(item.sno_id)
         if elements[checkbox_name]:get() then
-            selected_affix[#selected_affix+1] = checkbox_name
+            selected[#selected+1] = checkbox_name
+        end
+    end
+    for _,item in pairs(utils.get_mythic_items()) do
+        local checkbox_name = 'mythic_' .. tostring(item.sno_id)
+        if elements[checkbox_name]:get() then
+            selected[#selected+1] = checkbox_name
         end
     end
     local filename = get_export_filename(is_backup)
@@ -615,7 +646,7 @@ function utils.export_filters(elements,is_backup)
         utils.log('error opening file' .. filename)
     end
     io.output(file)
-    io.write(json.encode(selected_affix))
+    io.write(json.encode(selected))
     io.close(file)
 
     utils.log('export ' .. filename .. ' done')
@@ -720,13 +751,12 @@ function utils.dump_tracker_info(tracker_data)
     for key,data in pairs(tracker_data) do
         if key == 'previous' or key == 'cached_inventory' then
         elseif key == 'restock_items' then
-            utils.log(key)
             for key2,data2 in pairs(data) do
                 for key3,data3 in pairs(data2) do
-                    if key3  == 'override' then
+                    if key3  == 'override' and data3.caller ~= nil then
                         utils.log(key .. '>' .. key2 .. '>' .. key3 .. '>caller:' .. tostring(data3.caller))
                         utils.log(key .. '>' .. key2 .. '>' .. key3 .. '>max:' .. tostring(data3.max))
-                    else
+                    elseif key3 ~= 'override' and key3 ~= 'settings_max' then
                         utils.log(key .. '>' .. key2 .. '>' .. key3 .. ':' .. tostring(data3))
                     end
                 end

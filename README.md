@@ -1,9 +1,9 @@
 # Alfred the butler
-#### V1.2.3
+#### V1.2.4
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
-Alfred also does near-instant sell and near-instant salvage, it will likely sell/salvage before you even see the inventory page open. It will still obey your filter settings (both GA count and affix/unique filters)
+Alfred also does near-instant sell and near-instant salvage, it will likely sell/salvage before you even see the inventory page open. It will still obey your filter settings (both GA count and affix/unique/mythic filters)
 
 ## Description
 Alfred is your personal butler in Cerrigar. He is capable of stashing, salvaging and selling items based on your settings. He is also capable of restock boss summon materials as well as infernal horde compasses. Additionally, he will also display status of your inventory on top left of your screen and you can see how many items alfred will stash/keep, salvage or sell as well as count/max boss summon materials and infernal horde compasses that you instruct alfred to restock.
@@ -39,14 +39,13 @@ select what to do with non-ancestral items by types and marked as junk
 - Drop down to select what to do with items that do not meet the threshold by types and marked as junk
 - Greater affix threshold to keep for mythic, uniques and legendaries. Setting all of them to 1 will tell alfred to keep/stash all items with 1 greater affix or more (basically keep/stash everything)
 - Keep max aspect checkbox -- if checked, will ignore the GA threshold and keep the item if the aspect roll is max
-- use affix/unique filter -- enable more specific filters via affix for legendaries and select which unique u want to keep
-#### General
-- Greater affix threshold settings is moved here if affix/unique fitler is enabled.
+- use unique/mythic filter -- enable more specific filters by selecting which unique/mythic u want to keep
+- use affix filter -- enable more specific filters via affix for legendaries
 - Additional slider for matching affix threshold
 - Both GA threshold and min affix threshold must be met
-- export/import functionality -- you can use this to export/import affix filter configuration. There is a preset for spiritborn for most common spiritborn build items
-#### Unique
-- search and add uniques that you want to keep
+- export/import functionality -- you can use this to export/import affix filter and unique/mythic configuration. There is a preset for spiritborn for most common spiritborn build items
+#### Unique/Mythic
+- search and add uniques/mythics that you want to keep
 #### Helm/Chest/Gloves/Pants/Boots/Amulet/Ring/Weapon/Offhand
 - search and add affixes that you want to keep
 - you can search by name, description or id

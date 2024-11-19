@@ -4,6 +4,7 @@ local gui = require 'gui'
 local utils = require 'core.utils'
 local affix_types = utils.get_item_affixes()
 local unique_items = utils.get_unique_items()
+local mythic_items = utils.get_mythic_items()
 
 local settings = {
     enabled = false,
@@ -30,6 +31,7 @@ local settings = {
     ancestral_affix_ga_count = 0,
     ancestral_affix = {},
     ancestral_unique = {},
+    ancestral_mythic = {},
     aggresive_movement = false,
     path_angle = 10,
     restock_items = {},
@@ -70,6 +72,7 @@ function settings:update_settings()
     settings.ancestral_unique_ga_count = gui.elements.ancestral_unique_ga_count_slider:get()
     settings.ancestral_mythic_ga_count = gui.elements.ancestral_mythic_ga_count_slider:get()
     settings.ancestral_filter = gui.elements.ancestral_filter_toggle:get()
+    settings.ancestral_unique_filter = gui.elements.ancestral_unique_filter_toggle:get()
     settings.ancestral_affix_count = gui.elements.ancestral_affix_count_slider:get()
     settings.ancestral_affix_ga_count = gui.elements.ancestral_affix_ga_count_slider:get()
     settings.path_angle = gui.elements.explorer_path_angle_slider:get()
@@ -84,10 +87,17 @@ function settings:update_settings()
         end
     end
     settings.ancestral_unique = {}
-    for _,affix in pairs(unique_items) do
-        local checkbox_name = 'unique_affix_' .. tostring(affix.sno_id)
+    for _,item in pairs(unique_items) do
+        local checkbox_name = 'unique_' .. tostring(item.sno_id)
         if gui.elements[checkbox_name] and gui.elements[checkbox_name]:get() then
-            settings.ancestral_unique[affix.sno_id] = true
+            settings.ancestral_unique[item.sno_id] = true
+        end
+    end
+    settings.ancestral_mythic = {}
+    for _,item in pairs(mythic_items) do
+        local checkbox_name = 'mythic_' .. tostring(item.sno_id)
+        if gui.elements[checkbox_name] and gui.elements[checkbox_name]:get() then
+            settings.ancestral_mythic[item.sno_id] = true
         end
     end
     settings.restock_items = {}

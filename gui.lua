@@ -1,49 +1,70 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = 'v1.2.3'
+local plugin_version = 'v1.2.4'
 
 local utils = require 'core.utils'
 local gui = {}
 
 local affix_types = utils.get_item_affixes()
 local unique_items = utils.get_unique_items()
+local mythic_items = utils.get_mythic_items()
 local restock_items = utils.get_restock_items()
 
 local function create_checkbox(value, key)
     return checkbox:new(value, get_hash(plugin_label .. '_' .. key))
 end
 
-local function add_affix_tree(name)
-    local tree_name = tostring(name) .. '_affix_tree'
+local function add_tree(name,is_affix)
+    local tree_name = tostring(name)
+    if is_affix then
+        tree_name = tree_name .. '_affix'
+    end
+    tree_name = tree_name .. '_tree'
     gui.elements[tree_name] = tree_node:new(2)
 end
 
-local function add_affix_checkbox(name,data)
-    for _,affix in pairs(data) do
-        local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
-        gui.elements[checkbox_name] = create_checkbox(false, checkbox_name)
+local function add_checkbox(name, data, is_affix, default)
+    for _,item in pairs(data) do
+        local checkbox_name = tostring(name)
+        if is_affix then
+            checkbox_name = checkbox_name .. '_affix'
+        end
+        checkbox_name = checkbox_name .. '_' .. tostring(item.sno_id)
+        gui.elements[checkbox_name] = create_checkbox(default, checkbox_name)
     end
 end
 
-local function add_affix_search(name)
-    local search_name = tostring(name) .. '_affix_search'
+local function add_search(name, is_affix)
+    local search_name = tostring(name)
+    if is_affix then
+        search_name = search_name .. '_affix'
+    end
+    search_name = search_name .. '_search'
     gui.elements[search_name] = input_text:new(get_hash(plugin_label .. tostring(name) .. '_search_input'))
 end
 
-local function render_affix_checkbox(name,data)
-    local search_name = tostring(name) .. '_affix_search'
-    for _,affix in pairs(data) do
-        for _,class in pairs(affix.class) do
+local function render_checkbox(name,data, is_affix)
+    local search_name = tostring(name)
+    if is_affix then
+        search_name = search_name .. '_affix'
+    end
+    search_name = search_name .. '_search'
+    for _,item in pairs(data) do
+        for _,class in pairs(item.class) do
             if class == 'all' or class == utils.get_character_class() then
-                local checkbox_name = tostring(name) .. '_affix_' .. tostring(affix.sno_id)
+                local checkbox_name = tostring(name)
+                if is_affix then
+                    checkbox_name = checkbox_name .. '_affix'
+                end
+                checkbox_name = checkbox_name .. '_' .. tostring(item.sno_id)
                 local search_string = string.lower(gui.elements[search_name]:get())
                 if search_string ~= '' and
-                    (string.lower(affix.name):match(search_string) or
-                    string.lower(affix.description):match(search_string) or
-                    string.lower(affix.sno_id):match(search_string))
+                    (string.lower(item.name):match(search_string) or
+                    string.lower(item.description):match(search_string) or
+                    string.lower(item.sno_id):match(search_string))
                 then
-                    gui.elements[checkbox_name]:render(affix.name, affix.description)
+                    gui.elements[checkbox_name]:render(item.name, item.description)
                 elseif gui.elements[checkbox_name]:get() then
-                    gui.elements[checkbox_name]:render(affix.name, affix.description)
+                    gui.elements[checkbox_name]:render(item.name, item.description)
                 end
             end
         end
@@ -92,8 +113,8 @@ gui.elements = {
     ancestral_unique_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_unique_ga_slider')),
     ancestral_mythic_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_mythic_ga_slider')),
     ancestral_filter_toggle = create_checkbox(false, 'use_filter'),
+    ancestral_unique_filter_toggle = create_checkbox(false, 'use_unique_filter'),
 
-    ancestral_filter_tree = tree_node:new(2),
     ancestral_affix_count_slider = slider_int:new(0, 3, 2, get_hash(plugin_label .. '_affix_slider')),
     ancestral_affix_ga_count_slider = slider_int:new(0, 3, 1, get_hash(plugin_label .. '_affix_ga_slider')),
     ancestral_affix_ga = create_checkbox(false, 'affix_ga'),
@@ -131,13 +152,15 @@ gui.elements = {
 }
 
 for _,affix_type in pairs(affix_types) do
-    add_affix_tree(affix_type.name)
-    add_affix_checkbox(affix_type.name, affix_type.data)
-    add_affix_search(affix_type.name)
+    add_tree(affix_type.name,true)
+    add_checkbox(affix_type.name, affix_type.data, true, false)
+    add_search(affix_type.name,true)
 end
-add_affix_tree('unique')
-add_affix_checkbox('unique', unique_items)
-add_affix_search('unique')
+add_tree('unique',false)
+add_checkbox('unique', unique_items, false, false)
+add_search('unique',false)
+add_tree('mythic',false)
+add_checkbox('mythic', mythic_items, false, true)
 for _,item in pairs(restock_items) do
     local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
     gui.elements[slider_name] = slider_int:new(0, item.max, 0, get_hash(slider_name))
@@ -194,39 +217,50 @@ function gui.render()
         gui.elements.ancestral_item_legendary:render('legendary items', gui.item_options, 'Select what to do with non-unique legendary items')
         gui.elements.ancestral_item_junk:render('junk items', gui.item_options, 'Select what to do with junk items')
         gui.elements.ancestral_keep_max_aspect:render('Keep max aspect','Keep max aspect')
-        if not gui.elements.ancestral_filter_toggle:get() then
-            render_menu_header('Select the number of greater affixes on items you want to keep (override the default actions above to keep)')
-            gui.elements.ancestral_mythic_ga_count_slider:render('Mythic Greater Affix', 'Minimum greater affix to keep for mythic')
-            gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
-            gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
-        end
-        gui.elements.ancestral_filter_toggle:render('Use affix/unique filter', 'use affix filter')
+        gui.elements.ancestral_unique_filter_toggle:render('Use unique/mythic filter', 'use affix filter')
+        gui.elements.ancestral_filter_toggle:render('Use legendary affix filter', 'use affix filter')
         if gui.elements.ancestral_filter_toggle:get() then
-            if gui.elements.ancestral_filter_tree:push('General') then
-                render_menu_header('Select the number of greater affixes and matching affixes on items you want to keep (override the default actions above to keep)')
-                gui.elements.ancestral_mythic_ga_count_slider:render('Mythic Greater Affix', 'Minimum greater affix to keep for mythic')
-                gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
-                gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
-                gui.elements.ancestral_affix_count_slider:render('Min matching Affix', 'Minimum matching affix to keep')
-                -- gui.elements.ancestral_affix_ga_count_slider:render('Min matching GA', 'Minimum matching greater affix')
-                gui.elements.seperator:render('',{'Export'},'')
-                gui.elements.affix_export_button:render('', 'export all selected affixes to export folder', 0)
-                gui.elements.seperator:render('',{'Import'},'')
-                gui.elements.affix_import_name:render('file name', 'file name to import', false, 'import', '')
-                gui.elements.affix_import_button:render('', 'import selected affixes from file', 0)
-                gui.elements.ancestral_filter_tree:pop()
+            render_menu_header('Select the number of greater affixes and matching affixes on items you want to keep (override the default actions above to keep)')
+            render_menu_header('(Example, if you select 2GA and 2 matching affix, ALFRED WILL ONLY KEEP 2GA+ AND HAVE 2 MATCHING AFFIX. alfred will not keep 3GA and 1 matching affix. BOTH CONDITIONS MUST BE MET))')
+        else 
+            render_menu_header('Select the number of greater affixes on items you want to keep (override the default actions above to keep)')
+        end
+        gui.elements.ancestral_mythic_ga_count_slider:render('Mythic Greater Affix', 'Minimum greater affix to keep for mythic')
+        gui.elements.ancestral_unique_ga_count_slider:render('Unique Greater Affix', 'Minimum greater affix to keep for unique')
+        gui.elements.ancestral_ga_count_slider:render('Legendary Greater Affix', 'Minimum greater affix to keep for legendaries')
+        if gui.elements.ancestral_filter_toggle:get() then
+            gui.elements.ancestral_affix_count_slider:render('Min matching Affix', 'Minimum matching affix to keep')
+            -- gui.elements.ancestral_affix_ga_count_slider:render('Min matching GA', 'Minimum matching greater affix')
+        end
+        render_menu_header('Export or import affix data, unique data and mythic data')
+        gui.elements.seperator:render('',{'Export'},'')
+        gui.elements.affix_export_button:render('', 'export all selected affixes to export folder', 0)
+        gui.elements.seperator:render('',{'Import'},'')
+        gui.elements.affix_import_name:render('file name', 'file name to import', false, 'import', '')
+        gui.elements.affix_import_button:render('', 'import selected affixes from file', 0)
+        if gui.elements.ancestral_unique_filter_toggle:get() then
+            render_menu_header('REMEMBER TO SET THE UNIQUE/MYTHIC YOU WANT SO THAT IT DOESNT GET ACCIDENTALLY SALVAGED/SOLD')
+            if gui.elements['unique_tree']:push('Unique item') then
+                gui.elements['unique_search']:render('Search', 'Find unique items', false, '', '')
+                render_checkbox('unique', unique_items, false)
+                gui.elements['unique_tree']:pop()
             end
-            if gui.elements['unique_affix_tree']:push('Unique') then
-                gui.elements['unique_affix_search']:render('Search', 'Find unique items', false, '', '')
-                render_affix_checkbox('unique', unique_items)
-                gui.elements['unique_affix_tree']:pop()
+            if gui.elements['mythic_tree']:push('Mythic item') then
+                for _,item in pairs(mythic_items) do
+                    local checkbox_name = 'mythic_' .. tostring(item.sno_id)
+                    gui.elements[checkbox_name]:render(item.name, item.description)
+                end
+                gui.elements['mythic_tree']:pop()
             end
+        end
+        if gui.elements.ancestral_filter_toggle:get() then
+            render_menu_header('REMEMBER TO SET THE AFFIX YOU WANT SO THAT IT DOESNT GET ACCIDENTALLY SALVAGED/SOLD')
             for _,affix_type in pairs(affix_types) do
                 local tree_name = tostring(affix_type.name) .. '_affix_tree'
                 local search_name = tostring(affix_type.name) .. '_affix_search'
-                if gui.elements[tree_name]:push(affix_type.name) then
+                if gui.elements[tree_name]:push('Legendary ' .. affix_type.name .. ' affix') then
                     gui.elements[search_name]:render('Search', 'Find affixes', false, '', '')
-                    render_affix_checkbox(affix_type.name, affix_type.data)
+                    render_checkbox(affix_type.name, affix_type.data, true)
                     gui.elements[tree_name]:pop()
                 end
             end
