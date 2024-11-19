@@ -221,7 +221,7 @@ function gui.render()
         gui.elements.ancestral_filter_toggle:render('Use legendary affix filter', 'use affix filter')
         if gui.elements.ancestral_filter_toggle:get() then
             render_menu_header('Select the number of greater affixes and matching affixes on items you want to keep (override the default actions above to keep)')
-            render_menu_header('(Example, if you select 2GA and 2 matching affix, ALFRED WILL ONLY KEEP 2GA+ AND HAVE 2 MATCHING AFFIX. alfred will not keep 3GA and 1 matching affix. BOTH CONDITIONS MUST BE MET))')
+            render_menu_header('(Example, if you select 2GA and 2 matching affix, ALFRED WILL ONLY KEEP 2GA+ AND HAVE 2 MATCHING AFFIX. alfred will not keep 3GA and 1 matching affix. BOTH CONDITIONS MUST BE MET)')
         else 
             render_menu_header('Select the number of greater affixes on items you want to keep (override the default actions above to keep)')
         end
