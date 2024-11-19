@@ -307,10 +307,12 @@ function utils.is_max_aspect(affix)
 end
 function utils.is_correct_unique(item)
     local item_id = item:get_sno_id()
+    -- this is not a bug, unique needs to be int
     return utils.settings.ancestral_unique[item_id] ~= nil
 end
 function utils.is_correct_mythic(item)
     local item_id = item:get_sno_id()
+    -- this is not a bug, mythic needs to be string
     return utils.settings.ancestral_mythic[tostring(item_id)] ~= nil
 end
 function utils.is_correct_affix(item_type,affix)
