@@ -138,6 +138,8 @@ gui.elements = {
 
     drawing_tree = tree_node:new(1),
     draw_status = create_checkbox(true, 'draw_status'),
+    draw_status_offset_x = slider_int:new(0, 1200, 0, get_hash(plugin_label .. "draw_status_offset_x")),
+    draw_status_offset_y = slider_int:new(0, 600, 0, get_hash(plugin_label .. "draw_status_offset_y")),
     draw_stash = create_checkbox(false, 'draw_stash'),
     draw_sell = create_checkbox(false, 'draw_sell'),
     draw_salvage = create_checkbox(false, 'draw_salvage'),
@@ -192,6 +194,8 @@ function gui.render()
         if gui.elements.draw_sell:get() then
             render_menu_header('Items to sell are drawn with pink box')
         end
+        gui.elements.draw_status_offset_x:render("Status Offset X", "Adjust status message offset X")
+        gui.elements.draw_status_offset_y:render("Status Offset Y", "Adjust status message offset Y")
         gui.elements.draw_box_space:render("Box Spacing", "", 1)
         gui.elements.draw_start_offset_x:render("Start Offset X", "Adjust starting offset X")
         gui.elements.draw_start_offset_y:render("Start Offset Y", "Adjust start offset Y")

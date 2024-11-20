@@ -48,17 +48,24 @@ function drawing.draw_status()
     else
         status = 'Unknown'
     end
+
+    local messages = {}
+    if PLUGIN_barbara_the_oracle then
+        local barbara_status = PLUGIN_barbara_the_oracle.get_status()
+        if barbara_status.enabled then
+            messages[#messages+1] = 'Barbara Mode     : ' .. tostring(barbara_status.mode)
+        end
+    end
+
     local keybind_status = 'Off'
     if settings.get_export_keybind_state() then keybind_status = 'On' end
-    local messages = {
-        'Alfred Task      : ' .. status,
-        'Export Inventory : ' .. keybind_status,
-        'Inventory        : ' .. tracker.inventory_count,
-        'Keep             : ' .. tracker.stash_count,
-        'Salvage          : ' .. tracker.salvage_count,
-        'Sell             : ' .. tracker.sell_count,
-        '----------------------',
-    }
+    messages[#messages+1] = 'Alfred Task      : ' .. status
+    messages[#messages+1] = 'Export Inventory : ' .. keybind_status
+    messages[#messages+1] = 'Inventory        : ' .. tracker.inventory_count
+    messages[#messages+1] = 'Keep             : ' .. tracker.stash_count
+    messages[#messages+1] = 'Salvage          : ' .. tracker.salvage_count
+    messages[#messages+1] = 'Sell             : ' .. tracker.sell_count
+    messages[#messages+1] = '----------------------'
 
     for _,item in pairs(tracker.restock_items) do
         if item.max >= item.min then
@@ -66,15 +73,10 @@ function drawing.draw_status()
         end
     end
 
-    local y_pos = 50
-    if PLUGIN_barbara_the_oracle then
-        local barbara_status = PLUGIN_barbara_the_oracle.get_status()
-        if barbara_status.enabled then
-            y_pos = 70
-        end
-    end
+    local x_pos = 8 + gui.elements.draw_status_offset_x:get()
+    local y_pos = 50 + gui.elements.draw_status_offset_y:get()
     for _,msg in pairs(messages) do
-        graphics.text_2d(msg, vec2:new(8, y_pos), 20, color_white(255))
+        graphics.text_2d(msg, vec2:new(x_pos, y_pos), 20, color_white(255))
         y_pos = y_pos + 20
     end
 end
