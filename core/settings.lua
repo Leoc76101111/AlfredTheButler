@@ -56,6 +56,21 @@ function settings.get_keybind_state()
     return false
 end
 
+function settings.get_export_keybind_state()
+    local toggle_key = gui.elements.export_keybind_toggle:get_key();
+    local toggle_state = gui.elements.export_keybind_toggle:get_state();
+
+    -- If not using keybind, skip
+    if not settings.use_keybind then
+        return true
+    end
+
+    if settings.use_keybind and toggle_key ~= 0x0A and toggle_state == 1 then
+        return true
+    end
+    return false
+end
+
 function settings:update_settings()
     settings.enabled = gui.elements.main_toggle:get()
     settings.use_keybind = gui.elements.use_keybind:get()

@@ -100,10 +100,9 @@ function task.Execute()
     elseif ((settings.allow_external and tracker.external_trigger) or
         tracker.inventory_full or tracker.manual_trigger) or restock_trigger
     then
-        -- -- uncomment if you want to collect item data before salvage/sell
-        -- if task.status ~= status_enum['WAITING'] then
-        --     utils.export_inventory_info()
-        -- end
+        if settings.get_export_keybind_state() and task.status ~= status_enum['WAITING'] then
+            utils.export_inventory_info()
+        end
         if settings.stash_all_socketables and #get_local_player():get_socketable_items() == 33 then
             tracker.stash_socketables = true
         end

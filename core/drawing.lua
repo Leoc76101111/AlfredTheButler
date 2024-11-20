@@ -48,13 +48,16 @@ function drawing.draw_status()
     else
         status = 'Unknown'
     end
+    local keybind_status = 'Off'
+    if settings.get_export_keybind_state() then keybind_status = 'On' end
     local messages = {
-        'Alfred Task   : ' .. status,
-        'Inventory     : ' .. tracker.inventory_count,
-        'Keep          : ' .. tracker.stash_count,
-        'Salvage       : ' .. tracker.salvage_count,
-        'Sell          : ' .. tracker.sell_count,
-        '-------------------',
+        'Alfred Task      : ' .. status,
+        'Export Inventory : ' .. keybind_status,
+        'Inventory        : ' .. tracker.inventory_count,
+        'Keep             : ' .. tracker.stash_count,
+        'Salvage          : ' .. tracker.salvage_count,
+        'Sell             : ' .. tracker.sell_count,
+        '----------------------',
     }
 
     for _,item in pairs(tracker.restock_items) do

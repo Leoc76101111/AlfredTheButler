@@ -93,6 +93,7 @@ gui.elements = {
 
     use_keybind = create_checkbox(false, 'use_keybind'),
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_keybind_toggle' )),
+    export_keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_export_keybind_toggle' )),
     dump_keybind = keybind:new(0x0A,false,get_hash(plugin_label .. '_dump_keybind')),
     manual_keybind = keybind:new(0x0A,false,get_hash(plugin_label .. '_manual_keybind')),
 
@@ -172,6 +173,7 @@ function gui.render()
     gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot')
     if gui.elements.use_keybind:get() then
         gui.elements.keybind_toggle:render('Toggle Keybind', 'Toggle the bot for quick enable')
+        gui.elements.export_keybind_toggle:render('Toggle Export Keybind', 'Toggle to export inventory data before sell/salvage/stash')
         gui.elements.dump_keybind:render('Dump tracker info', 'Dump all tracker info to log')
         gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now')
     end

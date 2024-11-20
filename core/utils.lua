@@ -697,13 +697,20 @@ function utils.export_inventory_info()
     for _, item in pairs(items) do
         local item_info = {}
         if item then
+            local is_salvage = utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE'])
+            local is_sell = utils.is_salvage_or_sell(item,utils.item_enum['SELL'])
+            item_info['action'] = 'keep'
+            if is_salvage then item_info['action'] = 'salvage'
+            elseif is_sell then item_info['action'] = 'sell'
+            elseif utils.settings.item_use_stash then item_info['action'] = 'stash' end
+
             item_info['name'] = item:get_display_name()
             item_info['id'] = item:get_sno_id()
             item_info['type'] = utils.get_item_type(item)
-            item_info['durability'] = item:get_durability()
+            -- item_info['durability'] = item:get_durability()
             item_info['affix'] = {}
             item_info['aspect'] = {}
-            item_info['attributes'] = {}
+            -- item_info['attributes'] = {}
             for _,affix in pairs(item:get_affixes()) do
                 local affix_id = affix.affix_name_hash
                 if item_aspect[affix_id] then
@@ -723,9 +730,9 @@ function utils.export_inventory_info()
                     }
                 end
             end
-            for key,attr in pairs(attributes) do
-                item_info['attributes'][key] = item:get_attribute(attr)
-            end
+            -- for key,attr in pairs(attributes) do
+            --     item_info['attributes'][key] = item:get_attribute(attr)
+            -- end
         end
         items_info[#items_info+1] = item_info
     end
