@@ -20,6 +20,26 @@ local debounce_time = get_time_since_inject()
 local debounce_timeout = 1
 local execute_restock = false
 local stash_item_count = -1
+local failed_interaction_count = -1
+local last_interaction_item_count = -1
+
+local function update_last_interaction_time()
+    local local_player = get_local_player()
+    local item_count = #local_player:get_inventory_items() +
+        #local_player:get_consumable_items() +
+        #local_player:get_dungeon_key_items() +
+        #local_player:get_socketable_items()
+
+    if item_count == last_interaction_item_count then
+        failed_interaction_count = failed_interaction_count + 1
+    else
+        failed_interaction_count = -1
+    end
+    if failed_interaction_count < 10 then
+        task.last_interaction = get_time_since_inject()
+    end
+    last_interaction_item_count = item_count
+end
 
 local function is_inventory_max(type)
     if type == 'key' then
@@ -60,14 +80,11 @@ function extension.execute()
                 end
                 stash_counter = stash_counter + item_count
                 if need_counter > 0 and not is_inventory_max(item_data.item_type) then
-                    -- move 3 times because sometimes it get stuck
                     loot_manager.move_item_from_stash(item)
-                    loot_manager.move_item_from_stash(item)
-                    loot_manager.move_item_from_stash(item)
+                    update_last_interaction_time()
                     need_counter = need_counter - item_count
                 end
             end
-            task.last_interaction = get_time_since_inject()
             debounce_time = get_time_since_inject()
         end
         tracker.restock_items[key]['stash'] = stash_counter
@@ -94,6 +111,22 @@ function extension.is_done()
                 restock_done = false
             end
         end
+        if restock_done and #get_local_player():get_stash_items() > 0 then
+            local restock_items = utils.get_restock_items_from_tracker()
+            local stash_items = get_local_player():get_stash_items()
+            for key,_ in pairs(restock_items) do
+                restock_items[key].stash = 0
+            end
+            for _,item in pairs(stash_items) do
+                if restock_items[item:get_sno_id()] ~= nil then
+                    local item_count = item:get_stack_count()
+                    if item_count == 0 then
+                        item_count = 1
+                    end
+                    restock_items[item:get_sno_id()].stash = restock_items[item:get_sno_id()].stash + item_count
+                end
+            end
+        end
     end
     return (tracker.restock_count == 0 and not execute_restock) or
         (execute_restock and restock_done)
@@ -102,11 +135,15 @@ function extension.done()
     tracker.restock_done = true
     execute_restock = false
     stash_item_count = -1
+    failed_interaction_count = -1
+    last_interaction_item_count = -1
 end
 function extension.failed()
     tracker.restock_failed = true
     execute_restock = false
     stash_item_count = -1
+    failed_interaction_count = -1
+    last_interaction_item_count = -1
 end
 function extension.is_in_vendor_screen()
     local is_in_vendor_screen = false

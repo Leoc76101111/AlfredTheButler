@@ -22,7 +22,9 @@ local item_affix = {}
 local item_aspect = {}
 local item_unique = {}
 local item_restock = {
-    {sno_id = 1866012, name = 'Horde Compass', item_type = 'key', max = 33, min = 1},
+    {sno_id = 2167736, name = 'Horde Compass (6)', item_type = 'key', max = 150, min = 1},
+    {sno_id = 2167741, name = 'Horde Compass (8)', item_type = 'key', max = 150, min = 1},
+    {sno_id = 2167743, name = 'Horde Compass (10)', item_type = 'key', max = 150, min = 1},
     {sno_id = 1489420, name = 'Malignant Heart', item_type = 'consumables', max = 1650, min = 4},
     {sno_id = 1502128, name = 'Living Steel', item_type = 'consumables', max = 1650, min = 12},
     {sno_id = 1518053, name = 'Distilled Fear', item_type = 'consumables', max = 1650, min = 12},
@@ -67,18 +69,18 @@ utils.restock_enum = {
 }
 
 utils.mythics = {
-    ['1901484'] = "Tyrael's Might",
-    ['223271'] = 'The Grandfather',
-    ['241930'] = "Andariel's Visage",
-    ['359165'] = 'Ahavarion, Spear of Lycander',
-    ['221017'] = 'Doombringer',
-    ['609820'] = 'Harlequin Crest',
-    ['1275935'] = 'Melted Heart of Selig',
-    ['1306338'] = 'Ring of Starless Skies',
-    ['2059803'] = 'Shroud of False Death',
-    ['1982241'] = 'Nesekem, the Herald',
-    ['2059799'] = 'Heir of Perdition',
-    ['2059813'] = 'Shattered Vow',
+    [1901484] = "Tyrael's Might",
+    [223271] = 'The Grandfather',
+    [241930] = "Andariel's Visage",
+    [359165] = 'Ahavarion, Spear of Lycander',
+    [221017] = 'Doombringer',
+    [609820] = 'Harlequin Crest',
+    [1275935] = 'Melted Heart of Selig',
+    [1306338] = 'Ring of Starless Skies',
+    [2059803] = 'Shroud of False Death',
+    [1982241] = 'Nesekem, the Herald',
+    [2059799] = 'Heir of Perdition',
+    [2059813] = 'Shattered Vow',
 }
 
 local function get_plugin_root_path()
@@ -307,13 +309,11 @@ function utils.is_max_aspect(affix)
 end
 function utils.is_correct_unique(item)
     local item_id = item:get_sno_id()
-    -- this is not a bug, unique needs to be int
     return utils.settings.ancestral_unique[item_id] ~= nil
 end
 function utils.is_correct_mythic(item)
     local item_id = item:get_sno_id()
-    -- this is not a bug, mythic needs to be string
-    return utils.settings.ancestral_mythic[tostring(item_id)] ~= nil
+    return utils.settings.ancestral_mythic[item_id] ~= nil
 end
 function utils.is_correct_affix(item_type,affix)
     local affix_id = affix.affix_name_hash
@@ -361,8 +361,8 @@ function utils.is_salvage_or_sell_with_data(item,action)
     local item_id = item:get_sno_id()
 
     local item_type = utils.get_item_type(item)
-    if item_type == 'cache' then return false end
-    if item_type == 'unknown' then return false end
+    if item_type == 'cache' then return false, 0, false end
+    if item_type == 'unknown' then return false, 0, false end
 
     local display_name = item:get_display_name()
     local ancestral_ga_count = utils.get_greater_affix_count(display_name)
@@ -424,7 +424,7 @@ function utils.is_salvage_or_sell_with_data(item,action)
     end
 
     -- legendaries (not unique, not mythic)
-    if not is_unique and utils.mythics[tostring(item_id)] == nil and
+    if not is_unique and utils.mythics[item_id] == nil and
         utils.settings.ancestral_item_legendary == action and
         (ancestral_ga_count < utils.settings.ancestral_ga_count or
         (utils.settings.ancestral_filter and
@@ -433,7 +433,7 @@ function utils.is_salvage_or_sell_with_data(item,action)
         return true, ancestral_affix_count, is_max_aspect
     end
     -- uniques (is unique, not mythic)
-    if is_unique and utils.mythics[tostring(item_id)] == nil and
+    if is_unique and utils.mythics[item_id] == nil and
         utils.settings.ancestral_item_unique == action and
         (ancestral_ga_count < utils.settings.ancestral_unique_ga_count or
         (utils.settings.ancestral_unique_filter and not utils.is_correct_unique(item)))
@@ -441,7 +441,7 @@ function utils.is_salvage_or_sell_with_data(item,action)
         return true, ancestral_affix_count, is_max_aspect
     end
     -- mythics (not unique, is mythic)
-    if not is_unique and utils.mythics[tostring(item_id)] ~= nil and
+    if not is_unique and utils.mythics[item_id] ~= nil and
         utils.settings.ancestral_item_mythic == action and
         (ancestral_ga_count < utils.settings.ancestral_mythic_ga_count or
         (utils.settings.ancestral_unique_filter and not utils.is_correct_mythic(item)))
@@ -555,8 +555,12 @@ function utils.update_tracker_count(local_player)
             override = override,
             settings_max = item.max
         }
-        if stash_count > 0 and counter < item.min and item.min < max then
-            restock_count = restock_count +1
+        if stash_count > 0 and counter < item.min and item.min <= max then
+            if (item_restock_by_id[item.sno_id].item_type == 'key' and #get_local_player():get_dungeon_key_items() < 33) or
+                (item_restock_by_id[item.sno_id].item_type == 'consumables' and #get_local_player():get_consumable_items() < 33)
+            then
+                restock_count = restock_count +1
+            end
         end
     end
     tracker.restock_count = restock_count
@@ -564,7 +568,7 @@ end
 function utils.get_restock_items_from_tracker()
     local restock_item_by_id = {}
     for _,item in pairs(tracker.restock_items) do
-        restock_item_by_id[tostring(item.sno_id)] = item
+        restock_item_by_id[item.sno_id] = item
     end
     return restock_item_by_id
 end

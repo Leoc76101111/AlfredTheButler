@@ -37,7 +37,7 @@ function drawing.draw_status()
     local status = ''
     if tracker.external_caller and tracker.external_pause then
         status = 'Paused by ' .. tracker.external_caller
-    elseif not settings.get_keybind_state() and not tracker.external_caller and not tracker.trigger_tasks then
+    elseif not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then
         status = 'Paused'
     elseif current_task and settings.allow_external and tracker.external_caller then
         status = '(' .. tracker.external_caller .. ' - '

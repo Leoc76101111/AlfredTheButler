@@ -18,6 +18,27 @@ local status_enum = {
 
 local debounce_time = nil
 local debounce_timeout = 1
+local stash_item_count = -1
+local failed_interaction_count = -1
+local last_interaction_item_count = -1
+
+local function update_last_interaction_time()
+    local local_player = get_local_player()
+    local item_count = #local_player:get_inventory_items() +
+        #local_player:get_consumable_items() +
+        #local_player:get_dungeon_key_items() +
+        #local_player:get_socketable_items()
+
+    if item_count == last_interaction_item_count then
+        failed_interaction_count = failed_interaction_count + 1
+    else
+        failed_interaction_count = -1
+    end
+    if failed_interaction_count < 10 then
+        task.last_interaction = get_time_since_inject()
+    end
+    last_interaction_item_count = item_count
+end
 
 local extension = {}
 function extension.get_npc()
@@ -43,12 +64,9 @@ function extension.execute()
         if item and not utils.is_salvage_or_sell(item,utils.item_enum['SELL']) and
             not utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE'])
         then
-            -- move 3 times because sometimes it get stuck
             loot_manager.move_item_to_stash(item)
-            loot_manager.move_item_to_stash(item)
-            loot_manager.move_item_to_stash(item)
+            update_last_interaction_time()
         end
-        task.last_interaction = get_time_since_inject()
         debounce_time = get_time_since_inject()
     end
     if settings.stash_extra_materials then
@@ -56,34 +74,26 @@ function extension.execute()
         if tracker.stash_boss_materials then
             local consumeable_items = local_player:get_consumable_items()
             for _,item in pairs(consumeable_items) do
-                if restock_items[tostring(item:get_sno_id())] ~= nil then
-                    local current = restock_items[tostring(item:get_sno_id())]
+                if restock_items[item:get_sno_id()] ~= nil then
+                    local current = restock_items[item:get_sno_id()]
                     if current.count - item:get_stack_count() >= current.max or current.max < current.min then
-                        -- move 3 times because sometimes it get stuck
                         loot_manager.move_item_to_stash(item)
-                        loot_manager.move_item_to_stash(item)
-                        loot_manager.move_item_to_stash(item)
-                        restock_items[tostring(item:get_sno_id())].count = current.count - item:get_stack_count()
+                        update_last_interaction_time()
                     end
                 end
-                task.last_interaction = get_time_since_inject()
                 debounce_time = get_time_since_inject()
             end
         end
         if tracker.stash_compasses then
             local key_items = local_player:get_dungeon_key_items()
             for _,item in pairs(key_items) do
-                if restock_items[tostring(item:get_sno_id())] ~= nil then
-                    local current = restock_items[tostring(item:get_sno_id())]
+                if restock_items[item:get_sno_id()] ~= nil then
+                    local current = restock_items[item:get_sno_id()]
                     if current.count - 1 >= current.max or current.max < current.min then
-                        -- move 3 times because sometimes it get stuck
                         loot_manager.move_item_to_stash(item)
-                        loot_manager.move_item_to_stash(item)
-                        loot_manager.move_item_to_stash(item)
-                        restock_items[tostring(item:get_sno_id())].count = current.count - 1
+                        update_last_interaction_time()
                     end
                 end
-                task.last_interaction = get_time_since_inject()
                 debounce_time = get_time_since_inject()
             end
         end
@@ -91,12 +101,9 @@ function extension.execute()
     if settings.stash_all_socketables and tracker.stash_socketables then
         local socket_items = local_player:get_socketable_items()
         for _,item in pairs(socket_items) do
-            -- move 3 times because sometimes it get stuck
             loot_manager.move_item_to_stash(item)
-            loot_manager.move_item_to_stash(item)
-            loot_manager.move_item_to_stash(item)
+            update_last_interaction_time()
         end
-        task.last_interaction = get_time_since_inject()
         debounce_time = get_time_since_inject()
     end
 end
@@ -129,6 +136,22 @@ function extension.is_done()
             material_stashed = false
         end
     end
+    if material_stashed and #get_local_player():get_stash_items() > 0 then
+        local restock_items = utils.get_restock_items_from_tracker()
+        local stash_items = get_local_player():get_stash_items()
+        for key,_ in pairs(restock_items) do
+            restock_items[key].stash = 0
+        end
+        for _,item in pairs(stash_items) do
+            if restock_items[item:get_sno_id()] ~= nil then
+                local item_count = item:get_stack_count()
+                if item_count == 0 then
+                    item_count = 1
+                end
+                restock_items[item:get_sno_id()].stash = restock_items[item:get_sno_id()].stash + item_count
+            end
+        end
+    end
     local socketable_stashed = true
     if tracker.stash_socketables then
         socketable_stashed = #get_local_player():get_socketable_items() == 0
@@ -139,12 +162,24 @@ function extension.is_done()
 end
 function extension.done()
     tracker.stash_done = true
+    stash_item_count = -1
+    failed_interaction_count = -1
+    last_interaction_item_count = -1
 end
 function extension.failed()
     tracker.stash_failed = true
+    stash_item_count = -1
+    failed_interaction_count = -1
+    last_interaction_item_count = -1
 end
 function extension.is_in_vendor_screen()
-    return #get_local_player():get_stash_items() > 0
+    local is_in_vendor_screen = false
+    local stash_count = #get_local_player():get_stash_items()
+    if stash_count > 0 and stash_item_count == stash_count then
+        is_in_vendor_screen = true
+    end
+    stash_item_count = stash_count
+    return is_in_vendor_screen
 end
 
 task.name = 'stash'

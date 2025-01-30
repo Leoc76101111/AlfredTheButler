@@ -33,8 +33,8 @@ local function main_pulse()
     utils.update_tracker_count(local_player)
 
     if gui.elements.manual_keybind:get_state() == 1 then
-        gui.elements.manual_keybind:set(false)
         if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
+        gui.elements.manual_keybind:set(false)
         debounce_time = get_time_since_inject()
         external.resume()
         utils.reset_restock_stash_count()
@@ -45,8 +45,8 @@ local function main_pulse()
         end
     end
     if gui.elements.dump_keybind:get_state() == 1 then
-        gui.elements.dump_keybind:set(false)
         if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
+        gui.elements.dump_keybind:set(false)
         debounce_time = get_time_since_inject()
         utils.dump_tracker_info(tracker)
         -- utils.export_inventory_info()

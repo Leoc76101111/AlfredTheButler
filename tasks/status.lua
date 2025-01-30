@@ -62,7 +62,6 @@ function task.shouldExecute()
     elseif tracker.trigger_tasks and status.complete then
         should_execute = true
     end
-
     return should_execute
 end
 
@@ -97,8 +96,8 @@ function task.Execute()
 
     if tracker.timeout then
         task.status = status_enum['TIMEOUT']
-    elseif ((settings.allow_external and tracker.external_trigger) or
-        tracker.inventory_full or tracker.manual_trigger) or restock_trigger
+    elseif (settings.allow_external and tracker.external_trigger) or
+        tracker.inventory_full or tracker.manual_trigger or restock_trigger
     then
         if settings.get_export_keybind_state() and task.status ~= status_enum['WAITING'] then
             utils.export_inventory_info()
