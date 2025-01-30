@@ -96,7 +96,6 @@ task.shouldExecute = function ()
     end
     if utils.player_in_zone('Scos_Cerrigar') and
         tracker.trigger_tasks and
-        tracker.stocktake and
         not tracker.stocktake_failed and
         not tracker.stocktake_done and
         (tracker.sell_done or tracker.sell_failed) and
@@ -106,6 +105,14 @@ task.shouldExecute = function ()
         return true
     end
     return false
+end
+task.baseExecute = task.Execute
+task.Execute = function ()
+    if not tracker.stocktake then
+        tracker.stocktake_done = true
+    else
+        task.baseExecute()
+    end
 end
 
 return task
