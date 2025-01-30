@@ -52,6 +52,15 @@ local external = {
         end
         utils.log('task triggered by ' .. tostring(caller))
     end,
+    stock_take = function (caller, callback)
+        tracker.stocktake = true
+        tracker.external_caller = caller
+        tracker.external_trigger = true
+        if callback then
+            tracker.external_trigger_callback = callback
+        end
+        utils.log('task triggered by ' .. tostring(caller))
+    end,
     get_restock_items = function ()
         return tracker.restock_items
     end,

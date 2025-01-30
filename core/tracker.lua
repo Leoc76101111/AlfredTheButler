@@ -37,6 +37,9 @@ local tracker = {
     stash_compasses           = false,
     stash_boss_materials      = false,
     cached_inventory          = {},
+    stocktake                 = false,
+    stocktake_done            = false,
+    stocktake_failed          = false,
 }
 
 return tracker

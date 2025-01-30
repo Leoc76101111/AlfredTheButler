@@ -21,10 +21,11 @@ local function all_task_done()
         complete = false,
         failed = false
     }
-    -- add stash action when stash is available
+
     if (tracker.sell_done or tracker.sell_failed) and
         (tracker.stash_done or tracker.stash_failed) and
         (tracker.restock_done or tracker.restock_failed) and
+        (tracker.stocktake_done or tracker.stocktake_failed) and
         (tracker.salvage_done or tracker.salvage_failed) and
         (tracker.repair_done or tracker.repair_failed) and
         (not tracker.teleport or tracker.teleport_done or tracker.teleport_failed)
@@ -32,7 +33,7 @@ local function all_task_done()
         status.complete = true
     end
 
-    -- dont check restock or repair
+    -- dont check restock, stocktake or repair
     if tracker.sell_failed or
         tracker.stash_failed or
         tracker.salvage_failed or

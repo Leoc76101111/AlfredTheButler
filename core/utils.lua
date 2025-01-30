@@ -228,6 +228,9 @@ function utils.reset_all_task()
     tracker.stash_done = false
     tracker.restock_failed = false
     tracker.restock_done = false
+    tracker.stocktake_failed = false
+    tracker.stocktake_done = false
+    tracker.stocktake = false
     tracker.all_task_done = false
     tracker.stash_socketables = false
     tracker.stash_compasses = false

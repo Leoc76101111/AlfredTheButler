@@ -77,7 +77,8 @@ task.shouldExecute = function ()
         not tracker.salvage_done and
         (tracker.sell_done or tracker.sell_failed) and
         (tracker.stash_done or tracker.stash_failed) and
-        (tracker.restock_done or tracker.restock_failed)
+        (tracker.restock_done or tracker.restock_failed) and
+        (tracker.stocktake_done or tracker.stocktake_failed)
     then
         return true
     end

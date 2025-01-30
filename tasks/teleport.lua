@@ -45,7 +45,8 @@ function extension.reset()
     if not local_player then return end
     local new_position = vec3:new(-1661.931640625, -596.4111328125, 36.90625)
     if tracker.last_task == 'stash' or
-        tracker.last_task == 'restock'
+        tracker.last_task == 'restock' or
+        tracker.last_task == 'stocktake'
     then
         new_position = vec3:new(-1684.3427734375, -595.40625, 37.6484375)
     elseif tracker.last_task == 'salvage' then
@@ -87,6 +88,7 @@ task.shouldExecute = function ()
         (tracker.sell_done or tracker.sell_failed) and
         (tracker.stash_done or tracker.stash_failed) and
         (tracker.restock_done or tracker.restock_failed) and
+        (tracker.stocktake_done or tracker.stocktake_failed) and
         (tracker.salvage_done or tracker.salvage_failed) and
         (tracker.repair_done or tracker.repair_failed)
     then
@@ -101,6 +103,7 @@ task.Execute = function ()
         not (tracker.sell_done or tracker.sell_failed) and
         not (tracker.stash_done or tracker.stash_failed) and
         not (tracker.restock_done or tracker.restock_failed) and
+        not (tracker.stocktake_done or tracker.stocktake_failed) and
         not (tracker.salvage_done or tracker.salvage_failed) and
         not (tracker.repair_done or tracker.repair_failed)
     then
