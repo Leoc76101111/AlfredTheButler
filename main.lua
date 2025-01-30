@@ -56,10 +56,6 @@ local function main_pulse()
         return
     end
 
-    if orbwalker.get_orb_mode() ~= 3 then
-        orbwalker.set_clear_toggle(true);
-    end
-
     task_manager.execute_tasks()
 end
 
