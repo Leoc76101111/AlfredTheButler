@@ -94,8 +94,8 @@ gui.elements = {
     use_keybind = create_checkbox(false, 'use_keybind'),
     keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_keybind_toggle' )),
     export_keybind_toggle = keybind:new(0x0A, true, get_hash(plugin_label .. '_export_keybind_toggle' )),
-    dump_keybind = keybind:new(0x0A,false,get_hash(plugin_label .. '_dump_keybind')),
-    manual_keybind = keybind:new(0x0A,false,get_hash(plugin_label .. '_manual_keybind')),
+    dump_keybind = keybind:new(0x0A, true, get_hash(plugin_label .. '_dump_keybind')),
+    manual_keybind = keybind:new(0x0A, true, get_hash(plugin_label .. '_manual_keybind')),
 
     stash_toggle = create_checkbox(false, 'stash_toggle'),
 
@@ -238,12 +238,6 @@ function gui.render()
             gui.elements.ancestral_affix_count_slider:render('Min matching Affix', 'Minimum matching affix to keep')
             -- gui.elements.ancestral_affix_ga_count_slider:render('Min matching GA', 'Minimum matching greater affix')
         end
-        render_menu_header('Export or import affix data, unique data and mythic data')
-        gui.elements.seperator:render('',{'Export'},'')
-        gui.elements.affix_export_button:render('', 'export all selected affixes to export folder', 0)
-        gui.elements.seperator:render('',{'Import'},'')
-        gui.elements.affix_import_name:render('file name', 'file name to import', false, 'import', '')
-        gui.elements.affix_import_button:render('', 'import selected affixes from file', 0)
         if gui.elements.ancestral_unique_filter_toggle:get() then
             render_menu_header('REMEMBER TO SET THE UNIQUE/MYTHIC YOU WANT SO THAT IT DOESNT GET ACCIDENTALLY SALVAGED/SOLD')
             if gui.elements['unique_tree']:push('Unique item') then
@@ -270,6 +264,14 @@ function gui.render()
                     gui.elements[tree_name]:pop()
                 end
             end
+        end
+        if gui.elements.ancestral_unique_filter_toggle:get() or gui.elements.ancestral_filter_toggle:get() then
+            render_menu_header('Export or import affix data, unique data and mythic data')
+            gui.elements.seperator:render('',{'Export'},'')
+            gui.elements.affix_export_button:render('', 'export all selected affixes to export folder', 0)
+            gui.elements.seperator:render('',{'Import'},'')
+            gui.elements.affix_import_name:render('file name', 'file name to import', false, 'import', '')
+            gui.elements.affix_import_button:render('', 'import selected affixes from file', 0)
         end
         gui.elements.ancestral_item_tree:pop()
     end
