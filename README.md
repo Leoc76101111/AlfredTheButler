@@ -1,5 +1,5 @@
 # Alfred the butler
-#### V1.3.1
+#### V1.3.2
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
@@ -64,7 +64,6 @@ Also in the task folder, there is an `external-template.lua` as a sample on how 
 
 ## Known issues
 - some aspects are giving false positive, mainly those that have multiple data (e.g. frost stride). for now, alfred is treating them as real max aspect to not accidentally sell/salvage a max one
-- manual keybind sometimes stops working when stashing failed. need more testing, but once it stoped working need to reopen to fix it.
 
 ## Credits
 - Letrico - general help, bouncing ideas, my faq XD
