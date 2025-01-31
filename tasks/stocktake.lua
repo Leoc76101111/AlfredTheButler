@@ -109,7 +109,7 @@ end
 task.baseExecute = task.Execute
 task.Execute = function ()
     if not tracker.stocktake then
-        tracker.stocktake_done = true
+        extension.done()
     else
         task.baseExecute()
     end
