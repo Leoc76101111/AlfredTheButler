@@ -107,6 +107,7 @@ task.Execute = function ()
         not (tracker.salvage_done or tracker.salvage_failed) and
         not (tracker.repair_done or tracker.repair_failed)
     then
+        task.retry = 0
         task.status = status_enum['EXECUTE']
         teleport_with_debounce()
     elseif utils.player_in_zone('Scos_Cerrigar') then
