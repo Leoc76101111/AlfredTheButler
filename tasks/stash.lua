@@ -118,7 +118,7 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    if task.status == status_enum['EXECUTE'] and
+    if task.check_status(status_enum['EXECUTE']) and
         #get_local_player():get_stash_items() == 300
     then
         return true
