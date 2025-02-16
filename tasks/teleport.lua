@@ -109,7 +109,7 @@ task.Execute = function ()
     then
         task.status = status_enum['EXECUTE']
         teleport_with_debounce()
-    else
+    elseif utils.player_in_zone('Scos_Cerrigar') then
         task.baseExecute()
     end
 end
