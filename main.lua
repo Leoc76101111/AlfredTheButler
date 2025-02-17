@@ -7,6 +7,7 @@ local task_manager = require 'core.task_manager'
 local tracker      = require 'core.tracker'
 local external     = require 'core.external'
 local drawing      = require 'core.drawing'
+local json = require 'core.json'
 
 local local_player
 local debounce_time = nil
@@ -44,12 +45,48 @@ local function main_pulse()
             tracker.teleport = true
         end
     end
+
     if gui.elements.dump_keybind:get_state() == 1 then
         if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
         gui.elements.dump_keybind:set(false)
         debounce_time = get_time_since_inject()
-        utils.dump_tracker_info(tracker)
+        external.trigger_tasks_with_teleport('test')
+        -- utils.dump_tracker_info(tracker)
+        -- utils.log(local_player:get_attribute(attributes.PLAYER_IS_PARTY_INVITABLE))
         -- utils.export_inventory_info()
+        -- local vendor_items = loot_manager.get_vendor_items()
+        -- if type(vendor_items) == "userdata" and vendor_items.size then
+        --     local size = vendor_items:size()
+        --     console.print(size)
+        --     for i = 1, size do
+        --         local item = vendor_items:get(i)
+        --         if item then
+        --             console.print(item:get_display_name())
+        --             console.print(item:get_price())
+        --         end
+        --     end
+        -- end
+        -- local glp = get_glyphs()
+        -- utils.log('hi')
+        -- utils.log(glp:size() > 0)
+        -- utils.log(glp:get(1).glyph_instance)
+        -- utils.log(glp:get(1).glyph_id)
+        -- utils.log(glp:get(1).glyph_name_hash)
+        -- utils.log(glp:get(1):get_name())
+        -- utils.log(glp:get(1):get_max_level())
+        -- utils.log(glp:get(1):get_level())
+        -- utils.log(glp:get(1):can_upgrade())
+        -- utils.log(glp:get(1):get_upgrade_chance())
+
+        -- utils.log('aa')
+        -- local gizmo = utils.get_npc("Gizmo_Paragon_Glyph_Upgrade")
+        -- interact_vendor(gizmo)
+        -- upgrade_glyph(glp:get(1))
+        -- for key,val in pairs(getmetatable(glp:get(1))) do
+        --     utils.log(key)
+        --     utils.log(val)
+        -- end
+        -- utils.log(glp)
     end
 
     if not (settings.get_keybind_state() or tracker.external_trigger or tracker.manual_trigger) then
