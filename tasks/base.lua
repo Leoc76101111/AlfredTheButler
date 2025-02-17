@@ -162,7 +162,7 @@ function base.new_task()
             task.extension.reset()
         else
             task.extension.failed()
-            task.status  = status_prefix .. task.status_enum['FAILED']
+            task.set_status(task.status_enum['FAILED'])
             task.retry = 0
         end
     end
