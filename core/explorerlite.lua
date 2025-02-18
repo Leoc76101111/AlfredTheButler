@@ -69,18 +69,13 @@ function MinHeap:contains(value)
 end
 
 local utils = require "core.utils"
-local enums = require "data.enums"
 local settings = require "core.settings"
-local tracker = require "core.tracker"
 local explorerlite = {
     enabled = false,
     is_task_running = false, --added to prevent boss dead pathing 
 }
-local explored_areas = {}
 local target_position = nil
 local grid_size = 2            -- Size of grid cells in meters
-local exploration_radius = 10   -- Radius in which areas are considered explored
-local explored_buffer = 2      -- Buffer around explored areas in meters
 local max_target_distance = 120 -- Maximum distance for a new target
 local target_distance_states = {120, 40, 20, 5}
 local target_distance_index = 1
@@ -88,11 +83,8 @@ local unstuck_target_distance = 15 -- Maximum distance for an unstuck target
 local stuck_threshold = 2      -- Seconds before the character is considered "stuck"
 local last_position = nil
 local last_move_time = 0
-local last_explored_targets = {}
-local max_last_targets = 50
 local stuck_check_interval = 60  -- Check every 2 seconds
 local stuck_distance_threshold = 0.5  -- Consider stuck if moved less than 0.5 units
-local temp_target_distance = 10  -- Distance for temporary target
 local last_stuck_check_time = 0
 local last_stuck_check_position = nil
 local original_target = nil
@@ -100,12 +92,6 @@ local original_target = nil
 -- A* pathfinding variables
 local current_path = {}
 local path_index = 1
-
--- Explorationsmodus
-local exploration_mode = "unexplored" -- "unexplored" oder "explored"
-
--- Richtung für den "explored" Modus
-local exploration_direction = { x = 10, y = 0 } -- Initiale Richtung (kann angepasst werden)
 
 -- Neue Variable für die letzte Bewegungsrichtung
 local last_movement_direction = nil
@@ -149,15 +135,6 @@ local explored_area_bounds = {
     min_z = math.huge,
     max_z = math.huge
 }
-local function update_explored_area_bounds(point, radius)
-    --console.print("Updating explored area bounds.")
-    explored_area_bounds.min_x = math.min(explored_area_bounds.min_x, point:x() - radius)
-    explored_area_bounds.max_x = math.max(explored_area_bounds.max_x, point:x() + radius)
-    explored_area_bounds.min_y = math.min(explored_area_bounds.min_y, point:y() - radius)
-    explored_area_bounds.max_y = math.max(explored_area_bounds.max_y, point:y() + radius)
-    explored_area_bounds.min_z = math.min(explored_area_bounds.min_z or math.huge, point:z() - radius)
-    explored_area_bounds.max_z = math.max(explored_area_bounds.max_z or -math.huge, point:z() + radius)
-end
 
 local function is_point_in_explored_area(point)
     --console.print("Checking if point is in explored area.")
@@ -285,103 +262,9 @@ function explorerlite:reset_exploration()
     console.print("Exploration reset. All areas marked as unexplored.")
 end
 
-local function is_near_wall(point)
-    --console.print("Checking if point is near wall.")
-    local wall_check_distance = 2 -- Abstand zur Überprüfung von Wänden
-    local directions = {
-        { x = 1, y = 0 }, { x = -1, y = 0 }, { x = 0, y = 1 }, { x = 0, y = -1 },
-        { x = 1, y = 1 }, { x = 1, y = -1 }, { x = -1, y = 1 }, { x = -1, y = -1 }
-    }
-
-    for _, dir in ipairs(directions) do
-        local check_point = vec3:new(
-            point:x() + dir.x * wall_check_distance,
-            point:y() + dir.y * wall_check_distance,
-            point:z()
-        )
-        check_point = set_height_of_valid_position(check_point)
-        if not utility.is_point_walkeable(check_point) then
-            return true
-        end
-    end
-    return false
-end
-
--- Removed the find_central_unexplored_target function
--- It was previously located here
-
-local function find_random_explored_target()
-    console.print("Finding random explored target.")
-    local player_pos = get_player_position()
-    local check_radius = max_target_distance
-    local explored_points = {}
-
-    for x = -check_radius, check_radius, grid_size do
-        for y = -check_radius, check_radius, grid_size do
-            local point = vec3:new(
-                player_pos:x() + x,
-                player_pos:y() + y,
-                player_pos:z()
-            )
-            point = set_height_of_valid_position(point)
-            local grid_key = get_grid_key(point)
-            if utility.is_point_walkeable(point) and explored_areas[grid_key] and not is_near_wall(point) then
-                table.insert(explored_points, point)
-            end
-        end
-    end
-
-    if #explored_points == 0 then   
-        return nil
-    end
-
-    return explored_points[math.random(#explored_points)]
-end
-
 function vec3.__add(v1, v2)
     --console.print("Adding two vectors.")
     return vec3:new(v1:x() + v2:x(), v1:y() + v2:y(), v1:z() + v2:z())
-end
-
-local function is_in_last_targets(point)
-    --console.print("Checking if point is in last targets.")
-    for _, target in ipairs(last_explored_targets) do
-        if calculate_distance(point, target) < grid_size * 2 then
-            return true
-        end
-    end
-    return false
-end
-
-local function add_to_last_targets(point)
-   --console.print("Adding point to last targets.")
-    table.insert(last_explored_targets, 1, point)
-    if #last_explored_targets > max_last_targets then
-        table.remove(last_explored_targets)
-    end
-end
-
-local function find_nearby_unexplored_point(center, radius)
-    local check_radius = max_target_distance
-    local player_pos = get_player_position()
-
-    for x = -check_radius, check_radius, grid_size do
-        for y = -check_radius, check_radius, grid_size do
-            local point = vec3:new(
-                center:x() + x,
-                center:y() + y,
-                center:z()
-            )
-
-            point = set_height_of_valid_position(point)
-
-            if utility.is_point_walkeable(point) and not is_point_in_explored_area(point) then
-                return point
-            end
-        end
-    end
-
-    return nil
 end
 
 -- A* pathfinding functions
@@ -650,7 +533,6 @@ end
 
 function explorerlite:move_to_target()
     console.print("Moving to target")
-    
     if handle_stuck_player() then
         -- If we've just set a temporary target, we want to move to it immediately
         if settings.aggresive_movement then
@@ -670,7 +552,6 @@ end
 
 
 local last_call_time = 0.0
-local is_player_on_quest = false
 on_update(function()
     if not settings.enabled then
         return
@@ -695,10 +576,6 @@ on_update(function()
     local current_core_time = get_time_since_inject()
     if current_core_time - last_call_time > 0.45 then
         last_call_time = current_core_time
-        is_player_on_quest = utils.player_on_quest(enums.quests.pit_ongoing) and settings.enabled
-        if not is_player_on_quest then
-            return
-        end
 
         check_walkable_area()
         local is_stuck = check_if_stuck()
@@ -719,7 +596,6 @@ on_update(function()
 end)
 
 on_render(function()
-    
     if not settings.enabled then
         return
     end
@@ -741,8 +617,6 @@ on_render(function()
             graphics.text_3d("PATH_1", point, 15, color)
         end
     end
-
-    -- Removed the mode label
 end)
 
 return explorerlite
