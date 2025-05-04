@@ -51,7 +51,7 @@ function extension.is_done()
     local is_done = true
     local items = local_player:get_equipped_items()
     for _, item in pairs(items) do
-        if item:get_durability() < 50 then
+        if item:get_durability() < 95 then
             is_done = false
         end
     end
