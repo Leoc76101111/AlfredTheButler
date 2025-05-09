@@ -97,7 +97,7 @@ function task.Execute()
     if tracker.timeout then
         task.status = status_enum['TIMEOUT']
     elseif (settings.allow_external and tracker.external_trigger) or
-        tracker.inventory_full or tracker.manual_trigger or restock_trigger
+        tracker.inventory_full or tracker.manual_trigger or restock_trigger or tracker.need_repair
     then
         if settings.get_export_keybind_state() and task.status ~= status_enum['WAITING'] then
             utils.export_inventory_info()

@@ -40,6 +40,7 @@ local tracker = {
     stocktake                 = false,
     stocktake_done            = false,
     stocktake_failed          = false,
+    need_repair               = false,
 }
 
 return tracker

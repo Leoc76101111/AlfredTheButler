@@ -583,6 +583,15 @@ function utils.update_tracker_count(local_player)
         end
     end
     tracker.restock_count = restock_count
+
+    local need_repair = false
+    local items = local_player:get_equipped_items()
+    for _, item in pairs(items) do
+        if item:get_durability() <= 10 then
+            need_repair = true
+        end
+    end
+    tracker.need_repair = need_repair
 end
 function utils.get_restock_items_from_tracker()
     local restock_item_by_id = {}

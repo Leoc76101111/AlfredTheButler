@@ -25,6 +25,7 @@ local external = {
             sell_failed     = tracker.sell_failed,
             sell_done       = tracker.sell_done,
             all_task_done   = tracker.all_task_done,
+            need_repair     = tracker.need_repair,
         }
     end,
     pause = function (caller)
