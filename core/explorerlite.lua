@@ -438,11 +438,7 @@ function explorerlite:movement_spell_to_target(target)
     if not local_player then return end
 
     local movement_spell_id = {
-        288106, -- Sorcerer teleport
-        358761, -- Rogue dash
-        355606, -- Rogue shadow step
-        1663206, -- spiritborn hunter 
-        1871821, -- spiritborn soar
+        337031, -- General Evade
     }
 
     if settings.use_evade_as_movement_spell then
@@ -495,8 +491,11 @@ local function move_to_target()
 
         local next_point = current_path[path_index]
         if next_point and not next_point:is_zero() then
-            pathfinder.request_move(next_point)
-            --pathfinder.force_move(next_point)
+            explorerlite:movement_spell_to_target(next_point)
+            local new_player_pos = get_player_position()
+            if calculate_distance(player_pos, new_player_pos) == 0 then
+                pathfinder.request_move(next_point)
+            end
         end
 
         if next_point and next_point.x and not next_point:is_zero() and calculate_distance(player_pos, next_point) < grid_size then

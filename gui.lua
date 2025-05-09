@@ -82,9 +82,10 @@ gui.item_options = {
     'Sell'
 }
 
-gui.restock_options = {
-    'Active',
-    'Passive',
+gui.stash_extra_options= {
+    'Never',
+    'When full',
+    'Always',
 }
 
 gui.elements = {
@@ -124,10 +125,15 @@ gui.elements = {
     affix_import_button = button:new(get_hash(plugin_label .. '_affix_import_button')),
     affix_import_name = input_text:new(get_hash(plugin_label .. '_affix_import_button')),
 
-    restock_tree = tree_node:new(1),
-    restock_type = combo_box:new(1, get_hash(plugin_label .. '_restock_type')),
-    restock_teleport_delay =  slider_int:new(0, 300, 60, get_hash(plugin_label .. '_restock_teleport_delay')),
-    stash_all_socketables = create_checkbox(false, 'stash_all_socketables'),
+    socketable_tree = tree_node:new(1),
+    stash_socketables = combo_box:new(0, get_hash(plugin_label .. '_stash_socketables')),
+
+    consumeable_tree = tree_node:new(1),
+    stash_consumables = combo_box:new(0, get_hash(plugin_label .. '_stash_consumables')),
+
+    key_tree = tree_node:new(1),
+    stash_keys = combo_box:new(0, get_hash(plugin_label .. '_stash_keys')),
+
     stash_extra_materials = create_checkbox(false, 'stash_extra_materials'),
 
     gamble_tree = tree_node:new(1),
@@ -275,26 +281,52 @@ function gui.render()
         end
         gui.elements.ancestral_item_tree:pop()
     end
-    if gui.elements.restock_tree:push('Restock') then
-        render_menu_header('Active mode allows alfred to initiate a teleport to restock.')
-        gui.elements.restock_type:render('Mode',gui.restock_options,'Active mode will trigger if drop below min, Passive mode will wait for other tasks')
-        if gui.elements.restock_type:get() == utils.restock_enum['ACTIVE'] then
-            gui.elements.restock_teleport_delay:render('Teleport delay', 'delay so you can kill bosses')
-        end
-        gui.elements.stash_all_socketables:render('Stash all socketables', 'Stash all socketables when socketables inventory is full')
-        if gui.elements.stash_all_socketables:get() then
+    if gui.elements.socketable_tree:push('Socketables') then
+        gui.elements.stash_socketables:render('Stash socketables', gui.stash_extra_options, 'Select when to stash socketables')
+        if gui.elements.stash_socketables:get() == utils.stash_extra_enum['NEVER'] then
+            render_menu_header('Never stash socketables')
+        elseif gui.elements.stash_socketables:get() == utils.stash_extra_enum['FULL'] then
             render_menu_header('Stash all socketables when alfred is stashing equipment if socketables inventory is full')
+        elseif gui.elements.stash_socketables:get() == utils.stash_extra_enum['ALWAYS'] then
+            render_menu_header('Stash all socketables when alfred is stashing')
         end
-        gui.elements.stash_extra_materials:render('Stash extras materials', 'Stash any boss materials or compass > max')
-        if gui.elements.stash_extra_materials:get() then
-            render_menu_header('Stash extra boss materials when alfred is stashing equipment if consumeables inventory is full')
-            render_menu_header('Stash extra compasses when alfred is stashing equipment if key inventory is full')
+        gui.elements.socketable_tree:pop()
+    end
+    if gui.elements.socketable_tree:push('Consumables (boss materials)') then
+        gui.elements.stash_consumables:render('Stash consumables', gui.stash_extra_options, 'Select when to stash consumables')
+        if gui.elements.stash_consumables:get() == utils.stash_extra_enum['NEVER'] then
+            render_menu_header('Never stash consumables')
+        elseif gui.elements.stash_consumables:get() == utils.stash_extra_enum['FULL'] then
+            render_menu_header('Stash extra boss materials when alfred is stashing equipment if consumables inventory is full')
+        elseif gui.elements.stash_consumables:get() == utils.stash_extra_enum['ALWAYS'] then
+            render_menu_header('Stash extra boss materials when alfred is stashing')
         end
+        render_menu_header('Restock')
         for _,item in pairs(restock_items) do
-            local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
-            gui.elements[slider_name]:render(item.name, 'Maximum to have in inventory')
+            if item.item_type == 'consumables' then 
+                local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
+                gui.elements[slider_name]:render(item.name, 'Maximum to have in inventory')
+            end
         end
-        gui.elements.restock_tree:pop()
+        gui.elements.socketable_tree:pop()
+    end
+    if gui.elements.key_tree:push('Dungeon Keys') then
+        gui.elements.stash_keys:render('Stash dungeon keys', gui.stash_extra_options, 'Select when to stash dungeon keys')
+        if gui.elements.stash_keys:get() == utils.stash_extra_enum['NEVER'] then
+            render_menu_header('Never stash dungeon keys')
+        elseif gui.elements.stash_keys:get() == utils.stash_extra_enum['FULL'] then
+            render_menu_header('Stash extra compasses and tributes when alfred is stashing equipment if dungeon keys inventory is full')
+        elseif gui.elements.stash_keys:get() == utils.stash_extra_enum['ALWAYS'] then
+            render_menu_header('Stash extra compasses and tributes when alfred is stashing')
+        end
+        render_menu_header('Restock')
+        for _,item in pairs(restock_items) do
+            if item.item_type == 'key' then 
+                local slider_name = plugin_label .. 'restock_' .. tostring(item.sno_id)
+                gui.elements[slider_name]:render(item.name, 'Maximum to have in inventory')
+            end
+        end
+        gui.elements.key_tree:pop()
     end
 
     -- if gui.elements.gamble_tree:push('Gamble') then

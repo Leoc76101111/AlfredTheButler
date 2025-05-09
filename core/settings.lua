@@ -35,10 +35,9 @@ local settings = {
     aggresive_movement = false,
     path_angle = 10,
     restock_items = {},
-    restock_type = utils.restock_enum['PASSIVE'],
-    restock_teleport_delay = 30,
-    stash_all_socketables = false,
-    stash_extra_materials = false,
+    stash_socketables = utils.stash_extra_enum['NEVER'],
+    stash_consumables = utils.stash_extra_enum['NEVER'],
+    stash_keys = utils.stash_extra_enum['NEVER'],
 }
 
 function settings.get_keybind_state()
@@ -116,10 +115,9 @@ function settings:update_settings()
         end
     end
     settings.restock_items = {}
-    settings.restock_type = gui.elements.restock_type:get()
-    settings.restock_teleport_delay = gui.elements.restock_teleport_delay:get()
-    settings.stash_all_socketables = gui.elements.stash_all_socketables:get()
-    settings.stash_extra_materials = gui.elements.stash_extra_materials:get()
+    settings.stash_socketables = gui.elements.stash_socketables:get()
+    settings.stash_consumables = gui.elements.stash_consumables:get()
+    settings.stash_keys = gui.elements.stash_keys:get()
     for _,item in pairs(utils.get_restock_items()) do
         local sno_id = item.sno_id
         local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)

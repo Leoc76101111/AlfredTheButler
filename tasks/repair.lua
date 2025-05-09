@@ -47,7 +47,7 @@ function extension.reset()
 end
 function extension.is_done()
     local local_player = get_local_player()
-    if not local_player then return true end
+    if not local_player then return false end
     local is_done = true
     local items = local_player:get_equipped_items()
     for _, item in pairs(items) do

@@ -69,36 +69,34 @@ function extension.execute()
         end
         debounce_time = get_time_since_inject()
     end
-    if settings.stash_extra_materials then
-        local restock_items = utils.get_restock_items_from_tracker()
-        if tracker.stash_boss_materials then
-            local consumeable_items = local_player:get_consumable_items()
-            for _,item in pairs(consumeable_items) do
-                if restock_items[item:get_sno_id()] ~= nil then
-                    local current = restock_items[item:get_sno_id()]
-                    if current.count - item:get_stack_count() >= current.max or current.max < current.min then
-                        loot_manager.move_item_to_stash(item)
-                        update_last_interaction_time()
-                    end
+    local restock_items = utils.get_restock_items_from_tracker()
+    if tracker.stash_boss_materials then
+        local consumeable_items = local_player:get_consumable_items()
+        for _,item in pairs(consumeable_items) do
+            if restock_items[item:get_sno_id()] ~= nil then
+                local current = restock_items[item:get_sno_id()]
+                if current.count - item:get_stack_count() >= current.max or current.max < current.min then
+                    loot_manager.move_item_to_stash(item)
+                    update_last_interaction_time()
                 end
-                debounce_time = get_time_since_inject()
             end
-        end
-        if tracker.stash_compasses then
-            local key_items = local_player:get_dungeon_key_items()
-            for _,item in pairs(key_items) do
-                if restock_items[item:get_sno_id()] ~= nil then
-                    local current = restock_items[item:get_sno_id()]
-                    if current.count - 1 >= current.max or current.max < current.min then
-                        loot_manager.move_item_to_stash(item)
-                        update_last_interaction_time()
-                    end
-                end
-                debounce_time = get_time_since_inject()
-            end
+            debounce_time = get_time_since_inject()
         end
     end
-    if settings.stash_all_socketables and tracker.stash_socketables then
+    if tracker.stash_keys then
+        local key_items = local_player:get_dungeon_key_items()
+        for _,item in pairs(key_items) do
+            if restock_items[item:get_sno_id()] ~= nil then
+                local current = restock_items[item:get_sno_id()]
+                if current.count - 1 >= current.max or current.max < current.min then
+                    loot_manager.move_item_to_stash(item)
+                    update_last_interaction_time()
+                end
+            end
+            debounce_time = get_time_since_inject()
+        end
+    end
+    if tracker.stash_socketables then
         local socket_items = local_player:get_socketable_items()
         for _,item in pairs(socket_items) do
             loot_manager.move_item_to_stash(item)
@@ -126,12 +124,12 @@ function extension.is_done()
     local material_stashed = true
     for _,item_data in pairs(tracker.restock_items) do
         if (item_data.item_type == 'consumables' and
-            (item_data.count - 50 >= item_data.max or
+            (item_data.count - 99 >= item_data.max or
             item_data.max < item_data.min and item_data.count > 0) and
             tracker.stash_boss_materials) or
             (item_data.item_type == 'key' and
-            item_data.count - 1 >= item_data.max and
-            tracker.stash_compasses)
+            item_data.count - 99 >= item_data.max and
+            tracker.stash_keys)
         then
             material_stashed = false
         end
@@ -157,8 +155,9 @@ function extension.is_done()
         socketable_stashed = #get_local_player():get_socketable_items() == 0
     end
     return (not settings.item_use_stash or tracker.stash_count == 0) and
-        (not settings.stash_all_socketables or socketable_stashed) and
-        (not settings.stash_extra_materials or material_stashed)
+        (not tracker.stash_socketables or socketable_stashed) and
+        (not tracker.stash_boss_materials or material_stashed) and
+        (not tracker.stash_keys or material_stashed)
 end
 function extension.done()
     tracker.stash_done = true

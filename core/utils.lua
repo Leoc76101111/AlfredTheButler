@@ -8,6 +8,7 @@ local utils    = {
     last_dump_time = 0,
 }
 local item_types = {
+    'tempering',
     'helm',
     'chest',
     'gloves',
@@ -22,17 +23,30 @@ local item_affix = {}
 local item_aspect = {}
 local item_unique = {}
 local item_restock = {
-    {sno_id = 2167736, name = 'Horde Compass (6)', item_type = 'key', max = 150, min = 1},
-    {sno_id = 2167741, name = 'Horde Compass (8)', item_type = 'key', max = 150, min = 1},
-    {sno_id = 2167743, name = 'Horde Compass (10)', item_type = 'key', max = 150, min = 1},
-    {sno_id = 1489420, name = 'Malignant Heart', item_type = 'consumables', max = 1650, min = 4},
-    {sno_id = 1502128, name = 'Living Steel', item_type = 'consumables', max = 1650, min = 12},
-    {sno_id = 1518053, name = 'Distilled Fear', item_type = 'consumables', max = 1650, min = 12},
-    {sno_id = 1522891, name = 'Exquisite Blood', item_type = 'consumables', max = 1650, min = 12},
-    {sno_id = 1524917, name = 'Mucus-Slick Egg', item_type = 'consumables', max = 800, min = 2},
-    {sno_id = 1524924, name = 'Shard of Agony', item_type = 'consumables', max = 800, min = 2},
-    {sno_id = 1810144, name = 'Sandscorched Shackles', item_type = 'consumables', max = 800, min = 2},
-    {sno_id = 1812685, name = 'Pincushioned Doll', item_type = 'consumables', max = 800, min = 2},
+    {sno_id = 2167736, name = 'Horde Compass (6)', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2167741, name = 'Horde Compass (8)', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2167743, name = 'Horde Compass (10)', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 1489420, name = 'Malignant Heart', item_type = 'consumables', max = 3267, min = 12},
+    {sno_id = 1502128, name = 'Living Steel', item_type = 'consumables', max = 3267, min = 12},
+    {sno_id = 1518053, name = 'Distilled Fear', item_type = 'consumables', max = 3267, min = 12},
+    {sno_id = 1522891, name = 'Exquisite Blood', item_type = 'consumables', max = 3267, min = 12},
+    {sno_id = 2193876, name = 'Judicators Mask', item_type = 'consumables', max = 3267, min = 12},
+    {sno_id = 1524924, name = 'Shard of Agony', item_type = 'consumables', max = 3267, min = 3},
+    {sno_id = 1812685, name = 'Pincushioned Doll', item_type = 'consumables', max = 3267, min = 3},
+    {sno_id = 2194097, name = 'Abhorrent Heart', item_type = 'consumables', max = 3267, min = 3},
+    {sno_id = 2194099, name = 'Betrayers Husk', item_type = 'consumables', max = 3267, min = 2},
+    {sno_id = 2090358, name = 'Tribute of Titans', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2125049, name = 'Tribute of Ascendance (United)', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2077995, name = 'Tribute of Refinement', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2090362, name = 'Tribute of Ascendance (Resolute)', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2125047, name = 'Tribute of Radiance (United)', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2125691, name = 'Tribute of Harmony', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2077998, name = 'Tribute of Radiance (Resolute)', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2131528, name = 'Tribute of Mystique', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2048063, name = 'Tribute of Titans', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2125688, name = 'Tribute of Growth', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2090360, name = 'Tribute of Pride', item_type = 'key', max = 3267, min = 1},
+    {sno_id = 2077993, name = 'Tribute of Heritage', item_type = 'key', max = 3267, min = 1},
 }
 local item_restock_by_id = {}
 for _,item in pairs(item_restock) do
@@ -63,9 +77,10 @@ utils.item_enum = {
     SALVAGE = 1,
     SELL = 2
 }
-utils.restock_enum = {
-    ACTIVE = 0,
-    PASSIVE = 1
+utils.stash_extra_enum = {
+    NEVER = 0,
+    FULL = 1,
+    ALWAYS = 2
 }
 
 utils.mythics = {
@@ -233,7 +248,7 @@ function utils.reset_all_task()
     tracker.stocktake = false
     tracker.all_task_done = false
     tracker.stash_socketables = false
-    tracker.stash_compasses = false
+    tracker.stash_keys = false
     tracker.stash_boss_materials = false
 end
 function utils.reset_restock_stash_count()
@@ -366,6 +381,7 @@ function utils.is_salvage_or_sell_with_data(item,action)
     local item_type = utils.get_item_type(item)
     if item_type == 'cache' then return false, 0, false end
     if item_type == 'unknown' then return false, 0, false end
+    if item_type == 'tempering' then return false, 0, false end
 
     local display_name = item:get_display_name()
     local ancestral_ga_count = utils.get_greater_affix_count(display_name)
@@ -768,14 +784,7 @@ function utils.dump_tracker_info(tracker_data)
         if key == 'previous' or key == 'cached_inventory' then
         elseif key == 'restock_items' then
             for key2,data2 in pairs(data) do
-                for key3,data3 in pairs(data2) do
-                    if key3  == 'override' and data3.caller ~= nil then
-                        utils.log(key .. '>' .. key2 .. '>' .. key3 .. '>caller:' .. tostring(data3.caller))
-                        utils.log(key .. '>' .. key2 .. '>' .. key3 .. '>max:' .. tostring(data3.max))
-                    elseif key3 ~= 'override' and key3 ~= 'settings_max' then
-                        utils.log(key .. '>' .. key2 .. '>' .. key3 .. ':' .. tostring(data3))
-                    end
-                end
+                utils.log(key .. '>' .. key2 .. '>data:' .. json.encode(data2))
             end
         else
             utils.log(key .. ':' .. tostring(data))

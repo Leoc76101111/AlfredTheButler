@@ -50,10 +50,10 @@ function drawing.draw_status()
     end
 
     local messages = {}
-    if PLUGIN_barbara_the_oracle then
-        local barbara_status = PLUGIN_barbara_the_oracle.get_status()
-        if barbara_status.enabled then
-            messages[#messages+1] = 'Barbara Mode     : ' .. tostring(barbara_status.mode)
+    if PLUGIN_robin_the_sidekick then
+        local robin_status = PLUGIN_robin_the_sidekick.get_status()
+        if robin_status.enabled then
+            messages[#messages+1] = 'Robin Mode       : ' .. tostring(robin_status.mode)
         end
     end
 

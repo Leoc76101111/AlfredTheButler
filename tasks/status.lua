@@ -13,7 +13,6 @@ local status_enum = {
 local task = {
     name = 'Status',
     status = status_enum['IDLE'],
-    teleport_trigger_time = nil,
 }
 
 local function all_task_done()
@@ -103,27 +102,26 @@ function task.Execute()
         if settings.get_export_keybind_state() and task.status ~= status_enum['WAITING'] then
             utils.export_inventory_info()
         end
-        if settings.stash_all_socketables and #get_local_player():get_socketable_items() == 33 then
+        if settings.stash_socketables == utils.stash_extra_enum['ALWAYS'] or
+            (settings.stash_socketables == utils.stash_extra_enum['FULL'] and #get_local_player():get_socketable_items() == 33) 
+        then
             tracker.stash_socketables = true
+        else 
+            tracker.stash_socketables = false
         end
-        if settings.stash_extra_materials then
-            if #get_local_player():get_consumable_items() == 33 then
-                tracker.stash_boss_materials = true
-            end
-            if #get_local_player():get_dungeon_key_items() == 33 then
-                tracker.stash_compasses = true
-            end
+        if settings.stash_consumables == utils.stash_extra_enum['ALWAYS'] or
+            (settings.stash_consumables == utils.stash_extra_enum['FULL'] and #get_local_player():get_consumable_items() == 33) 
+        then
+            tracker.stash_boss_materials = true
+        else 
+            tracker.stash_boss_materials = false
         end
-        if restock_trigger and
-            settings.restock_type == utils.restock_enum['ACTIVE'] and
-            task.teleport_trigger_time == nil
+        if settings.stash_keys == utils.stash_extra_enum['ALWAYS'] or
+            (settings.stash_keys == utils.stash_extra_enum['FULL'] and #get_local_player():get_dungeon_key_items() == 33) 
         then
-            task.teleport_trigger_time = get_time_since_inject()
-        elseif restock_trigger and
-            settings.restock_type == utils.restock_enum['ACTIVE'] and
-            task.teleport_trigger_time + settings.restock_teleport_delay < get_time_since_inject()
-        then
-            tracker.teleport = true
+            tracker.stash_keys = true
+        else 
+            tracker.stash_keys = false
         end
         tracker.trigger_tasks = true
         task.status = status_enum['WAITING']
