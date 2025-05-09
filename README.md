@@ -1,5 +1,5 @@
 # Alfred the butler
-#### V1.4.0
+#### V1.4.1
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
@@ -49,13 +49,24 @@ select what to do with non-ancestral items by types and marked as junk
 #### Helm/Chest/Gloves/Pants/Boots/Amulet/Ring/Weapon/Offhand
 - search and add affixes that you want to keep
 - you can search by name, description or id
-### Restock
-- mode active/passive
-  - active mode will trigger teleport and restock if item when item runs out
-  - teleport delay -- number of seconds to wait before initiating teleport when in active mode
-  - stock all socketables -- if socketables inventory is full, will stash all of them
-  - stock extra materials -- if key/consumeable inventory is full, will stash extra boss materials and compasses
-  - sliders for maximum amount of item to restock up to
+### Socketables
+- stash socketables
+  - never -- never stash socketables
+  - when full -- only stash socketables when socketables inventory is full
+  - always -- always stash socketables whenever alfred is triggered
+### Consumables
+- stash consumeables
+  - never -- never stash boss materials
+  - when full -- only stash boss materials when boss materials inventory is full
+  - always -- always stash boss materials whenever alfred is triggered
+- sliders for maximum amount of item to restock up to
+    - set to 0 if u do not want to restock that item
+### Dungeon Keys
+- stash dungeon keys
+  - never -- never stash compasses and tributes
+  - when full -- only stash compasses and tributes when compasses and tributes inventory is full
+  - always -- always stash compasses and tributes whenever alfred is triggered
+- sliders for maximum amount of item to restock up to
     - set to 0 if u do not want to restock that item
 
 ## For devs
