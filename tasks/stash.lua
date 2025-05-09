@@ -88,7 +88,7 @@ function extension.execute()
         for _,item in pairs(key_items) do
             if restock_items[item:get_sno_id()] ~= nil then
                 local current = restock_items[item:get_sno_id()]
-                if current.count - 1 >= current.max or current.max < current.min then
+                if current.count - item:get_stack_count() >= current.max or current.max < current.min then
                     loot_manager.move_item_to_stash(item)
                     update_last_interaction_time()
                 end

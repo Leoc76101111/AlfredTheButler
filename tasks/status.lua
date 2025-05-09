@@ -103,21 +103,21 @@ function task.Execute()
             utils.export_inventory_info()
         end
         if settings.stash_socketables == utils.stash_extra_enum['ALWAYS'] or
-            (settings.stash_socketables == utils.stash_extra_enum['FULL'] and #get_local_player():get_socketable_items() == 33) 
+            (settings.stash_socketables == utils.stash_extra_enum['FULL'] and #get_local_player():get_socketable_items() == 33)
         then
             tracker.stash_socketables = true
-        else 
+        else
             tracker.stash_socketables = false
         end
         if settings.stash_consumables == utils.stash_extra_enum['ALWAYS'] or
-            (settings.stash_consumables == utils.stash_extra_enum['FULL'] and #get_local_player():get_consumable_items() == 33) 
+            (settings.stash_consumables == utils.stash_extra_enum['FULL'] and #get_local_player():get_consumable_items() == 33)
         then
             tracker.stash_boss_materials = true
-        else 
+        else
             tracker.stash_boss_materials = false
         end
         if settings.stash_keys == utils.stash_extra_enum['ALWAYS'] or
-            (settings.stash_keys == utils.stash_extra_enum['FULL'] and #get_local_player():get_dungeon_key_items() == 33) 
+            (settings.stash_keys == utils.stash_extra_enum['FULL'] and #get_local_player():get_dungeon_key_items() == 33)
         then
             tracker.stash_keys = true
         else 
