@@ -8,7 +8,6 @@ local utils    = {
     last_dump_time = 0,
 }
 local item_types = {
-    'tempering',
     'helm',
     'chest',
     'gloves',
@@ -353,6 +352,9 @@ function utils.get_item_type(item)
     }
     if name:match('cache') then
         return 'cache'
+    end
+    if name:match('tempering') then
+        return 'tempering'
     end
     for _,types in pairs(item_types) do
         if name:match(types) then
