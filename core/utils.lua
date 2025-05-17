@@ -226,7 +226,6 @@ function utils.reset_all_task()
     end
     tracker.previous = previous
     tracker.last_reset = 0
-    tracker.timeout = false
     tracker.teleport = false
     tracker.teleport_done = false
     tracker.teleport_failed = false

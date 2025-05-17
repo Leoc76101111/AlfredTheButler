@@ -9,7 +9,6 @@ local settings = {
     plugin_version = gui.plugin_version,
     enabled = false,
     use_keybind = false,
-    timeout = 0,
     allow_external = true,
     -- item_magic = utils.item_enum['SALVAGE'],
     -- item_rare = utils.item_enum['SALVAGE'],

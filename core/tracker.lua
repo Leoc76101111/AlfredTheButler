@@ -4,7 +4,6 @@ local plugin_label = 'alfred_the_butler'
 local tracker = {
     name                      = plugin_label,
     version                   = nil,
-    timeout                   = false,
     inventory_full            = false,
     inventory_count           = 0,
     salvage_count             = 0,

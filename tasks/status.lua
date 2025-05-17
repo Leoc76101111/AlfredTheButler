@@ -4,8 +4,7 @@ local tracker = require 'core.tracker'
 
 local status_enum = {
     IDLE = 'Idle',
-    WAITING = 'Waiting to be in Cerrigar',
-    TIMEOUT = 'Alfred is in timeout'
+    WAITING = 'Waiting to be in Cerrigar'
 }
 
 local task = {
@@ -86,9 +85,7 @@ function task.Execute()
         end
     end
 
-    if tracker.timeout then
-        task.status = status_enum['TIMEOUT']
-    elseif (settings.allow_external and tracker.external_trigger) or
+    if (settings.allow_external and tracker.external_trigger) or
         tracker.need_trigger or tracker.manual_trigger
     then
         if settings.get_export_keybind_state() and task.status ~= status_enum['WAITING'] then

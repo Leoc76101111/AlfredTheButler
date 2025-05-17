@@ -23,14 +23,9 @@ function task.shouldExecute()
     if settings.use_alfred and PLUGIN_alfred_the_butler then
         local status = PLUGIN_alfred_the_butler.get_status()
         -- add additional conditions to trigger if required
-        -- remove status.timeout if you must finish salvage/sell before continuing
-        -- alfred will retry once timeout is over
-        if status.enabled and
-            status.inventory_full and
-            (status.sell_count > 0 or status.salvage_count > 0)
+        if (status.enabled and status.need_trigger) or
+            task.status == status_enum['WAITING']
         then
-            return true
-        elseif task.status == status_enum['WAITING'] then
             return true
         end
     end

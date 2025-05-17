@@ -22,7 +22,6 @@ end
 
 local function main_pulse()
     settings:update_settings()
-    tracker.timeout = tracker.last_reset + settings.timeout >= get_time_since_inject()
     if PERSISTENT_MODE ~= nil and PERSISTENT_MODE ~= false  then
         if keybind_data:get() ~= (gui.elements.keybind_toggle:get_state() == 1) then
             keybind_data:set(gui.elements.keybind_toggle:get_state() == 1)
