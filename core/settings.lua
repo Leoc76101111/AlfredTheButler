@@ -1,5 +1,3 @@
-local plugin_label = 'alfred_the_butler'
-
 local gui = require 'gui'
 local utils = require 'core.utils'
 local affix_types = utils.get_item_affixes()
@@ -7,9 +5,10 @@ local unique_items = utils.get_unique_items()
 local mythic_items = utils.get_mythic_items()
 
 local settings = {
+    plugin_label = gui.plugin_label,
+    plugin_version = gui.plugin_version,
     enabled = false,
     use_keybind = false,
-    item_use_stash = true,
     timeout = 0,
     allow_external = true,
     -- item_magic = utils.item_enum['SALVAGE'],
@@ -120,7 +119,7 @@ function settings:update_settings()
     settings.stash_keys = gui.elements.stash_keys:get()
     for _,item in pairs(utils.get_restock_items()) do
         local sno_id = item.sno_id
-        local slider_name = plugin_label .. 'restock_' .. tostring(sno_id)
+        local slider_name = settings.plugin_label .. 'restock_' .. tostring(sno_id)
         settings.restock_items[#settings.restock_items+1] = {
             sno_id = sno_id,
             name = item.name,

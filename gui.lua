@@ -71,6 +71,9 @@ local function render_checkbox(name,data, is_affix)
     end
 end
 
+gui.plugin_label = plugin_label
+gui.plugin_version = plugin_version
+
 gui.stash_options = {
     'Inventory',
     'Stash'

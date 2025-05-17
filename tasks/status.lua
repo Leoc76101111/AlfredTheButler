@@ -1,5 +1,3 @@
-local plugin_label = 'alfred_the_butler'
-
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
@@ -71,7 +69,6 @@ function task.Execute()
         return
     end
 
-    local restock_trigger = false
     local status = all_task_done()
     if status.complete then
         utils.reset_all_task()
@@ -89,15 +86,10 @@ function task.Execute()
         end
     end
 
-    if tracker.restock_count > 0 then
-        restock_trigger = true
-    end
-
-
     if tracker.timeout then
         task.status = status_enum['TIMEOUT']
     elseif (settings.allow_external and tracker.external_trigger) or
-        tracker.inventory_full or tracker.manual_trigger or restock_trigger or tracker.need_repair
+        tracker.need_trigger or tracker.manual_trigger
     then
         if settings.get_export_keybind_state() and task.status ~= status_enum['WAITING'] then
             utils.export_inventory_info()

@@ -1,7 +1,9 @@
 local plugin_label = 'alfred_the_butler'
+-- kept plugin label instead of waiting for update_tracker to set it
 
 local tracker = {
     name                      = plugin_label,
+    version                   = nil,
     timeout                   = false,
     inventory_full            = false,
     inventory_count           = 0,
@@ -41,6 +43,7 @@ local tracker = {
     stocktake_done            = false,
     stocktake_failed          = false,
     need_repair               = false,
+    need_trigger              = false,
 }
 
 return tracker

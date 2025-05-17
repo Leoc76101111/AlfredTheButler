@@ -1,5 +1,3 @@
-local plugin_label = 'alfred_the_butler'
-
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
@@ -154,7 +152,7 @@ function extension.is_done()
     if tracker.stash_socketables then
         socketable_stashed = #get_local_player():get_socketable_items() == 0
     end
-    return (not settings.item_use_stash or tracker.stash_count == 0) and
+    return (not tracker.stash_count == 0) and
         (not tracker.stash_socketables or socketable_stashed) and
         (not tracker.stash_boss_materials or material_stashed) and
         (not tracker.stash_keys or material_stashed)

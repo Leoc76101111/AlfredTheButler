@@ -97,3 +97,4 @@ if not utils.settings then
     utils.settings = settings
 end
 PLUGIN_alfred_the_butler = external
+AlfredTheButlerPlugin = external

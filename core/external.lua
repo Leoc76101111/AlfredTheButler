@@ -1,5 +1,3 @@
-local plugin_label = 'alfred_the_butler'
-
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
@@ -7,11 +5,12 @@ local tracker = require 'core.tracker'
 local external = {
     get_status = function ()
         return {
-            name            = plugin_label,
+            name            = settings.plugin_label,
+            version         = settings.version,
+            enabled         = settings.enabled,
             teleport        = tracker.teleport,
             teleport_done   = tracker.teleport_done,
             teleport_failed = tracker.teleport_failed,
-            enabled         = settings.enabled,
             inventory_full  = tracker.inventory_full,
             inventory_count = tracker.inventory_count,
             salvage_count   = tracker.salvage_count,
@@ -26,6 +25,7 @@ local external = {
             sell_done       = tracker.sell_done,
             all_task_done   = tracker.all_task_done,
             need_repair     = tracker.need_repair,
+            need_trigger    = tracker.need_trigger,
         }
     end,
     pause = function (caller)

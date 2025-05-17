@@ -1,5 +1,3 @@
-local plugin_label = 'alfred_the_butler'
-
 local json = require 'core.json'
 local tracker = require 'core.tracker'
 
@@ -186,7 +184,7 @@ function utils.get_restock_items()
 end
 
 function utils.log(msg)
-    console.print(plugin_label .. ': ' .. tostring(msg))
+    console.print(utils.settings.plugin_label .. ': ' .. tostring(msg))
 end
 
 function utils.get_character_class()
@@ -594,6 +592,9 @@ function utils.update_tracker_count(local_player)
         end
     end
     tracker.need_repair = need_repair
+    tracker.need_trigger = tracker.inventory_full or tracker.need_repair or tracker.restock_count > 0
+    tracker.name = utils.settings.plugin_label
+    tracker.version = utils.settings.plugin_version
 end
 function utils.get_restock_items_from_tracker()
     local restock_item_by_id = {}
@@ -736,7 +737,7 @@ function utils.export_inventory_info()
             item_info['action'] = 'keep'
             if is_salvage then item_info['action'] = 'salvage'
             elseif is_sell then item_info['action'] = 'sell'
-            elseif utils.settings.item_use_stash then item_info['action'] = 'stash' end
+            else item_info['action'] = 'stash' end
 
             item_info['name'] = item:get_display_name()
             item_info['id'] = item:get_sno_id()

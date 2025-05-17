@@ -1,7 +1,4 @@
-local plugin_label = 'alfred_the_butler'
-
 local gui          = require 'gui'
-local utils        = require 'core.utils'
 local settings     = require 'core.settings'
 local task_manager = require 'core.task_manager'
 local tracker      = require 'core.tracker'
@@ -50,8 +47,8 @@ function drawing.draw_status()
     end
 
     local messages = {}
-    if PLUGIN_robin_the_sidekick then
-        local robin_status = PLUGIN_robin_the_sidekick.get_status()
+    if RobinTheSidekickPlugin then
+        local robin_status = RobinTheSidekickPlugin.get_status()
         if robin_status.enabled then
             messages[#messages+1] = 'Robin Mode       : ' .. tostring(robin_status.mode)
         end

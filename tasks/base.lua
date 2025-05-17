@@ -1,10 +1,6 @@
-local plugin_label = 'alfred_the_butler'
-
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
-local gui = require 'gui'
-local explorerlite = require 'core.explorerlite'
 
 -- actions need to be overwritten
 local extension = {

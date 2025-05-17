@@ -1,6 +1,3 @@
-local plugin_label = 'alfred_the_butler'
-
-local settings = require 'core.settings'
 local task_manager = {}
 local tasks = {}
 local current_task = { name = 'Idle', status = 'Idle' } -- Default state when no task is active
