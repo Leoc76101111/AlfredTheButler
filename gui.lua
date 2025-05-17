@@ -211,6 +211,7 @@ function gui.render()
     end
     if gui.elements.misc_tree:push('General settings') then
         gui.elements.explorer_path_angle_slider:render("Explorer Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
+        render_menu_header('IMPORTANT TO SET MAX INVENTORY ITEM TO 25 OR LOWER IF YOU ARE RUNNING BOSSER AND NOT PICKING EVERYTHING UP. SETTING HIGHER THAN 25 MIGHT CAUSE A MYTHIC TO BE LOST')
         gui.elements.max_inventory:render("Max inventory items", "No. of items in inventory to trigger alfred tasks")
         gui.elements.misc_tree:pop()
     end
