@@ -43,6 +43,9 @@ local tracker = {
     stocktake_failed          = false,
     need_repair               = false,
     need_trigger              = false,
+    need_stash_socketables    = false,
+    need_stash_consumables    = false,
+    need_stash_keys           = false,
 }
 
 return tracker

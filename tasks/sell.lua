@@ -76,6 +76,9 @@ task.shouldExecute = function ()
         not tracker.sell_failed and
         not tracker.sell_done
     then
+        if task.check_status(task.status_enum['FAILED']) then
+            task.set_status(task.status_enum['IDLE'])
+        end
         return true
     end
 

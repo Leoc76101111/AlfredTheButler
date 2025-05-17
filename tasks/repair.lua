@@ -83,6 +83,9 @@ task.shouldExecute = function ()
         (tracker.stocktake_done or tracker.stocktake_failed) and
         (tracker.salvage_done or tracker.salvage_failed)
     then
+        if task.check_status(task.status_enum['FAILED']) then
+            task.set_status(task.status_enum['IDLE'])
+        end
         return true
     end
     return false

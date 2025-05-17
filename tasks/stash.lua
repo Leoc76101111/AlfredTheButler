@@ -152,7 +152,7 @@ function extension.is_done()
     if tracker.stash_socketables then
         socketable_stashed = #get_local_player():get_socketable_items() == 0
     end
-    return (not tracker.stash_count == 0) and
+    return (tracker.stash_count == 0) and
         (not tracker.stash_socketables or socketable_stashed) and
         (not tracker.stash_boss_materials or material_stashed) and
         (not tracker.stash_keys or material_stashed)
@@ -193,6 +193,9 @@ task.shouldExecute = function ()
         not tracker.stash_done and
         (tracker.sell_done or tracker.sell_failed)
     then
+        if task.check_status(task.status_enum['FAILED']) then
+            task.set_status(task.status_enum['IDLE'])
+        end
         return true
     end
     return false

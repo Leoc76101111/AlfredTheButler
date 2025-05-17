@@ -85,28 +85,30 @@ function task.Execute()
         end
     end
 
+    if status.failed then
+        utils.reset_all_task()
+        tracker.trigger_tasks = true
+    end
+
     if (settings.allow_external and tracker.external_trigger) or
         tracker.need_trigger or tracker.manual_trigger
     then
         if settings.get_export_keybind_state() and task.status ~= status_enum['WAITING'] then
             utils.export_inventory_info()
         end
-        if settings.stash_socketables == utils.stash_extra_enum['ALWAYS'] or
-            (settings.stash_socketables == utils.stash_extra_enum['FULL'] and #get_local_player():get_socketable_items() == 33)
+        if settings.stash_socketables == utils.stash_extra_enum['ALWAYS'] or tracker.need_stash_socketables
         then
             tracker.stash_socketables = true
         else
             tracker.stash_socketables = false
         end
-        if settings.stash_consumables == utils.stash_extra_enum['ALWAYS'] or
-            (settings.stash_consumables == utils.stash_extra_enum['FULL'] and #get_local_player():get_consumable_items() == 33)
+        if settings.stash_consumables == utils.stash_extra_enum['ALWAYS'] or tracker.need_stash_consumables
         then
             tracker.stash_boss_materials = true
         else
             tracker.stash_boss_materials = false
         end
-        if settings.stash_keys == utils.stash_extra_enum['ALWAYS'] or
-            (settings.stash_keys == utils.stash_extra_enum['FULL'] and #get_local_player():get_dungeon_key_items() == 33)
+        if settings.stash_keys == utils.stash_extra_enum['ALWAYS'] or tracker.need_stash_keys
         then
             tracker.stash_keys = true
         else 

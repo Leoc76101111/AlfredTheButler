@@ -78,6 +78,9 @@ task.shouldExecute = function ()
         (tracker.restock_done or tracker.restock_failed) and
         (tracker.stocktake_done or tracker.stocktake_failed)
     then
+        if task.check_status(task.status_enum['FAILED']) then
+            task.set_status(task.status_enum['IDLE'])
+        end
         return true
     end
     return false

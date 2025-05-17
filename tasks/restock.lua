@@ -172,6 +172,9 @@ task.shouldExecute = function ()
         if tracker.restock_count > 0 then
             execute_restock = true
         end
+        if task.check_status(task.status_enum['FAILED']) then
+            task.set_status(task.status_enum['IDLE'])
+        end
         return true
     end
     return false
