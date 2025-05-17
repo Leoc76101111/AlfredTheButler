@@ -6,7 +6,7 @@ local external = {
     get_status = function ()
         return {
             name            = settings.plugin_label,
-            version         = settings.version,
+            version         = settings.plugin_version,
             enabled         = settings.enabled,
             teleport        = tracker.teleport,
             teleport_done   = tracker.teleport_done,
@@ -27,6 +27,32 @@ local external = {
             need_repair     = tracker.need_repair,
             need_trigger    = tracker.need_trigger,
         }
+    end,
+    check_version = function(input)
+        input = input:gsub("^v", "")
+        local current = {}
+        local check = {}
+        for part in settings.plugin_version:gmatch("%d+") do
+            local num = tonumber(part)
+            if not num then return false end
+            table.insert(current, num)
+        end
+        for part in input:gmatch("%d+") do
+            local num = tonumber(part)
+            if not num then return false end
+            table.insert(check, num)
+        end
+        if #check ~= 3 then
+            return false
+        end
+        for i = 1, 3 do
+            if current[i] > check[i] then
+                return true
+            elseif current[i] < check[i] then
+                return false
+            end
+        end
+        return true
     end,
     pause = function (caller)
         tracker.external_caller = caller
