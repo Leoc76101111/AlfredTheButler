@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = 'v1.4.4'
+local plugin_version = '1.4.4'
 
 local utils = require 'core.utils'
 local gui = {}
@@ -184,7 +184,7 @@ for _,item in pairs(restock_items) do
 end
 
 function gui.render()
-    if not gui.elements.main_tree:push('Alfred the Butler | Leoric | ' .. plugin_version) then return end
+    if not gui.elements.main_tree:push('Alfred the Butler | Leoric | v' .. gui.plugin_version) then return end
     gui.elements.main_toggle:render('Enable', 'Enable alfred')
     gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot')
     if gui.elements.use_keybind:get() then
