@@ -4,7 +4,8 @@ local tracker = require 'core.tracker'
 
 local status_enum = {
     IDLE = 'Idle',
-    WAITING = 'Waiting to be in Cerrigar'
+    WAITING = 'Waiting to be in Cerrigar',
+    FAILED = 'Alfred has failed you (successfully failed XD), please copy logs to discord channel'
 }
 
 local task = {
@@ -86,29 +87,40 @@ function task.Execute()
     end
 
     if status.failed then
-        utils.reset_all_task()
-        tracker.trigger_tasks = true
+        if settings.failed_action == utils.failed_action_enum['LOG'] then
+            if task.status ~= status_enum['FAILED'] then
+                utils.dump_tracker_info(tracker)
+            end
+            task.status = status_enum['FAILED']
+        else
+            utils.reset_all_task()
+            tracker.trigger_tasks = true
+        end
+        return
     end
 
     if (settings.allow_external and tracker.external_trigger) or
         tracker.need_trigger or tracker.manual_trigger
     then
-        if settings.get_export_keybind_state() and task.status ~= status_enum['WAITING'] then
+        if settings.get_export_keybind_state() and task.status ~= status_enum['WAITING'] and task.status ~= status_enum['FAILED'] then
             utils.export_inventory_info()
         end
-        if settings.stash_socketables == utils.stash_extra_enum['ALWAYS'] or tracker.need_stash_socketables
+        if settings.stash_socketables == utils.stash_extra_enum['ALWAYS'] or
+            tracker.need_stash_socketables
         then
             tracker.stash_socketables = true
         else
             tracker.stash_socketables = false
         end
-        if settings.stash_consumables == utils.stash_extra_enum['ALWAYS'] or tracker.need_stash_consumables
+        if settings.stash_consumables == utils.stash_extra_enum['ALWAYS'] or
+            tracker.need_stash_consumables
         then
             tracker.stash_boss_materials = true
         else
             tracker.stash_boss_materials = false
         end
-        if settings.stash_keys == utils.stash_extra_enum['ALWAYS'] or tracker.need_stash_keys
+        if settings.stash_keys == utils.stash_extra_enum['ALWAYS'] or
+            tracker.need_stash_keys
         then
             tracker.stash_keys = true
         else 

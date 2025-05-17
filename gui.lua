@@ -91,6 +91,11 @@ gui.stash_extra_options= {
     'Always',
 }
 
+gui.failed_options= {
+    'Log',
+    'Forced Retry',
+}
+
 gui.elements = {
     main_tree = tree_node:new(0),
     main_toggle = create_checkbox(false, 'main_toggle'),
@@ -140,9 +145,10 @@ gui.elements = {
     gamble_tree = tree_node:new(1),
     gamble_toggle = create_checkbox(false, 'gamble_toggle'),
 
-    misc_tree = tree_node:new(1),
+    general_tree = tree_node:new(1),
     explorer_path_angle_slider = slider_int:new(0, 360, 10, get_hash(plugin_label .. '_explorer_path_angle_slider')),
-    max_inventory = slider_int:new(20,33, 25, get_hash(plugin_label .. 'max_inventory')),
+    max_inventory = slider_int:new(20,33, 25, get_hash(plugin_label .. '_max_inventory')),
+    failed_action = combo_box:new(0, get_hash(plugin_label .. '_failed_action')),
 
     drawing_tree = tree_node:new(1),
     draw_status = create_checkbox(true, 'draw_status'),
@@ -212,11 +218,17 @@ function gui.render()
         gui.elements.draw_box_width:render("Box Width Slider", "Adjust box width")
         gui.elements.drawing_tree:pop()
     end
-    if gui.elements.misc_tree:push('General settings') then
+    if gui.elements.general_tree:push('General settings') then
         gui.elements.explorer_path_angle_slider:render("Explorer Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
         render_menu_header('IMPORTANT TO SET MAX INVENTORY ITEM TO 25 OR LOWER IF YOU ARE RUNNING BOSSER AND NOT PICKING EVERYTHING UP. SETTING HIGHER THAN 25 MIGHT CAUSE A MYTHIC TO BE LOST')
         gui.elements.max_inventory:render("Max inventory items", "No. of items in inventory to trigger alfred tasks")
-        gui.elements.misc_tree:pop()
+        gui.elements.failed_action:render('Failed action', gui.failed_options, 'Select what to do when alfred is in complete failure')
+        if gui.elements.failed_action:get() == utils.failed_action_enum['LOG'] then
+            render_menu_header('Log action will leave your character standing there and you might get disconnected for inactivity, but logs should still be copyable')
+        else
+            render_menu_header('Forced retry action will keep looping tasks, this will cause your character to move away and back and not trigger inactivity timer. if problem persist, it will stuck in a loop')
+        end
+        gui.elements.general_tree:pop()
     end
     if gui.elements.item_tree:push('Non-Ancestral') then
         render_menu_header('Select the default action for the following item types for non-ancestral items')

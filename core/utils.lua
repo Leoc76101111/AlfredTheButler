@@ -79,6 +79,10 @@ utils.stash_extra_enum = {
     FULL = 1,
     ALWAYS = 2
 }
+utils.failed_action_enum = {
+    LOG = 0,
+    RETRY = 1
+}
 
 utils.mythics = {
     [1901484] = "Tyrael's Might",
