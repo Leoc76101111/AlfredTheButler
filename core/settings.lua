@@ -9,7 +9,7 @@ local mythic_items = utils.get_mythic_items()
 local settings = {
     enabled = false,
     use_keybind = false,
-    item_use_stash = false,
+    item_use_stash = true,
     timeout = 0,
     allow_external = true,
     -- item_magic = utils.item_enum['SALVAGE'],
@@ -38,6 +38,7 @@ local settings = {
     stash_socketables = utils.stash_extra_enum['NEVER'],
     stash_consumables = utils.stash_extra_enum['NEVER'],
     stash_keys = utils.stash_extra_enum['NEVER'],
+    max_inventory = 25,
 }
 
 function settings.get_keybind_state()
@@ -73,7 +74,6 @@ end
 function settings:update_settings()
     settings.enabled = gui.elements.main_toggle:get()
     settings.use_keybind = gui.elements.use_keybind:get()
-    settings.item_use_stash = gui.elements.stash_toggle:get()
     settings.item_legendary_or_lower = gui.elements.item_legendary_or_lower:get()
     settings.item_unique = gui.elements.item_unique:get()
     settings.item_junk = gui.elements.item_junk:get()
@@ -128,6 +128,7 @@ function settings:update_settings()
             min = item.min
         }
     end
+    settings.max_inventory = gui.elements.max_inventory:get()
 end
 
 utils.settings = settings

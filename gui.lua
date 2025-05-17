@@ -98,8 +98,6 @@ gui.elements = {
     dump_keybind = keybind:new(0x0A, true, get_hash(plugin_label .. '_dump_keybind')),
     manual_keybind = keybind:new(0x0A, true, get_hash(plugin_label .. '_manual_keybind')),
 
-    stash_toggle = create_checkbox(false, 'stash_toggle'),
-
     item_tree = tree_node:new(1),
     item_legendary_or_lower = combo_box:new(1, get_hash(plugin_label .. '_item_legendary_or_lower')),
     item_unique = combo_box:new(2, get_hash(plugin_label .. '_item_unique')),
@@ -139,8 +137,9 @@ gui.elements = {
     gamble_tree = tree_node:new(1),
     gamble_toggle = create_checkbox(false, 'gamble_toggle'),
 
-    explorer_tree = tree_node:new(1),
+    misc_tree = tree_node:new(1),
     explorer_path_angle_slider = slider_int:new(0, 360, 10, get_hash(plugin_label .. '_explorer_path_angle_slider')),
+    max_inventory = slider_int:new(20,33, 25, get_hash(plugin_label .. 'max_inventory')),
 
     drawing_tree = tree_node:new(1),
     draw_status = create_checkbox(true, 'draw_status'),
@@ -185,7 +184,6 @@ function gui.render()
         gui.elements.dump_keybind:render('Dump tracker info', 'Dump all tracker info to log')
         gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now')
     end
-    gui.elements.stash_toggle:render('Keep item in stash','Keep item in stash')
     if gui.elements.drawing_tree:push('Display settings') then
         gui.elements.draw_status:render('Draw status', 'Draw status info on screen')
         gui.elements.draw_stash:render('Draw Keep items', 'Draw blue box around items that alfred will keep/stash')
@@ -211,9 +209,10 @@ function gui.render()
         gui.elements.draw_box_width:render("Box Width Slider", "Adjust box width")
         gui.elements.drawing_tree:pop()
     end
-    if gui.elements.explorer_tree:push('Explorer settings') then
-        gui.elements.explorer_path_angle_slider:render("Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
-        gui.elements.explorer_tree:pop()
+    if gui.elements.misc_tree:push('General settings') then
+        gui.elements.explorer_path_angle_slider:render("Explorer Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
+        gui.elements.max_inventory:render("Max inventory items", "No. of items in inventory to trigger alfred tasks")
+        gui.elements.misc_tree:pop()
     end
     if gui.elements.item_tree:push('Non-Ancestral') then
         render_menu_header('Select the default action for the following item types for non-ancestral items')

@@ -544,7 +544,7 @@ function utils.update_tracker_count(local_player)
     tracker.salvage_count = salvage_counter
     tracker.sell_count = sell_counter
     tracker.stash_count = stash_counter
-    tracker.inventory_full = tracker.inventory_count == 33
+    tracker.inventory_full = tracker.inventory_count >= utils.settings.max_inventory
 
     tracker.restock_count = 0
     local restock_count = 0
