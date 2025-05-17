@@ -7,6 +7,7 @@ local base_task = require 'tasks.base'
 local task = base_task.new_task()
 local status_enum = {
     IDLE = 'Idle',
+    WAITING = 'Waiting for looter',
     EXECUTE = 'Teleporting',
     MOVING = 'Moving to portal',
     INTERACTING = 'Interacting with portal',
@@ -107,6 +108,13 @@ task.Execute = function ()
     then
         task.retry = 0
         task.set_status(status_enum['EXECUTE'])
+        if LooteerPlugin then
+            local looting = LooteerPlugin.getSettings('looting')
+            if looting then
+                task.set_status(status_enum['WAITING'])
+                return
+            end
+        end
         teleport_with_debounce()
     else
         task.baseExecute()
