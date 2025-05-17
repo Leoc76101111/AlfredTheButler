@@ -1,5 +1,5 @@
 # Alfred the butler
-#### V1.4.3
+#### V1.4.4
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
@@ -21,7 +21,6 @@ there are 4 trigger conditions that can get alfred to do tasks:
   - toggle keybind -- for quick enable/disable
   - dump tracker info -- debug usage
   - manual trigger -- make alfred do task now (will teleport to cerrigar if not there)
-- Keep item in stash -- toggle to stash non-salvage non-sell inventory items (equipments only)
 ### Display settings
 - Draw Status -- to enable the status on top left of screen
 - Draw Keep Items -- draw blue box around items that is set to keep in inventory
@@ -29,8 +28,10 @@ there are 4 trigger conditions that can get alfred to do tasks:
 - Draw Salvage Items -- draw orange box around items that is set to salvage in inventory
 - Various box sizing and offset settings to adjust depending on screen size similar to affix filter
 
-### Explorer settings
-explorer settings similar to piteer (recommended to keep as default)
+### General settings
+- explorer path angle (lower is better)
+- max inventory items -- No. of items to count as inventory full. usefull for bossing when you dont pick all items up
+- failed action -- In event that alfred is unable to complete all task, alfred can stand there and dump tracker info to log, or alfred can just force retry and may be stuck in a loop (but atleast inactivity timer wont kick in)
 
 ### Non-ancestral
 select what to do with non-ancestral items by types and marked as junk
