@@ -38,6 +38,7 @@ local settings = {
     stash_keys = utils.stash_extra_enum['NEVER'],
     max_inventory = 25,
     failed_action = utils.failed_action_enum['LOG'],
+    use_evade = false,
 }
 
 function settings.get_keybind_state()
@@ -129,6 +130,7 @@ function settings:update_settings()
     end
     settings.max_inventory = gui.elements.max_inventory:get()
     settings.failed_action = gui.elements.failed_action:get()
+    settings.use_evade = gui.elements.use_evade:get()
 end
 
 utils.settings = settings

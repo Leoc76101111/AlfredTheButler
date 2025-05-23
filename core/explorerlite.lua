@@ -437,13 +437,12 @@ function explorerlite:movement_spell_to_target(target)
     local local_player = get_local_player()
     if not local_player then return end
 
+    if not settings.use_evade then return end
+
     local movement_spell_id = {
         337031, -- General Evade
     }
 
-    if settings.use_evade_as_movement_spell then
-        table.insert(movement_spell_id, 337031) -- General Evade
-    end
 
     -- Check if the dash spell is off cooldown and ready to cast
     for _, spell_id in ipairs(movement_spell_id) do
