@@ -39,6 +39,7 @@ local settings = {
     max_inventory = 25,
     failed_action = utils.failed_action_enum['LOG'],
     use_evade = false,
+    skip_cache = false,
 }
 
 function settings.get_keybind_state()
@@ -131,6 +132,7 @@ function settings:update_settings()
     settings.max_inventory = gui.elements.max_inventory:get()
     settings.failed_action = gui.elements.failed_action:get()
     settings.use_evade = gui.elements.use_evade:get()
+    settings.skip_cache = gui.elements.skip_cache:get()
 end
 
 utils.settings = settings

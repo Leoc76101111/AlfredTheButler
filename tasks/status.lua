@@ -5,7 +5,8 @@ local tracker = require 'core.tracker'
 local status_enum = {
     IDLE = 'Idle',
     WAITING = 'Waiting to be in Cerrigar',
-    FAILED = 'Alfred has failed you (successfully failed XD), please copy logs to discord channel'
+    FAILED = 'Alfred has failed you (successfully failed XD), please copy logs to discord channel',
+    STUCK = 'Alfred is stuck, you told him to not stash caches, and inventory is full of caches!'
 }
 
 local task = {
@@ -71,6 +72,10 @@ function task.Execute()
 
     local status = all_task_done()
     if status.complete then
+        if settings.skip_cache and tracker.inventory_full then
+            task.status = status_enum['STUCK']
+            return
+        end
         utils.reset_all_task()
         task.teleport_trigger_time = nil
         tracker.manual_trigger = false

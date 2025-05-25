@@ -521,11 +521,18 @@ function utils.update_tracker_count(local_player)
             local is_sell = utils.is_salvage_or_sell(item,utils.item_enum['SELL'])
             local is_stash = not is_salvage and not is_sell
 
+            if is_stash then
+                local item_type = utils.get_item_type(item)
+                if (item_type == 'cache' and utils.settings.skip_cache) then
+                    is_stash = false
+                end
+            end
+
             if is_salvage then
                 salvage_counter = salvage_counter + 1
             elseif is_sell then
                 sell_counter = sell_counter + 1
-            else
+            elseif is_stash then
                 stash_counter = stash_counter + 1
             end
             cached_inventory[#cached_inventory+1] = {

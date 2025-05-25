@@ -150,6 +150,7 @@ gui.elements = {
     max_inventory = slider_int:new(20,33, 25, get_hash(plugin_label .. '_max_inventory')),
     failed_action = combo_box:new(0, get_hash(plugin_label .. '_failed_action')),
     use_evade = create_checkbox(false, 'use_evade'),
+    skip_cache = create_checkbox(false, 'skip_cache'),
 
     drawing_tree = tree_node:new(1),
     draw_status = create_checkbox(true, 'draw_status'),
@@ -229,6 +230,10 @@ function gui.render()
             render_menu_header('Log action will leave your character standing there and you might get disconnected for inactivity, but logs should still be copyable')
         else
             render_menu_header('Forced retry action will keep looping tasks, this will cause your character to move away and back and not trigger inactivity timer. if problem persist, it will stuck in a loop')
+        end
+        gui.elements.skip_cache:render('Skip stashing cache', 'Keep caches in inventory (mainly for season 8)')
+        if gui.elements.skip_cache:get() then
+            render_menu_header('If you choose to skip stashing cache and your inventory is full of caches, alfred will just stand there')
         end
         gui.elements.general_tree:pop()
     end

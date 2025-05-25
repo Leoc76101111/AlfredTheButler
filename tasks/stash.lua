@@ -60,7 +60,8 @@ function extension.execute()
     local items = local_player:get_inventory_items()
     for _,item in pairs(items) do
         if item and not utils.is_salvage_or_sell(item,utils.item_enum['SELL']) and
-            not utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE'])
+            not utils.is_salvage_or_sell(item,utils.item_enum['SALVAGE']) and
+            not (settings.skip_cache and utils.get_item_type(item) == 'cache')
         then
             loot_manager.move_item_to_stash(item)
             update_last_interaction_time()
