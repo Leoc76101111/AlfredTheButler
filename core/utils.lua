@@ -632,7 +632,7 @@ function utils.import_filters(elements)
         return
     end
     io.input(file)
-    local data = io.read()
+    local data = io.read("*a")  -- <-- Added "*a" parameter
     if pcall(function () return json.decode(data) end) then
         local new_affix = json.decode(data)
         local new_settings = {}
