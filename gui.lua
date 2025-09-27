@@ -42,13 +42,17 @@ local function add_search(name, is_affix)
     gui.elements[search_name] = input_text:new(get_hash(plugin_label .. tostring(name) .. '_search_input'))
 end
 
-local function render_checkbox(name,data, is_affix)
+local function render_checkbox(name,data, is_affix, show_item_type)
     local search_name = tostring(name)
     if is_affix then
         search_name = search_name .. '_affix'
     end
     search_name = search_name .. '_search'
     for _,item in pairs(data) do
+        local item_name = item.name
+        if show_item_type then
+            item_name = item.name .. ' - ' .. item.item_type
+        end
         for _,class in pairs(item.class) do
             if class == 'all' or class == utils.get_character_class() then
                 local checkbox_name = tostring(name)
@@ -58,13 +62,13 @@ local function render_checkbox(name,data, is_affix)
                 checkbox_name = checkbox_name .. '_' .. tostring(item.sno_id)
                 local search_string = string.lower(gui.elements[search_name]:get())
                 if search_string ~= '' and
-                    (string.lower(item.name):match(search_string) or
+                    (string.lower(item_name):match(search_string) or
                     string.lower(item.description):match(search_string) or
                     string.lower(item.sno_id):match(search_string))
                 then
-                    gui.elements[checkbox_name]:render(item.name, item.description)
+                    gui.elements[checkbox_name]:render(item_name, item.description)
                 elseif gui.elements[checkbox_name]:get() then
-                    gui.elements[checkbox_name]:render(item.name, item.description)
+                    gui.elements[checkbox_name]:render(item_name, item.description)
                 end
             end
         end
@@ -270,7 +274,7 @@ function gui.render()
             render_menu_header('REMEMBER TO SET THE UNIQUE/MYTHIC YOU WANT SO THAT IT DOESNT GET ACCIDENTALLY SALVAGED/SOLD')
             if gui.elements['unique_tree']:push('Unique item') then
                 gui.elements['unique_search']:render('Search', 'Find unique items', false, '', '')
-                render_checkbox('unique', unique_items, false)
+                render_checkbox('unique', unique_items, false, true)
                 gui.elements['unique_tree']:pop()
             end
             if gui.elements['mythic_tree']:push('Mythic item') then
@@ -288,7 +292,7 @@ function gui.render()
                 local search_name = tostring(affix_type.name) .. '_affix_search'
                 if gui.elements[tree_name]:push('Legendary ' .. affix_type.name .. ' affix') then
                     gui.elements[search_name]:render('Search', 'Find affixes', false, '', '')
-                    render_checkbox(affix_type.name, affix_type.data, true)
+                    render_checkbox(affix_type.name, affix_type.data, true, false)
                     gui.elements[tree_name]:pop()
                 end
             end
