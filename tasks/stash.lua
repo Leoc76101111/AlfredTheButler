@@ -160,12 +160,14 @@ function extension.is_done()
 end
 function extension.done()
     tracker.stash_done = true
+    tracker.gamble_paused = false
     stash_item_count = -1
     failed_interaction_count = -1
     last_interaction_item_count = -1
 end
 function extension.failed()
     tracker.stash_failed = true
+    tracker.gamble_paused = false
     stash_item_count = -1
     failed_interaction_count = -1
     last_interaction_item_count = -1
@@ -193,6 +195,7 @@ task.shouldExecute = function ()
         not tracker.stash_failed and
         not tracker.stash_done and
         (tracker.sell_done or tracker.sell_failed) and
+        (tracker.gamble_done or tracker.gamble_failed or tracker.gamble_paused) and
         (tracker.salvage_done or tracker.salvage_failed)
     then
         if task.check_status(task.status_enum['FAILED']) then

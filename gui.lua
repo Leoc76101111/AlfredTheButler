@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = '1.6.1'
+local plugin_version = '1.6.2'
 
 local utils = require 'core.utils'
 local gui = {}
@@ -100,6 +100,16 @@ gui.failed_options= {
     'Forced Retry',
 }
 
+gui.gamble_categories = {
+    ['sorcerer'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Sword', 'Mace', 'Dagger', 'Staff', 'Wand', 'Focus'},
+    ['barbarian'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Axe', 'Sword', 'Mace', 'Two-Handed Axe', 'Two-Handed Sword', 'Two-Handed Mace', 'Polearm'},
+    ['rogue'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Sword', 'Dagger', 'Bow', 'Crossbow'},
+    ['druid'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Axe', 'Sword', 'Mace', 'Two-Handed Axe', 'Two-Handed Mace', 'Polearm', 'Dagger', 'Staff', 'Totem'},
+    ['necromancer'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Axe', 'Sword', 'Mace', 'Two-Handed Axe', 'Two-Handed Sword', 'Scythe', 'Two-Handed Mace', 'Two-Handed Scythe', 'Dagger', 'Shield', 'Wand', 'Focus'},
+    ['spiritborn'] = {'Quarterstaff', 'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Polearm', 'Glaive'},
+    ['default'] = {'CLASS NOT LOADED'}
+}
+
 gui.elements = {
     main_tree = tree_node:new(0),
     main_toggle = create_checkbox(false, 'main_toggle'),
@@ -150,6 +160,18 @@ gui.elements = {
 
     gamble_tree = tree_node:new(1),
     gamble_toggle = create_checkbox(false, 'gamble_toggle'),
+    gamble_other_language = create_checkbox(false, 'gamble_other_language'),
+    gamble_non_english = input_text:new(get_hash(plugin_label .. '_gamble_custom_text')),
+    gamble_threshold = slider_int:new(10, 2580, 1000, get_hash(plugin_label .. '_gamble_threshold')),
+    gamble_category = {
+        ['sorcerer'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_sorcerer_category')),
+        ['barbarian'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_barbarian_category')),
+        ['rogue'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_rogue_category')),
+        ['druid'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_druid_category')),
+        ['necromancer'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_necromancer_category')),
+        ['spiritborn'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_spiritborn_category')),
+        ['default'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_default_category')),
+    },
 
     general_tree = tree_node:new(1),
     explorer_path_angle_slider = slider_int:new(0, 360, 10, get_hash(plugin_label .. '_explorer_path_angle_slider')),
@@ -357,6 +379,21 @@ function gui.render()
             end
         end
         gui.elements.key_tree:pop()
+    end
+    if gui.elements.gamble_tree:push('Gambling settings') then
+        gui.elements.gamble_toggle:render('Enable gambling', 'enable gambling')
+        if gui.elements.gamble_toggle:get() then
+            render_menu_header('remember to disable gambling in piteer so that it doesnt clash')
+        end
+        gui.elements.gamble_threshold:render('Obols threshold', 'amount of obols before starting gambling')
+        gui.elements.gamble_other_language:render('Other Language', 'check this if your client language is not english')
+        if gui.elements.gamble_other_language:get() then
+            render_menu_header('type in the gamble category including any spaces in between')
+            gui.elements.gamble_non_english:render('Gamble category', 'type in the gamble category including any spaces in between', false, '', '')
+        else
+            local class = utils.get_character_class()
+            gui.elements.gamble_category[class]:render("Gamble Category", gui.gamble_categories[class], "Select the item category to gamble")
+        end
     end
 
     -- if gui.elements.gamble_tree:push('Gamble') then

@@ -50,8 +50,8 @@ function extension.reset()
         new_position = vec3:new(-1684.3427734375, -595.40625, 37.6484375)
     elseif tracker.last_task == 'salvage' then
         new_position = vec3:new(-1680.57421875, -597.4794921875, 37.572265625)
-    elseif tracker.last_task ==  'sell' then
-        new_position = vec3:new(-1673.71484375 , -586.8203125, 37.6484375)
+    elseif tracker.last_task ==  'sell' or tracker.last_task == 'gamble' then
+        new_position = vec3:new(-1670.6953125, -598.2548828125, 36.8857421875)
     end
     explorerlite:set_custom_target(new_position)
     explorerlite:move_to_target()
@@ -85,6 +85,7 @@ task.shouldExecute = function ()
         not tracker.teleport_failed and
         not tracker.teleport_done and
         (tracker.sell_done or tracker.sell_failed) and
+        (tracker.gamble_done or tracker.gamble_failed) and
         (tracker.stash_done or tracker.stash_failed) and
         (tracker.restock_done or tracker.restock_failed) and
         (tracker.stocktake_done or tracker.stocktake_failed) and

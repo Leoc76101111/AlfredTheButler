@@ -53,9 +53,11 @@ function extension.is_done()
 end
 function extension.done()
     tracker.salvage_done = true
+    tracker.gamble_paused = false
 end
 function extension.failed()
     tracker.salvage_failed = true
+    tracker.gamble_paused = false
 end
 function extension.is_in_vendor_screen()
     return loot_manager:is_in_vendor_screen()
@@ -73,7 +75,8 @@ task.shouldExecute = function ()
         tracker.trigger_tasks and
         not tracker.salvage_failed and
         not tracker.salvage_done and
-        (tracker.sell_done or tracker.sell_failed)
+        (tracker.sell_done or tracker.sell_failed) and
+        (tracker.gamble_done or tracker.gamble_failed or tracker.gamble_paused)
     then
         if task.check_status(task.status_enum['FAILED']) then
             task.set_status(task.status_enum['IDLE'])

@@ -7,11 +7,11 @@ local base_task = require 'tasks.base'
 local task = base_task.new_task()
 local status_enum = {
     IDLE = 'Idle',
-    EXECUTE = 'Selling',
+    EXECUTE = 'Gambling',
     MOVING = 'Moving to vendor',
     INTERACTING = 'Interacting with vendor',
-    RESETTING = 'Re-trying sell',
-    FAILED = 'Failed to sell'
+    RESETTING = 'Re-trying gamble',
+    FAILED = 'Failed to gamble'
 }
 
 local extension = {}
@@ -33,10 +33,26 @@ function extension.execute()
     local local_player = get_local_player()
     if not local_player then return end
     tracker.last_task = task.name
-    local items = local_player:get_inventory_items()
-    for _, item in pairs(items) do
-        if item and utils.is_salvage_or_sell(item,utils.item_enum['SELL']) then
-            loot_manager.sell_specific_item(item)
+    local vendor_items = loot_manager.get_vendor_items()
+    if type(vendor_items) == "userdata" and vendor_items.size then
+        local size = vendor_items:size()
+        local player_obols = local_player:get_obols()
+        local gamble_item = nil
+        local gamble_price = nil
+        for i = 1, size do
+            local item = vendor_items:get(i)
+            if item then
+                local display_name = item:get_display_name()
+                if display_name == settings.gamble_category then
+                    gamble_item = item
+                    gamble_price = item:get_price()
+                end
+            end
+        end
+        if gamble_item ~= nil and player_obols >= gamble_price then
+            loot_manager.buy_item(gamble_item)
+        else
+            tracker.gambling = false
         end
     end
 end
@@ -51,21 +67,33 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    return tracker.sell_count == 0
+    return not tracker.gambling
 end
 function extension.done()
-    tracker.sell_done = true
-    tracker.gamble_paused = false
+    tracker.gamble_done = true
+    tracker.sell_done = false
+    tracker.sell_failed = false
+    tracker.salvage_done = false
+    tracker.salvage_failed = false
+    tracker.stash_done = false
+    tracker.stash_failed = false
+    tracker.gambling = false
 end
 function extension.failed()
-    tracker.sell_failed = true
-    tracker.gamble_paused = false
+    tracker.gamble_failed = true
+    tracker.sell_done = false
+    tracker.sell_failed = false
+    tracker.salvage_done = false
+    tracker.salvage_failed = false
+    tracker.stash_done = false
+    tracker.stash_failed = false
+    tracker.gambling = false
 end
 function extension.is_in_vendor_screen()
     return loot_manager:is_in_vendor_screen()
 end
 
-task.name = 'sell'
+task.name = 'gamble'
 task.extension = extension
 task.status_enum = status_enum
 
@@ -73,11 +101,18 @@ task.shouldExecute = function ()
     if tracker.trigger_tasks == false then
         task.retry = 0
     end
+
+    local local_player = get_local_player()
+    if not local_player then return false end
+    if #local_player:get_inventory_items() == 33 then
+        tracker.gamble_paused = true
+    end
+
     if utils.player_in_zone('Scos_Cerrigar') and
         tracker.trigger_tasks and
-        not tracker.sell_failed and
-        not tracker.sell_done and
-        (tracker.gamble_done or tracker.gamble_failed or tracker.gamble_paused)
+        not tracker.gamble_failed and
+        not tracker.gamble_done and
+        not tracker.gamble_paused
     then
         if task.check_status(task.status_enum['FAILED']) then
             task.set_status(task.status_enum['IDLE'])

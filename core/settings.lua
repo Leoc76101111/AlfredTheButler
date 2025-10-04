@@ -40,6 +40,9 @@ local settings = {
     failed_action = utils.failed_action_enum['LOG'],
     use_evade = false,
     skip_cache = false,
+    gamble_enabled = false,
+    gamble_threshold = 1000,
+    gamble_category = 'UNKNOWN'
 }
 
 function settings.get_keybind_state()
@@ -135,6 +138,16 @@ function settings:update_settings()
     settings.failed_action = gui.elements.failed_action:get()
     settings.use_evade = gui.elements.use_evade:get()
     settings.skip_cache = gui.elements.skip_cache:get()
+
+    settings.gamble_enabled = gui.elements.gamble_toggle:get()
+    settings.gamble_threshold = gui.elements.gamble_threshold:get()
+
+    if gui.elements.gamble_other_language:get() then
+        settings.gamble_category = gui.elements.gamble_non_english:get()
+    else
+        local class = utils.get_character_class()
+        settings.gamble_category = gui.gamble_categories[class][gui.elements.gamble_category[class]:get() + 1]
+    end
 end
 
 utils.settings = settings

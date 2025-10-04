@@ -131,6 +131,9 @@ function task.Execute()
         else 
             tracker.stash_keys = false
         end
+        if settings.gamble_enabled and local_player:get_obols() >= settings.gamble_threshold then
+            tracker.gambling = true
+        end
         tracker.trigger_tasks = true
         task.status = status_enum['WAITING']
     else
