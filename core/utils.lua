@@ -99,6 +99,8 @@ utils.mythics = {
     [2059813] = 'Shattered Vow',
 }
 
+utils.chaos = {}
+
 local function get_plugin_root_path()
     local plugin_root = string.gmatch(package.path, '.*?\\?')()
     plugin_root = plugin_root:gsub('?','')
@@ -160,6 +162,21 @@ local function get_uniques()
     io.close(file)
     for _,item in pairs(data) do
         item_unique[#item_unique+1] = item
+    end
+end
+local function get_chaos()
+    local filename = get_plugin_root_path()
+    filename = filename .. 'data\\affix\\chaos.json'
+    local file, err = io.open(filename,'r')
+    if not file then
+        utils.log('error opening file' .. filename)
+        return
+    end
+    io.input(file)
+    local data = json.decode(io.read())
+    io.close(file)
+    for _,item in pairs(data) do
+        utils.chaos[item.sno_id] = item.name
     end
 end
 function utils.get_item_affixes()
@@ -454,11 +471,21 @@ function utils.is_salvage_or_sell_with_data(item,action)
     then
         return true, ancestral_affix_count, is_max_aspect
     end
+    -- chaos uniques (is unique, not mythic)
+    if is_unique and utils.mythics[item_id] == nil and
+        utils.settings.ancestral_item_chaos == action and
+        (ancestral_ga_count < utils.settings.ancestral_chaos_ga_count or
+        (utils.settings.ancestral_unique_filter and not utils.is_correct_unique(item))) and
+        utils.chaos[item_id] ~= nil
+    then
+        return true, ancestral_affix_count, is_max_aspect
+    end
     -- uniques (is unique, not mythic)
     if is_unique and utils.mythics[item_id] == nil and
         utils.settings.ancestral_item_unique == action and
         (ancestral_ga_count < utils.settings.ancestral_unique_ga_count or
-        (utils.settings.ancestral_unique_filter and not utils.is_correct_unique(item)))
+        (utils.settings.ancestral_unique_filter and not utils.is_correct_unique(item))) and
+        utils.chaos[item_id] == nil
     then
         return true, ancestral_affix_count, is_max_aspect
     end
@@ -828,5 +855,6 @@ for _,types in pairs(item_types) do
     get_affixes_and_aspect(types)
 end
 get_uniques()
+get_chaos()
 
 return utils
