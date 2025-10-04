@@ -167,6 +167,7 @@ task.shouldExecute = function ()
         not tracker.restock_failed and
         not tracker.restock_done and
         (tracker.sell_done or tracker.sell_failed) and
+        (tracker.salvage_done or tracker.salvage_failed) and
         (tracker.stash_done or tracker.stash_failed)
     then
         if tracker.restock_count > 0 then

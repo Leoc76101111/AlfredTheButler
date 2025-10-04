@@ -73,10 +73,7 @@ task.shouldExecute = function ()
         tracker.trigger_tasks and
         not tracker.salvage_failed and
         not tracker.salvage_done and
-        (tracker.sell_done or tracker.sell_failed) and
-        (tracker.stash_done or tracker.stash_failed) and
-        (tracker.restock_done or tracker.restock_failed) and
-        (tracker.stocktake_done or tracker.stocktake_failed)
+        (tracker.sell_done or tracker.sell_failed)
     then
         if task.check_status(task.status_enum['FAILED']) then
             task.set_status(task.status_enum['IDLE'])
