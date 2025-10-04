@@ -16,11 +16,11 @@ local status_enum = {
 
 local extension = {}
 function extension.get_npc()
-    return utils.get_npc(utils.npc_enum['SILVERSMITH'])
+    return utils.get_npc(utils.npc_enum['GAMBLER'])
     -- return utils.get_npc(utils.npc_enum['WEAPON'])
 end
 function extension.move()
-    local npc_location = utils.get_npc_location('SILVERSMITH')
+    local npc_location = utils.get_npc_location('GAMBLER')
     -- local npc_location = utils.get_npc_location('WEAPON')
     explorerlite:set_custom_target(npc_location)
     explorerlite:move_to_target()
@@ -43,7 +43,7 @@ end
 function extension.reset()
     local local_player = get_local_player()
     if not local_player then return end
-    local new_position = vec3:new(-1673.71484375 , -586.8203125, 37.6484375)
+    local new_position = vec3:new(-1670.6953125, -598.2548828125, 36.8857421875)
     if task.reset_state == status_enum['MOVING'] then
         new_position = vec3:new(-1651.9208984375, -598.6142578125, 36.3134765625)
     end
