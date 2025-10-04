@@ -43,7 +43,6 @@ function extension.execute()
             local item = vendor_items:get(i)
             if item then
                 local display_name = item:get_display_name():lower()
-                console.print(display_name)
                 if display_name == settings.gamble_category then
                     gamble_item = item
                     gamble_price = item:get_price()
