@@ -14,6 +14,15 @@ local status_enum = {
     FAILED = 'Failed to gamble'
 }
 
+local function reset_other_tasks()
+    tracker.sell_done = false
+    tracker.sell_failed = false
+    tracker.salvage_done = false
+    tracker.salvage_failed = false
+    tracker.stash_done = false
+    tracker.stash_failed = false
+end
+
 local extension = {}
 function extension.get_npc()
     return utils.get_npc(utils.npc_enum['GAMBLER'])
@@ -49,8 +58,20 @@ function extension.execute()
                 end
             end
         end
+        -- temp fix for get_price giving 0, most expensive item is 100, so stop gambling at 100
+        gamble_price = 100
         if gamble_item ~= nil and player_obols >= gamble_price then
             loot_manager.buy_item(gamble_item)
+            -- set count to 1 if count == 0 due to 0.5 seconds debounce on tracker update
+            if tracker.sell_count == 0 then
+                tracker.sell_count = 1
+            end
+            if tracker.salvage_count == 0 then
+                tracker.salvage_count = 1
+            end
+            if tracker.stash_count == 0 then
+                tracker.stash_count = 1
+            end
         else
             tracker.gambling = false
         end
@@ -70,23 +91,13 @@ function extension.is_done()
     return not tracker.gambling
 end
 function extension.done()
+    reset_other_tasks()
     tracker.gamble_done = true
-    tracker.sell_done = false
-    tracker.sell_failed = false
-    tracker.salvage_done = false
-    tracker.salvage_failed = false
-    tracker.stash_done = false
-    tracker.stash_failed = false
     tracker.gambling = false
 end
 function extension.failed()
+    reset_other_tasks()
     tracker.gamble_failed = true
-    tracker.sell_done = false
-    tracker.sell_failed = false
-    tracker.salvage_done = false
-    tracker.salvage_failed = false
-    tracker.stash_done = false
-    tracker.stash_failed = false
     tracker.gambling = false
 end
 function extension.is_in_vendor_screen()
@@ -102,12 +113,6 @@ task.shouldExecute = function ()
         task.retry = 0
     end
 
-    local local_player = get_local_player()
-    if not local_player then return false end
-    if #local_player:get_inventory_items() == 33 then
-        tracker.gamble_paused = true
-    end
-
     if utils.player_in_zone('Scos_Cerrigar') and
         tracker.trigger_tasks and
         not tracker.gamble_failed and
@@ -116,6 +121,11 @@ task.shouldExecute = function ()
     then
         if task.check_status(task.status_enum['FAILED']) then
             task.set_status(task.status_enum['IDLE'])
+        end
+        local local_player = get_local_player()
+        if local_player and  #local_player:get_inventory_items() == 33 then
+            reset_other_tasks()
+            tracker.gamble_paused = true
         end
         return true
     end

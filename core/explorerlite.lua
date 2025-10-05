@@ -98,7 +98,7 @@ local last_movement_direction = nil
 
 --ai fix for kill monsters path
 function explorerlite:clear_path_and_target()
-    console.print("Clearing path and target.")
+    -- console.print("Clearing path and target.")
     target_position = nil
     current_path = {}
     path_index = 1
@@ -145,7 +145,7 @@ end
 
 
 local function find_unstuck_target()
-    console.print("Finding unstuck target.")
+    -- console.print("Finding unstuck target.")
     local player_pos = get_player_position()
     local valid_targets = {}
 
@@ -189,7 +189,7 @@ local function handle_stuck_player()
         local distance_moved = calculate_distance(player_pos, last_stuck_check_position)
 
         if distance_moved < stuck_distance_threshold then
-            console.print("Player appears to be stuck. Finding temporary target.")
+            -- console.print("Player appears to be stuck. Finding temporary target.")
             original_target = target_position
             local temp_target = find_unstuck_target()
             if temp_target then
@@ -197,11 +197,11 @@ local function handle_stuck_player()
                 --console.print("Temporary target set: " .. tostring(temp_target))
 
             else
-                console.print("Failed to find temporary target.")
+                -- console.print("Failed to find temporary target.")
             end
             return true
         elseif original_target and distance_moved >= stuck_distance_threshold * 2 then
-            console.print("Player has moved. Returning to original target.")
+            -- console.print("Player has moved. Returning to original target.")
             target_position = original_target
             original_target = nil
         end
@@ -259,7 +259,7 @@ function explorerlite:reset_exploration()
     exploration_mode = "unexplored"
     last_movement_direction = nil
 
-    console.print("Exploration reset. All areas marked as unexplored.")
+    -- console.print("Exploration reset. All areas marked as unexplored.")
 end
 
 function vec3.__add(v1, v2)
@@ -362,7 +362,7 @@ local function a_star(start, goal)
     while not open_set:empty() do
         iterations = iterations + 1
         if iterations > 6666 then
-            console.print("Max iterations reached, aborting!")
+            -- console.print("Max iterations reached, aborting!")
             break
         end
 
@@ -395,9 +395,9 @@ local function a_star(start, goal)
     if target_distance_index < #target_distance_states then
         target_distance_index = target_distance_index + 1
         max_target_distance = target_distance_states[target_distance_index]
-        console.print("No path found. Reducing max target distance to " .. max_target_distance)
+        -- console.print("No path found. Reducing max target distance to " .. max_target_distance)
     else
-        console.print("No path found even after reducing max target distance.")
+        -- console.print("No path found even after reducing max target distance.")
     end
 
     return nil
@@ -429,7 +429,7 @@ end
 explorerlite.check_if_stuck = check_if_stuck
 
 function explorerlite:set_custom_target(target)
-    console.print("Setting custom target.")
+    -- console.print("Setting custom target.")
     target_position = target
 end
 
@@ -450,12 +450,12 @@ function explorerlite:movement_spell_to_target(target)
             -- Cast the dash spell towards the target's position
             local success = cast_spell.position(spell_id, target, 3.0) -- A little delay or else rogue goes turbo in dashing
             if success then
-                console.print("Successfully used movement spell to target.")
+                -- console.print("Successfully used movement spell to target.")
             else
-                console.print("Failed to use movement spell.")
+                -- console.print("Failed to use movement spell.")
             end
         else
-            console.print("Movement spell on cooldown.")
+            -- console.print("Movement spell on cooldown.")
         end
     end
 end
@@ -483,7 +483,7 @@ local function move_to_target()
             last_a_star_call = current_core_time
 
             if not current_path then
-                console.print("No path found to target. Finding new target.")
+                -- console.print("No path found to target. Finding new target.")
                 return
             end
         end
@@ -513,7 +513,7 @@ local function move_to_target()
         end
     else
         -- Move to center if no target
-        console.print("No target found. Moving to center.")
+        -- console.print("No target found. Moving to center.")
         pathfinder.force_move_raw(vec3:new(9.204102, 8.915039, 0.000000))
     end
 end
@@ -523,14 +523,14 @@ local function move_to_target_aggresive()
         pathfinder.force_move_raw(target_position)
     else
         -- Move to center if no target
-        console.print("No target found. Moving to center.")
+        -- console.print("No target found. Moving to center.")
         pathfinder.force_move_raw(vec3:new(9.204102, 8.915039, 0.000000))
     end
 end
 
 
 function explorerlite:move_to_target()
-    console.print("Moving to target")
+    -- console.print("Moving to target")
     if handle_stuck_player() then
         -- If we've just set a temporary target, we want to move to it immediately
         if settings.aggresive_movement then
@@ -578,7 +578,7 @@ on_update(function()
         check_walkable_area()
         local is_stuck = check_if_stuck()
         if is_stuck then
-            console.print("Character was stuck. Finding new target and attempting revive")
+            -- console.print("Character was stuck. Finding new target and attempting revive")
             target_position = find_target(false)
             target_position = set_height_of_valid_position(target_position)
             last_move_time = os.time()

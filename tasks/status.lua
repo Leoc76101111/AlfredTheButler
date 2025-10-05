@@ -26,6 +26,7 @@ local function all_task_done()
         (tracker.stocktake_done or tracker.stocktake_failed) and
         (tracker.salvage_done or tracker.salvage_failed) and
         (tracker.repair_done or tracker.repair_failed) and
+        (tracker.gamble_done or tracker.gamble_failed) and
         (not tracker.teleport or tracker.teleport_done or tracker.teleport_failed)
     then
         status.complete = true
@@ -55,7 +56,7 @@ function task.shouldExecute()
         should_execute = true
     elseif not tracker.trigger_tasks then
         should_execute = true
-    elseif tracker.trigger_tasks and status.failed then
+    elseif tracker.trigger_tasks and status.complete and status.failed then
         tracker.last_reset = get_time_since_inject()
         should_execute = true
     elseif tracker.trigger_tasks and status.complete then

@@ -268,9 +268,10 @@ function utils.reset_all_task()
     tracker.stash_keys = false
     tracker.stash_boss_materials = false
     tracker.gamble_failed = false
-    tracker.gamble_done = false    
+    tracker.gamble_done = false
     tracker.gamble_paused = false
     tracker.gambling = false
+    tracker.trigger_tasks = false
 end
 function utils.reset_restock_stash_count()
     for key,_ in pairs(tracker.restock_items) do
