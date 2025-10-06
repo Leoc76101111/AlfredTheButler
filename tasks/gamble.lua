@@ -59,7 +59,9 @@ function extension.execute()
             end
         end
         -- temp fix for get_price giving 0, most expensive item is 100, so stop gambling at 100
-        gamble_price = 100
+        if gamble_price == 0 then
+            gamble_price = 100
+        end
         if gamble_item ~= nil and player_obols >= gamble_price then
             loot_manager.buy_item(gamble_item)
             -- set count to 1 if count == 0 due to 0.5 seconds debounce on tracker update

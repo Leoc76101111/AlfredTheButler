@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = '1.6.2b3'
+local plugin_version = '1.6.2b4'
 
 local utils = require 'core.utils'
 local gui = {}
@@ -100,6 +100,12 @@ gui.failed_options= {
     'Forced Retry',
 }
 
+gui.gamble_language= {
+    'English',
+    'Chinese',
+    'Other'
+}
+
 gui.gamble_categories = {
     ['sorcerer'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Sword', 'Mace', 'Dagger', 'Staff', 'Wand', 'Focus'},
     ['barbarian'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Axe', 'Sword', 'Mace', 'Two-Handed Axe', 'Two-Handed Sword', 'Two-Handed Mace', 'Polearm'},
@@ -108,6 +114,16 @@ gui.gamble_categories = {
     ['necromancer'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Axe', 'Sword', 'Mace', 'Two-Handed Axe', 'Two-Handed Sword', 'Scythe', 'Two-Handed Mace', 'Two-Handed Scythe', 'Dagger', 'Shield', 'Wand', 'Focus'},
     ['spiritborn'] = {'Quarterstaff', 'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Polearm', 'Glaive'},
     ['default'] = {'CLASS NOT LOADED'}
+}
+
+gui.gamble_categories_chinese = {
+    ['sorcerer'] = {"软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "剑", "钉锤", "匕首", "杖", "魔杖", "聚能器"},
+    ['barbarian'] = {"软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "斧", "剑", "钉锤", "双手斧", "双手剑", "双手钉锤", "长柄武器"},
+    ['rogue'] = {"软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "剑", "匕首", "弓", "弩"},
+    ['druid'] = {"软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "斧", "剑", "钉锤", "双手斧", "双手钉锤", "长柄武器", "匕首", "杖", "图腾"},
+    ['necromancer'] = {"软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "斧", "剑", "钉锤", "双手斧", "双手剑", "镰刀", "双手钉锤", "双手镰刀", "匕首", "盾牌", "魔杖", "聚能器"},
+    ['spiritborn'] = {"长杖", "软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "长柄武器", "剑刃戟"},
+    ['default'] = {"CLASS NOT LOADED"}
 }
 
 gui.elements = {
@@ -160,7 +176,7 @@ gui.elements = {
 
     gamble_tree = tree_node:new(1),
     gamble_toggle = create_checkbox(false, 'gamble_toggle'),
-    gamble_other_language = create_checkbox(false, 'gamble_other_language'),
+    gamble_language = combo_box:new(0, get_hash(plugin_label .. '_gamble_language')),
     gamble_non_english = input_text:new(get_hash(plugin_label .. '_gamble_custom_text')),
     gamble_threshold = slider_int:new(10, 2580, 1000, get_hash(plugin_label .. '_gamble_threshold')),
     gamble_category = {
@@ -386,13 +402,16 @@ function gui.render()
             render_menu_header('remember to disable gambling in piteer so that it doesnt clash')
         end
         gui.elements.gamble_threshold:render('Obols threshold', 'amount of obols before starting gambling')
-        gui.elements.gamble_other_language:render('Other Language', 'check this if your client language is not english')
-        if gui.elements.gamble_other_language:get() then
-            render_menu_header('type in the gamble category including any spaces in between')
-            gui.elements.gamble_non_english:render('Gamble category', 'type in the gamble category including any spaces in between', false, '', '')
-        else
+        gui.elements.gamble_language:render('Language', gui.gamble_language, "Select your client language")
+        if gui.gamble_language[gui.elements.gamble_language:get()+1] == 'English' then
             local class = utils.get_character_class()
             gui.elements.gamble_category[class]:render("Gamble Category", gui.gamble_categories[class], "Select the item category to gamble")
+        elseif gui.gamble_language[gui.elements.gamble_language:get()+1] == 'Chinese' then
+            local class = utils.get_character_class()
+            gui.elements.gamble_category[class]:render("Gamble Category", gui.gamble_categories_chinese[class], "Select the item category to gamble")
+        else
+            render_menu_header('type in the gamble category including any spaces in between')
+            gui.elements.gamble_non_english:render('Gamble category', 'type in the gamble category including any spaces in between', false, '', '')
         end
     end
 

@@ -142,11 +142,14 @@ function settings:update_settings()
     settings.gamble_enabled = gui.elements.gamble_toggle:get()
     settings.gamble_threshold = gui.elements.gamble_threshold:get()
 
-    if gui.elements.gamble_other_language:get() then
-        settings.gamble_category = gui.elements.gamble_non_english:get():lower()
-    else
+    if gui.gamble_language[gui.elements.gamble_language:get()+1] == 'English' then
         local class = utils.get_character_class()
         settings.gamble_category = gui.gamble_categories[class][gui.elements.gamble_category[class]:get() + 1]:lower()
+    elseif gui.gamble_language[gui.elements.gamble_language:get()+1] == 'Chinese' then
+         local class = utils.get_character_class()
+        settings.gamble_category = gui.gamble_categories_chinese[class][gui.elements.gamble_category[class]:get() + 1]:lower()
+    else
+       settings.gamble_category = gui.elements.gamble_non_english:get():lower()
     end
 end
 
