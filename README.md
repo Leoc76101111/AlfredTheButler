@@ -1,5 +1,5 @@
 # Alfred the butler
-#### V1.6.1
+#### V1.6.2
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
@@ -71,6 +71,15 @@ select what to do with non-ancestral items by types and marked as junk
   - always -- always stash compasses and tributes whenever alfred is triggered
 - sliders for maximum amount of item to restock up to
     - set to 0 if u do not want to restock that item
+
+### Gambling Settings
+- Enable gambling -- toggle on/off for alfred to gamble
+- Obols threshold -- amount of obols before starting gambling
+- Language -- set to your client language so that it can match the categoies.
+- For English and Chinese (simplified)
+  - drop down to select gambling category
+- For Other
+  - text input to accept the gambking category
 
 ## For devs
 Alfred exposes an external collection of functions via global variable `PLUGIN_alfred_the_butler`.
