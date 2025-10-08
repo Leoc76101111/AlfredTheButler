@@ -1,5 +1,5 @@
 # Alfred the butler
-#### V1.6.2
+#### V1.6.3
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
@@ -42,11 +42,14 @@ select what to do with non-ancestral items by types and marked as junk
 - Drop down to select what to do with items that do not meet the threshold by types and marked as junk
 - Greater affix threshold to keep for mythic, uniques and legendaries. Setting all of them to 1 will tell alfred to keep/stash all items with 1 greater affix or more (basically keep/stash everything)
 - Keep max aspect checkbox -- if checked, will ignore the GA threshold and keep the item if the aspect roll is max
+- use aspect filter -- if checked, will use aspect filters for max aspect instead of all
 - use unique/mythic filter -- enable more specific filters by selecting which unique/mythic u want to keep
 - use affix filter -- enable more specific filters via affix for legendaries
 - Additional slider for matching affix threshold
 - Both GA threshold and min affix threshold must be met
 - export/import functionality -- you can use this to export/import affix filter and unique/mythic configuration. There is a preset for spiritborn for most common spiritborn build items
+#### Aspect
+- search and add aspects that you want to keep if they are max roll
 #### Unique/Mythic
 - search and add uniques/mythics that you want to keep
 #### Helm/Chest/Gloves/Pants/Boots/Amulet/Ring/Weapon/Offhand
