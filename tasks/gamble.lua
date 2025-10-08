@@ -54,12 +54,12 @@ function extension.execute()
                 local display_name = item:get_display_name():lower()
                 if display_name == settings.gamble_category then
                     gamble_item = item
-                    gamble_price = item:get_price()
+                    -- gamble_price = item:get_price()
                 end
             end
         end
         -- temp fix for get_price giving 0, most expensive item is 100, so stop gambling at 100
-        if gamble_price == 0 then
+        if gamble_price == nil or gamble_price == 0 then
             gamble_price = 100
         end
         if gamble_item ~= nil and player_obols >= gamble_price then
