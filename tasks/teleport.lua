@@ -84,13 +84,13 @@ task.shouldExecute = function ()
         tracker.trigger_tasks and
         not tracker.teleport_failed and
         not tracker.teleport_done and
-        (tracker.sell_done or tracker.sell_failed) and
         (tracker.gamble_done or tracker.gamble_failed) and
+        (tracker.sell_done or tracker.sell_failed) and
+        (tracker.salvage_done or tracker.salvage_failed) and
+        (tracker.repair_done or tracker.repair_failed) and
         (tracker.stash_done or tracker.stash_failed) and
         (tracker.restock_done or tracker.restock_failed) and
-        (tracker.stocktake_done or tracker.stocktake_failed) and
-        (tracker.salvage_done or tracker.salvage_failed) and
-        (tracker.repair_done or tracker.repair_failed)
+        (tracker.stocktake_done or tracker.stocktake_failed)
     then
         if task.check_status(task.status_enum['FAILED']) then
             task.set_status(task.status_enum['IDLE'])
@@ -103,12 +103,13 @@ task.baseExecute = task.Execute
 task.Execute = function ()
     if tracker.teleport and
         not utils.player_in_zone('Scos_Cerrigar') and
+        not (tracker.gamble_done or tracker.gamble_failed) and
         not (tracker.sell_done or tracker.sell_failed) and
         not (tracker.salvage_done or tracker.salvage_failed) and
+        not (tracker.repair_done or tracker.repair_failed) and
         not (tracker.stash_done or tracker.stash_failed) and
         not (tracker.restock_done or tracker.restock_failed) and
-        not (tracker.stocktake_done or tracker.stocktake_failed) and
-        not (tracker.repair_done or tracker.repair_failed)
+        not (tracker.stocktake_done or tracker.stocktake_failed)
     then
         task.retry = 0
         task.set_status(status_enum['EXECUTE'])

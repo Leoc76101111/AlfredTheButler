@@ -1,6 +1,7 @@
 local gui = require 'gui'
 local utils = require 'core.utils'
 local affix_types = utils.get_item_affixes()
+local item_aspects = utils.get_item_aspects()
 local unique_items = utils.get_unique_items()
 local mythic_items = utils.get_mythic_items()
 
@@ -21,6 +22,8 @@ local settings = {
     ancestral_item_mythic = utils.item_enum['KEEP'],
     ancestral_item_junk = utils.item_enum['SALVAGE'],
     ancestral_keep_max_aspect = true,
+    ancestral_aspect_filter = false,
+    ancestral_aspect = {},
     ancestral_ga_count = 0,
     ancestral_unique_ga_count = 0,
     ancestral_mythic_ga_count = 0,
@@ -86,7 +89,8 @@ function settings:update_settings()
     settings.ancestral_item_chaos = gui.elements.ancestral_item_chaos:get()
     settings.ancestral_item_mythic = gui.elements.ancestral_item_mythic:get()
     settings.ancestral_item_junk = gui.elements.ancestral_item_junk:get()
-    settings.ancestral_keep_max_aspect = gui.elements.ancestral_keep_max_aspect:get()
+    settings.ancestral_keep_max_aspect = gui.elements.ancestral_keep_max_aspect_toggle:get()
+    settings.ancestral_aspect_filter = gui.elements.ancestral_aspect_filter_toggle:get()
     settings.ancestral_ga_count = gui.elements.ancestral_ga_count_slider:get()
     settings.ancestral_unique_ga_count = gui.elements.ancestral_unique_ga_count_slider:get()
     settings.ancestral_chaos_ga_count = gui.elements.ancestral_chaos_ga_count_slider:get()
@@ -118,6 +122,13 @@ function settings:update_settings()
         local checkbox_name = 'mythic_' .. tostring(item.sno_id)
         if gui.elements[checkbox_name] and gui.elements[checkbox_name]:get() then
             settings.ancestral_mythic[item.sno_id] = true
+        end
+    end
+    settings.ancestral_aspect = {}
+    for id,_ in pairs(item_aspects) do
+        local checkbox_name = 'aspect_' .. tostring(id)
+        if gui.elements[checkbox_name] and gui.elements[checkbox_name]:get() then
+            settings.ancestral_aspect[id] = true
         end
     end
     settings.restock_items = {}

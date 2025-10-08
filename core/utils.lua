@@ -142,7 +142,7 @@ local function get_affixes_and_aspect(name)
     }
     for _,affix in pairs(data) do
         if affix.is_aspect then
-            item_aspect[affix.sno_id] = affix.name
+            item_aspect[affix.sno_id] = affix
         else
             affix_group.data[#affix_group.data+1] = affix
         end
@@ -317,7 +317,7 @@ function utils.get_greater_affix_count(display_name)
 end
 function utils.is_max_aspect(affix)
     local affix_id = affix.affix_name_hash
-    if item_aspect[affix_id] then
+    if item_aspect[affix_id] ~= nil then
         -- if ascending
         if affix:get_roll_max() > affix:get_roll_min() then
             -- simple direct comparison
@@ -358,6 +358,10 @@ end
 function utils.is_correct_affix(item_type,affix)
     local affix_id = affix.affix_name_hash
     return utils.settings.ancestral_affix[item_type][affix_id]
+end
+function utils.is_correct_aspect(affix)
+    local affix_id = affix.affix_name_hash
+    return utils.settings.ancestral_aspect[affix_id] ~= nil
 end
 function utils.get_item_type(item)
     local name = string.lower(item:get_name())
@@ -439,9 +443,11 @@ function utils.is_salvage_or_sell_with_data(item,action)
     local ancestral_affix_count = 0
     local ancestral_affix_ga_count = 0
     local is_max_aspect = false
+    local is_correct_aspect = false
     for _,affix in pairs(item_affixes) do
         if utils.settings.ancestral_keep_max_aspect and utils.is_max_aspect(affix) then
             is_max_aspect = true
+            is_correct_aspect = utils.is_correct_aspect(affix)
         end
         if item_type == 'unknown' then
             for _,types in pairs(item_types) do
@@ -463,7 +469,9 @@ function utils.is_salvage_or_sell_with_data(item,action)
         return true, ancestral_affix_count, is_max_aspect
     end
     -- junk, locked, max_aspect
-    if item:is_junk() or item:is_locked() or is_max_aspect then
+    if item:is_junk() or item:is_locked() or
+       (is_max_aspect and (not utils.settings.ancestral_aspect_filter or is_correct_aspect))
+    then
         return false, ancestral_affix_count, is_max_aspect
     end
 
@@ -685,6 +693,14 @@ function utils.import_filters(elements)
                 end
             end
         end
+        for _,aspect in pairs(item_aspect) do
+            local checkbox_name = 'aspect_' .. tostring(aspect.sno_id)
+            if new_settings[checkbox_name] then
+                elements[checkbox_name]:set(true)
+            else
+                elements[checkbox_name]:set(false)
+            end
+        end
         for _,item in pairs(item_unique) do
             local checkbox_name = 'unique_' .. tostring(item.sno_id)
             if new_settings[checkbox_name] then
@@ -705,7 +721,7 @@ function utils.import_filters(elements)
         utils.log('error in import file' .. filename)
     end
     io.close(file)
-    utils.log('export ' .. filename .. ' done')
+    utils.log('import ' .. filename .. ' done')
 end
 function utils.export_filters(elements,is_backup)
     local selected = {}
@@ -715,6 +731,12 @@ function utils.export_filters(elements,is_backup)
             if elements[checkbox_name]:get() then
                 selected[#selected+1] = checkbox_name
             end
+        end
+    end
+    for _,aspect in pairs(item_aspect) do
+        local checkbox_name = 'aspect_' .. tostring(aspect.sno_id)
+        if elements[checkbox_name]:get() then
+            selected[#selected+1] = checkbox_name
         end
     end
     for _,item in pairs(item_unique) do
@@ -800,7 +822,7 @@ function utils.export_inventory_info()
             -- item_info['attributes'] = {}
             for _,affix in pairs(item:get_affixes()) do
                 local affix_id = affix.affix_name_hash
-                if item_aspect[affix_id] then
+                if item_aspect[affix_id] ~= nil then
                     item_info['aspect']['id'] = affix_id
                     item_info['aspect']['name'] = affix:get_name()
                     item_info['aspect']['roll'] = affix:get_roll()
