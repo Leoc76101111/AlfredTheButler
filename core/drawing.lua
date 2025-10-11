@@ -30,6 +30,7 @@ end
 local drawing = {}
 
 function drawing.draw_status()
+    local local_player = get_local_player()
     local current_task = task_manager.get_current_task()
     local status = ''
     if tracker.external_caller and tracker.external_pause then
@@ -62,6 +63,9 @@ function drawing.draw_status()
     messages[#messages+1] = 'Keep             : ' .. tracker.stash_count
     messages[#messages+1] = 'Salvage          : ' .. tracker.salvage_count
     messages[#messages+1] = 'Sell             : ' .. tracker.sell_count
+    if settings.gamble_enabled and local_player ~= nil then
+        messages[#messages+1] = 'Obols            : '.. tostring(local_player:get_obols()) .. '/' ..  tostring(settings.gamble_threshold)
+    end
     messages[#messages+1] = '----------------------'
 
     for _,item in pairs(tracker.restock_items) do

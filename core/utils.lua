@@ -645,13 +645,15 @@ function utils.update_tracker_count(local_player)
     tracker.need_stash_socketables = utils.settings.stash_socketables == utils.stash_extra_enum['FULL'] and #get_local_player():get_socketable_items() == 33
     tracker.need_stash_consumables = utils.settings.stash_consumables == utils.stash_extra_enum['FULL'] and #get_local_player():get_consumable_items() == 33
     tracker.need_stash_keys = utils.settings.stash_keys == utils.stash_extra_enum['FULL'] and #get_local_player():get_dungeon_key_items() == 33
+    tracker.need_gamble = utils.settings.gamble_enabled and local_player:get_obols() >= utils.settings.gamble_threshold
 
     tracker.need_trigger = tracker.inventory_full or
         tracker.need_repair or
         tracker.restock_count > 0 or
         tracker.need_stash_socketables or
         tracker.need_stash_consumables or
-        tracker.need_stash_keys
+        tracker.need_stash_keys or
+        tracker.need_gamble
 
     tracker.name = utils.settings.plugin_label
     tracker.version = utils.settings.plugin_version

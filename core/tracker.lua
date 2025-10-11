@@ -46,6 +46,7 @@ local tracker = {
     need_stash_socketables    = false,
     need_stash_consumables    = false,
     need_stash_keys           = false,
+    need_gamble               = false,
     gamble_done               = false,
     gamble_failed             = false,
     gamble_paused             = false,
