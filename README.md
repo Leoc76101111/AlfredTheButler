@@ -14,6 +14,8 @@ there are 4 trigger conditions that can get alfred to do tasks:
 - a manual trigger via keybind
 - restock mode is set to active and you have less than the hardcoded minimum (for boss item, it is set to the minimum required to summon boss, for compass it is 1)
 
+For aspect/unique/mythic/affix filters, if you are using a build guide from mobalytics, here is a tool made by RadicalDadical55 that can create a proper import json for you to use: https://github.com/RadDude42/Build-Scraper
+
 ## Configurations
 ### general
 - Enable checkbox -- to enable alfred plugin
