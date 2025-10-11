@@ -1,5 +1,5 @@
 # Alfred the butler
-#### V1.6.3
+#### V1.6.4
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
@@ -10,7 +10,7 @@ Alfred is your personal butler in Cerrigar. He is capable of stashing, salvaging
 
 there are 4 trigger conditions that can get alfred to do tasks:
 - called by an external plugin
-- inventory is full and you went back to cerrigar
+- inventory (or obol) is full and you went back to cerrigar
 - a manual trigger via keybind
 - restock mode is set to active and you have less than the hardcoded minimum (for boss item, it is set to the minimum required to summon boss, for compass it is 1)
 
