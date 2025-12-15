@@ -99,6 +99,7 @@ gui.gamble_categories = {
     ['druid'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Axe', 'Sword', 'Mace', 'Two-Handed Axe', 'Two-Handed Mace', 'Polearm', 'Dagger', 'Staff', 'Totem'},
     ['necromancer'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Axe', 'Sword', 'Mace', 'Two-Handed Axe', 'Two-Handed Sword', 'Scythe', 'Two-Handed Mace', 'Two-Handed Scythe', 'Dagger', 'Shield', 'Wand', 'Focus'},
     ['spiritborn'] = {'Quarterstaff', 'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Polearm', 'Glaive'},
+    ['paladin'] = {"Cap", "Whispering Key", "Tunic", "Gloves", "Boots", "Pants", "Amulet", "Ring", "Axe", "Sword", "Mace", "Shield", "Flail", "Two-Handed Axe", "Two-Handed Sword", "Two-Handed Mace", },
     ['default'] = {'CLASS NOT LOADED'}
 }
 

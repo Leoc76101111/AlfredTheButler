@@ -200,7 +200,8 @@ function utils.get_character_class()
         [3] = 'rogue',
         [5] = 'druid',
         [6] = 'necromancer',
-        [7] = 'spiritborn'
+        [7] = 'spiritborn',
+        [8] = 'paladin'
     }
     if character_classes[class_id] then
         return character_classes[class_id]
