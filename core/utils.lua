@@ -201,7 +201,8 @@ function utils.get_character_class()
         [5] = 'druid',
         [6] = 'necromancer',
         [7] = 'spiritborn',
-        [8] = 'paladin'
+        [8] = 'default', -- new class in expansion, dont know name yet
+        [9] = 'paladin'
     }
     if character_classes[class_id] then
         return character_classes[class_id]

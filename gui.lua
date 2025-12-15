@@ -172,6 +172,7 @@ gui.elements = {
         ['druid'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_druid_category')),
         ['necromancer'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_necromancer_category')),
         ['spiritborn'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_spiritborn_category')),
+        ['paladin'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_paladin_category')),
         ['default'] = combo_box:new(0, get_hash(plugin_label .. '_gamble_default_category')),
     },
 
