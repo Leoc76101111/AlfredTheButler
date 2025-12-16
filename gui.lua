@@ -328,7 +328,8 @@ function gui.render()
             end
         end
         if gui.elements.ancestral_filter_toggle:get() then
-            render_menu_header('REMEMBER TO SET THE AFFIX YOU WANT SO THAT IT DOESNT GET ACCIDENTALLY SALVAGED/SOLD')
+            render_menu_header('REMEMBER TO SET THE AFFIX YOU WANT ON ALL SLOTS SO THAT IT DOESNT GET ACCIDENTALLY SALVAGED/SOLD')
+            render_menu_header('(PS. I have included affixes that are placeholder "(PH)" for season 11, these may not actually exist, but some of paladins are in this category)')
             for _,affix_type in pairs(affix_types) do
                 local tree_name = tostring(affix_type.name) .. '_affix_tree'
                 local search_name = tostring(affix_type.name) .. '_affix_search'
