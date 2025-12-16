@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = '1.7.1'
+local plugin_version = '1.7.2'
 
 local utils = require 'core.utils'
 local gui = {}
@@ -99,7 +99,7 @@ gui.gamble_categories = {
     ['druid'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Axe', 'Sword', 'Mace', 'Two-Handed Axe', 'Two-Handed Mace', 'Polearm', 'Dagger', 'Staff', 'Totem'},
     ['necromancer'] = {'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Axe', 'Sword', 'Mace', 'Two-Handed Axe', 'Two-Handed Sword', 'Scythe', 'Two-Handed Mace', 'Two-Handed Scythe', 'Dagger', 'Shield', 'Wand', 'Focus'},
     ['spiritborn'] = {'Quarterstaff', 'Cap', 'Whispering Key', 'Tunic', 'Gloves', 'Boots', 'Pants', 'Amulet', 'Ring', 'Polearm', 'Glaive'},
-    ['paladin'] = {"Cap", "Whispering Key", "Tunic", "Gloves", "Boots", "Pants", "Amulet", "Ring", "Axe", "Sword", "Mace", "Shield", "Flail", "Two-Handed Axe", "Two-Handed Sword", "Two-Handed Mace", },
+    ['paladin'] = {"Cap", "Whispering Key", "Tunic", "Gloves", "Boots", "Pants", "Amulet", "Ring", "Axe", "Sword", "Mace", "Shield", "Flail", "Two-Handed Axe", "Two-Handed Sword", "Two-Handed Mace"},
     ['default'] = {'CLASS NOT LOADED'}
 }
 
@@ -110,6 +110,7 @@ gui.gamble_categories_chinese = {
     ['druid'] = {"软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "斧", "剑", "钉锤", "双手斧", "双手钉锤", "长柄武器", "匕首", "杖", "图腾"},
     ['necromancer'] = {"软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "斧", "剑", "钉锤", "双手斧", "双手剑", "镰刀", "双手钉锤", "双手镰刀", "匕首", "盾牌", "魔杖", "聚能器"},
     ['spiritborn'] = {"长杖", "软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "长柄武器", "剑刃戟"},
+    ['paladin'] = {"软帽", "低语钥匙", "短衣", "手套", "靴子", "裤子", "护符", "戒指", "斧", "剑", "钉锤", "盾", "连枷", "双手斧", "双手剑", "双手钉锤"},
     ['default'] = {"CLASS NOT LOADED"}
 }
 
