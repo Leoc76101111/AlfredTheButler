@@ -94,7 +94,7 @@ Also in the task folder, there is an `external-template.lua` as a sample on how 
 - some aspects are giving false positive, mainly those that have multiple data (e.g. frost stride). for now, alfred is treating them as real max aspect to not accidentally sell/salvage a max one
 
 ## Changelog
-#### V1.7.4
+### V1.7.4
 - revert temp fix for drawing (api is fixed)
 - fix stashing key sometimes not working properly
 - updated tribute list for S11
