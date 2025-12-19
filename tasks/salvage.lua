@@ -53,11 +53,9 @@ function extension.is_done()
 end
 function extension.done()
     tracker.salvage_done = true
-    tracker.gamble_paused = false
 end
 function extension.failed()
     tracker.salvage_failed = true
-    tracker.gamble_paused = false
 end
 function extension.is_in_vendor_screen()
     return loot_manager:is_in_vendor_screen()

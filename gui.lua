@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = '1.7.3'
+local plugin_version = '1.7.4'
 
 local utils = require 'core.utils'
 local gui = {}
@@ -136,14 +136,14 @@ gui.elements = {
     ancestral_item_mythic = combo_box:new(0, get_hash(plugin_label .. '_ancestral_item_mythic')),
     ancestral_keep_max_aspect_toggle = create_checkbox(true, 'max_aspect'),
     ancestral_aspect_filter_toggle = create_checkbox(false, 'aspect_filter'),
-    ancestral_ga_count_slider = slider_int:new(0, 3, 1, get_hash(plugin_label .. '_ga_slider')),
+    ancestral_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_ga_slider')),
     ancestral_unique_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_unique_ga_slider')),
     ancestral_mythic_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_mythic_ga_slider')),
     ancestral_filter_toggle = create_checkbox(false, 'use_filter'),
     ancestral_unique_filter_toggle = create_checkbox(false, 'use_unique_filter'),
 
-    ancestral_affix_count_slider = slider_int:new(0, 3, 2, get_hash(plugin_label .. '_affix_slider')),
-    ancestral_affix_ga_count_slider = slider_int:new(0, 3, 1, get_hash(plugin_label .. '_affix_ga_slider')),
+    ancestral_affix_count_slider = slider_int:new(0, 4, 2, get_hash(plugin_label .. '_affix_slider')),
+    ancestral_affix_ga_count_slider = slider_int:new(0, 4, 1, get_hash(plugin_label .. '_affix_ga_slider')),
     ancestral_affix_ga = create_checkbox(false, 'affix_ga'),
 
     affix_export_button = button:new(get_hash(plugin_label .. '_affix_export_button')),

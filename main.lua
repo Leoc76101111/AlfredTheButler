@@ -64,8 +64,7 @@ local function render_pulse()
     if gui.elements.draw_status:get() then
         drawing.draw_status()
     end
-    -- if is_inventory_open() and get_open_inventory_bag() == 0 and
-    if is_inventory_open() and
+    if is_inventory_open() and get_open_inventory_bag() == 0 and
         (gui.elements.draw_stash:get() or
         gui.elements.draw_sell:get() or
         gui.elements.draw_salvage:get())

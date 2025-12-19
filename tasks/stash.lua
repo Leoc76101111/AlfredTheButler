@@ -127,7 +127,8 @@ function extension.is_done()
             item_data.max < item_data.min and item_data.count > 0) and
             tracker.stash_boss_materials) or
             (item_data.item_type == 'key' and
-            item_data.count - 99 >= item_data.max and
+            (item_data.count - 99 >= item_data.max or
+            item_data.max < item_data.min and item_data.count > 0) and
             tracker.stash_keys)
         then
             material_stashed = false
