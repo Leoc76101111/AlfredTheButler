@@ -1,3 +1,5 @@
+local plugin_label = 'alfred_the_butler'
+
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
@@ -7,28 +9,42 @@ local base_task = require 'tasks.base'
 local task = base_task.new_task()
 local status_enum = {
     IDLE = 'Idle',
-    WAITING = 'Waiting for looter',
+    WAITING = 'Waiting ',
     EXECUTE = 'Teleporting',
     MOVING = 'Moving to portal',
     INTERACTING = 'Interacting with portal',
     RESETTING = 'Re-trying teleport',
     FAILED = 'Failed to teleport'
 }
-local debounce_time = nil
+local debounce_time = -1
 local debounce_timeout = 3
 local function teleport_with_debounce()
-    if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
+    if local_player:get_active_spell_id() == 186139 then
+        task.set_status(status_enum['EXECUTE'])
+    else
+        local status = status_enum['WAITING'] ..
+        string.format("%.2f", debounce_time + debounce_timeout - get_time_since_inject()) .. 's'
+        task.set_status(status)
+    end
+    if debounce_time + debounce_timeout > get_time_since_inject() then return end
     debounce_time = get_time_since_inject()
     teleport_to_waypoint(0x76D58)
+    task.set_status(status_enum['EXECUTE'])
 end
 local extension = {}
 function extension.get_npc()
     return utils.get_npc(utils.npc_enum['PORTAL'])
 end
 function extension.move()
+    if utils.player_in_zone('[sno none]') then return end
     local npc_location = utils.get_npc_location('PORTAL')
-    explorerlite:set_custom_target(npc_location)
-    explorerlite:move_to_target()
+    if BatmobilePlugin then
+        BatmobilePlugin.set_target(plugin_label, npc_location)
+        BatmobilePlugin.move(plugin_label)
+    else
+        explorerlite:set_custom_target(npc_location)
+        explorerlite:move_to_target()
+    end
 end
 function extension.interact()
     local npc = extension.get_npc()
@@ -112,11 +128,10 @@ task.Execute = function ()
         not (tracker.stocktake_done or tracker.stocktake_failed)
     then
         task.retry = 0
-        task.set_status(status_enum['EXECUTE'])
         if LooteerPlugin then
             local looting = LooteerPlugin.getSettings('looting')
             if looting then
-                task.set_status(status_enum['WAITING'])
+                task.set_status(status_enum['WAITING'] .. 'for looter')
                 return
             end
         end

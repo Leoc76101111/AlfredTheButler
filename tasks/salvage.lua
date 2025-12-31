@@ -1,3 +1,5 @@
+local plugin_label = 'alfred_the_butler'
+
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
@@ -20,8 +22,13 @@ function extension.get_npc()
 end
 function extension.move()
     local npc_location = utils.get_npc_location('BLACKSMITH')
-    explorerlite:set_custom_target(npc_location)
-    explorerlite:move_to_target()
+    if BatmobilePlugin then
+        BatmobilePlugin.set_target(plugin_label, npc_location)
+        BatmobilePlugin.move(plugin_label)
+    else
+        explorerlite:set_custom_target(npc_location)
+        explorerlite:move_to_target()
+    end
 end
 function extension.interact()
     local npc = extension.get_npc()
@@ -37,6 +44,14 @@ function extension.execute()
             loot_manager.salvage_specific_item(item)
         end
     end
+    local items = local_player:get_dungeon_key_items()
+    for _, item in pairs(items) do
+        local name = item:get_display_name()
+        if not item:is_locked() and string.lower(name):match('sigil') then
+        -- if item:is_junk() then
+            loot_manager.salvage_specific_item(item)
+        end
+    end
 end
 function extension.reset()
     local local_player = get_local_player()
@@ -49,9 +64,21 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
+    local local_player = get_local_player()
+    if not local_player then return end
+    local items = local_player:get_dungeon_key_items()
+    for _, item in pairs(items) do
+        local name = item:get_display_name()
+        if not item:is_locked() and string.lower(name):match('sigil') then
+            return false
+        end
+    end
     return tracker.salvage_count == 0
 end
 function extension.done()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.salvage_done = true
 end
 function extension.failed()

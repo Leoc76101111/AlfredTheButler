@@ -1,3 +1,5 @@
+local plugin_label = 'alfred_the_butler'
+
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
@@ -20,8 +22,13 @@ function extension.get_npc()
 end
 function extension.move()
     local npc_location = utils.get_npc_location('BLACKSMITH')
-    explorerlite:set_custom_target(npc_location)
-    explorerlite:move_to_target()
+    if BatmobilePlugin then
+        BatmobilePlugin.set_target(plugin_label, npc_location)
+        BatmobilePlugin.move(plugin_label)
+    else
+        explorerlite:set_custom_target(npc_location)
+        explorerlite:move_to_target()
+    end
 end
 function extension.interact()
     local npc = extension.get_npc()
@@ -56,6 +63,9 @@ function extension.is_done()
     return is_done
 end
 function extension.done()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.repair_done = true
 end
 function extension.failed()

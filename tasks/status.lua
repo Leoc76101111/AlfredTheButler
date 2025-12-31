@@ -1,3 +1,5 @@
+local plugin_label = 'alfred_the_butler'
+
 local utils = require 'core.utils'
 local settings = require 'core.settings'
 local tracker = require 'core.tracker'
@@ -12,6 +14,7 @@ local status_enum = {
 local task = {
     name = 'Status',
     status = status_enum['IDLE'],
+    batmobile_resume = nil
 }
 
 local function all_task_done()
@@ -90,6 +93,10 @@ function task.Execute()
                 tracker.external_trigger_callback = nil
             end
         end
+        if task.batmobile_resume ~= nil then
+            task.batmobile_resume = nil
+            BatmobilePlugin.resume(plugin_label)
+        end
     end
 
     if status.failed then
@@ -134,6 +141,10 @@ function task.Execute()
         end
         if tracker.need_gamble then
             tracker.gambling = true
+        end
+        if task.batmobile_resume == nil and BatmobilePlugin then
+            task.batmobile_resume = not BatmobilePlugin.is_paused()
+            BatmobilePlugin.pause(plugin_label)
         end
         tracker.trigger_tasks = true
         task.status = status_enum['WAITING']
