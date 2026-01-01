@@ -73,7 +73,10 @@ function extension.reset()
     explorerlite:move_to_target()
 end
 function extension.is_done()
-    return not (utils.player_in_zone('Scos_Cerrigar') or utils.player_in_zone('[sno none]'))
+    local npc = extension.get_npc()
+    local npc_location = utils.get_npc_location('PORTAL')
+    return not (utils.player_in_zone('Scos_Cerrigar') or utils.player_in_zone('[sno none]')) or
+        (utils.player_in_zone('Scos_Cerrigar') and npc == nil and utils.distance_to(npc_location) < 5)
 end
 function extension.done()
     tracker.teleport_done = true
