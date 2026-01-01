@@ -1,6 +1,6 @@
 local plugin_label = 'alfred_the_butler'
 local plugin_version = '1.7.4'
-console.print("Lua Plugin - Alfred the Butler - Leoric - " .. plugin_version);
+console.print("Lua Plugin - Alfred the Butler - Leoric - v" .. plugin_version)
 
 local utils = require 'core.utils'
 local gui = {}
