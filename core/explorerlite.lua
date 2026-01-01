@@ -437,10 +437,10 @@ function explorerlite:movement_spell_to_target(target)
     local local_player = get_local_player()
     if not local_player then return end
 
-    if not settings.use_evade then return end
+    -- if not settings.use_evade then return end
 
     local movement_spell_id = {
-        337031, -- General Evade
+        -- 337031, -- General Evade
     }
 
 

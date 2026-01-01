@@ -39,9 +39,10 @@ local settings = {
     stash_socketables = utils.stash_extra_enum['NEVER'],
     stash_consumables = utils.stash_extra_enum['NEVER'],
     stash_keys = utils.stash_extra_enum['NEVER'],
+    stash_sigis = false,
+    salvage_sigils = false,
     max_inventory = 25,
     failed_action = utils.failed_action_enum['LOG'],
-    use_evade = false,
     skip_cache = false,
     gamble_enabled = false,
     gamble_threshold = 1000,
@@ -133,6 +134,8 @@ function settings:update_settings()
     settings.stash_socketables = gui.elements.stash_socketables:get()
     settings.stash_consumables = gui.elements.stash_consumables:get()
     settings.stash_keys = gui.elements.stash_keys:get()
+    settings.stash_sigils = gui.elements.stash_sigils:get()
+    settings.salvage_sigils = gui.elements.salvage_sigils:get()
     for _,item in pairs(utils.get_restock_items()) do
         local sno_id = item.sno_id
         local slider_name = settings.plugin_label .. 'restock_' .. tostring(sno_id)
@@ -145,7 +148,6 @@ function settings:update_settings()
     end
     settings.max_inventory = gui.elements.max_inventory:get()
     settings.failed_action = gui.elements.failed_action:get()
-    settings.use_evade = gui.elements.use_evade:get()
     settings.skip_cache = gui.elements.skip_cache:get()
 
     settings.gamble_enabled = gui.elements.gamble_toggle:get()

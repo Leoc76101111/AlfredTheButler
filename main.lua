@@ -35,6 +35,7 @@ local function main_pulse()
         if debounce_time ~= nil and debounce_time + debounce_timeout > get_time_since_inject() then return end
         gui.elements.manual_keybind:set(false)
         debounce_time = get_time_since_inject()
+        -- orbwalker.set_clear_toggle(false)
         external.resume()
         utils.reset_restock_stash_count()
         utils.reset_all_task()

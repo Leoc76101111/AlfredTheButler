@@ -158,8 +158,8 @@ gui.elements = {
 
     key_tree = tree_node:new(1),
     stash_keys = combo_box:new(0, get_hash(plugin_label .. '_stash_keys')),
-
-    stash_extra_materials = create_checkbox(false, 'stash_extra_materials'),
+    stash_sigils = create_checkbox(false, 'stash_sigils'),
+    salvage_sigils = create_checkbox(false, 'salvage_sigils'),
 
     gamble_tree = tree_node:new(1),
     gamble_toggle = create_checkbox(false, 'gamble_toggle'),
@@ -181,7 +181,6 @@ gui.elements = {
     explorer_path_angle_slider = slider_int:new(0, 360, 10, get_hash(plugin_label .. '_explorer_path_angle_slider')),
     max_inventory = slider_int:new(20,33, 25, get_hash(plugin_label .. '_max_inventory')),
     failed_action = combo_box:new(0, get_hash(plugin_label .. '_failed_action')),
-    use_evade = create_checkbox(false, 'use_evade'),
     skip_cache = create_checkbox(false, 'skip_cache'),
 
     drawing_tree = tree_node:new(1),
@@ -224,12 +223,28 @@ end
 function gui.render()
     if not gui.elements.main_tree:push('Alfred the Butler | Leoric | v' .. gui.plugin_version) then return end
     gui.elements.main_toggle:render('Enable', 'Enable alfred')
-    gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot')
-    if gui.elements.use_keybind:get() then
-        gui.elements.keybind_toggle:render('Toggle Keybind', 'Toggle the bot for quick enable')
-        gui.elements.export_keybind_toggle:render('Toggle Export Keybind', 'Toggle to export inventory data before sell/salvage/stash')
-        gui.elements.dump_keybind:render('Dump tracker info', 'Dump all tracker info to log')
-        gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now')
+    if gui.elements.general_tree:push('General settings') then
+        gui.elements.use_keybind:render('Use keybind', 'Keybind to quick toggle the bot')
+        if gui.elements.use_keybind:get() then
+            gui.elements.keybind_toggle:render('Toggle Keybind', 'Toggle the bot for quick enable')
+            gui.elements.export_keybind_toggle:render('Toggle Export Keybind', 'Toggle to export inventory data before sell/salvage/stash')
+            gui.elements.dump_keybind:render('Dump tracker info', 'Dump all tracker info to log')
+            gui.elements.manual_keybind:render('Manual trigger', 'Make alfred run tasks now')
+        end
+        gui.elements.explorer_path_angle_slider:render("Explorer Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
+        render_menu_header('IMPORTANT TO SET MAX INVENTORY ITEM TO 25 OR LOWER IF YOU ARE RUNNING BOSSER AND NOT PICKING EVERYTHING UP. SETTING HIGHER THAN 25 MIGHT CAUSE A MYTHIC TO BE LOST')
+        gui.elements.max_inventory:render("Max inventory items", "No. of items in inventory to trigger alfred tasks")
+        gui.elements.failed_action:render('Failed action', gui.failed_options, 'Select what to do when alfred is in complete failure')
+        if gui.elements.failed_action:get() == utils.failed_action_enum['LOG'] then
+            render_menu_header('Log action will leave your character standing there and you might get disconnected for inactivity, but logs should still be copyable')
+        else
+            render_menu_header('Forced retry action will keep looping tasks, this will cause your character to move away and back and not trigger inactivity timer. if problem persist, it will stuck in a loop')
+        end
+        gui.elements.skip_cache:render('Skip stashing cache', 'Keep caches in inventory (mainly for season 8)')
+        if gui.elements.skip_cache:get() then
+            render_menu_header('If you choose to skip stashing cache and your inventory is full of caches, alfred will just stand there')
+        end
+        gui.elements.general_tree:pop()
     end
     if gui.elements.drawing_tree:push('Display settings') then
         gui.elements.draw_status:render('Draw status', 'Draw status info on screen')
@@ -255,23 +270,6 @@ function gui.render()
         gui.elements.draw_box_height:render("Box Height Slider", "Adjust box height")
         gui.elements.draw_box_width:render("Box Width Slider", "Adjust box width")
         gui.elements.drawing_tree:pop()
-    end
-    if gui.elements.general_tree:push('General settings') then
-        gui.elements.use_evade:render('Use Evade', 'Use evade when doing task in town')
-        gui.elements.explorer_path_angle_slider:render("Explorer Path angle", "adjust the angle for path filtering (0 - 360 degrees)")
-        render_menu_header('IMPORTANT TO SET MAX INVENTORY ITEM TO 25 OR LOWER IF YOU ARE RUNNING BOSSER AND NOT PICKING EVERYTHING UP. SETTING HIGHER THAN 25 MIGHT CAUSE A MYTHIC TO BE LOST')
-        gui.elements.max_inventory:render("Max inventory items", "No. of items in inventory to trigger alfred tasks")
-        gui.elements.failed_action:render('Failed action', gui.failed_options, 'Select what to do when alfred is in complete failure')
-        if gui.elements.failed_action:get() == utils.failed_action_enum['LOG'] then
-            render_menu_header('Log action will leave your character standing there and you might get disconnected for inactivity, but logs should still be copyable')
-        else
-            render_menu_header('Forced retry action will keep looping tasks, this will cause your character to move away and back and not trigger inactivity timer. if problem persist, it will stuck in a loop')
-        end
-        gui.elements.skip_cache:render('Skip stashing cache', 'Keep caches in inventory (mainly for season 8)')
-        if gui.elements.skip_cache:get() then
-            render_menu_header('If you choose to skip stashing cache and your inventory is full of caches, alfred will just stand there')
-        end
-        gui.elements.general_tree:pop()
     end
     if gui.elements.item_tree:push('Non-Ancestral') then
         render_menu_header('Select the default action for the following item types for non-ancestral items')
@@ -384,6 +382,8 @@ function gui.render()
     end
     if gui.elements.key_tree:push('Dungeon Keys') then
         gui.elements.stash_keys:render('Stash dungeon keys', gui.stash_extra_options, 'Select when to stash dungeon keys')
+        gui.elements.stash_sigils:render('Stash Favourited sigils', 'stash favourited sigils')
+        gui.elements.salvage_sigils:render('Salvage Non-Favourited sigils', 'salvage non-favourited sigils')
         if gui.elements.stash_keys:get() == utils.stash_extra_enum['NEVER'] then
             render_menu_header('Never stash dungeon keys')
         elseif gui.elements.stash_keys:get() == utils.stash_extra_enum['FULL'] then

@@ -44,12 +44,14 @@ function extension.execute()
             loot_manager.salvage_specific_item(item)
         end
     end
-    local items = local_player:get_dungeon_key_items()
-    for _, item in pairs(items) do
-        local name = item:get_display_name()
-        if not item:is_locked() and string.lower(name):match('sigil') then
-        -- if item:is_junk() then
-            loot_manager.salvage_specific_item(item)
+    if tracker.salvage_sigils then
+        local items = local_player:get_dungeon_key_items()
+        for _, item in pairs(items) do
+            local name = item:get_display_name()
+            if not item:is_locked() and string.lower(name):match('sigil') then
+            -- if item:is_junk() then
+                loot_manager.salvage_specific_item(item)
+            end
         end
     end
 end
@@ -67,10 +69,12 @@ function extension.is_done()
     local local_player = get_local_player()
     if not local_player then return end
     local items = local_player:get_dungeon_key_items()
-    for _, item in pairs(items) do
-        local name = item:get_display_name()
-        if not item:is_locked() and string.lower(name):match('sigil') then
-            return false
+    if tracker.salvage_sigils then
+        for _, item in pairs(items) do
+            local name = item:get_display_name()
+            if not item:is_locked() and string.lower(name):match('sigil') then
+                return false
+            end
         end
     end
     return tracker.salvage_count == 0

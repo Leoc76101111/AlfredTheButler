@@ -136,11 +136,18 @@ function task.Execute()
             tracker.need_stash_keys
         then
             tracker.stash_keys = true
-        else 
+            tracker.stash_sigils = settings.stash_sigils
+        else
             tracker.stash_keys = false
+            tracker.stash_sigils = false
         end
         if tracker.need_gamble then
             tracker.gambling = true
+        end
+        if settings.salvage_sigils then
+            tracker.salvage_sigils = true
+        else
+            tracker.salvage_sigils = false
         end
         if task.batmobile_resume == nil and BatmobilePlugin then
             task.batmobile_resume = not BatmobilePlugin.is_paused()

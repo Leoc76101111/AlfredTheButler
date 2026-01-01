@@ -101,6 +101,16 @@ function extension.execute()
             end
             debounce_time = get_time_since_inject()
         end
+        if tracker.stash_sigils then
+            local items = local_player:get_dungeon_key_items()
+            for _, item in pairs(items) do
+                local name = item:get_display_name()
+                if item:is_locked() and string.lower(name):match('sigil') then
+                    loot_manager.move_item_to_stash(item)
+                    update_last_interaction_time()
+                end
+            end
+        end
     end
     if tracker.stash_socketables then
         local socket_items = local_player:get_socketable_items()
@@ -110,6 +120,7 @@ function extension.execute()
         end
         debounce_time = get_time_since_inject()
     end
+    
 end
 function extension.reset()
     local local_player = get_local_player()
@@ -161,10 +172,21 @@ function extension.is_done()
     if tracker.stash_socketables then
         socketable_stashed = #get_local_player():get_socketable_items() == 0
     end
+    local sigils_stashed = true
+    if tracker.stash_sigils then
+        local items = local_player:get_dungeon_key_items()
+        for _, item in pairs(items) do
+            local name = item:get_display_name()
+            if item:is_locked() and string.lower(name):match('sigil') then
+                sigils_stashed = false
+            end
+        end
+    end
     return (tracker.stash_count == 0) and
         (not tracker.stash_socketables or socketable_stashed) and
         (not tracker.stash_boss_materials or material_stashed) and
-        (not tracker.stash_keys or material_stashed)
+        (not tracker.stash_keys or material_stashed) and
+        (not tracker.stash_sigils or sigils_stashed)
 end
 function extension.done()
     if BatmobilePlugin then
