@@ -19,6 +19,7 @@ local status_enum = {
 local debounce_time = -1
 local debounce_timeout = 3
 local function teleport_with_debounce()
+    local local_player = get_local_player()
     if local_player:get_active_spell_id() == 186139 then
         task.set_status(status_enum['EXECUTE'])
     else
@@ -96,6 +97,7 @@ task.name = 'teleport'
 task.extension = extension
 task.status_enum = status_enum
 task.max_retries = 5
+task.teleport_time = nil
 
 task.shouldExecute = function ()
     if tracker.trigger_tasks == false then
