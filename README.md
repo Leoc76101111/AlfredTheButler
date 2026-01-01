@@ -1,5 +1,5 @@
 # Alfred the butler
-#### V1.7.4
+#### V1.7.5
 ## DISCLAIMER
 Alfred is a plugin that CAN read and write files. In this repo, I have specifically only write to data/export folder and only read from data/import folder. It will ONLY read and write files if you press the import/export function on the menu. This is an open-source repo and you are free to check the code on what files alfred will read/write.
 
@@ -19,23 +19,23 @@ For aspect/unique/mythic/affix filters, if you are using a build guide from moba
 ## Configurations
 ### general
 - Enable checkbox -- to enable alfred plugin
+  
+### General settings
 - Keybinds
   - toggle keybind -- for quick enable/disable
   - dump tracker info -- debug usage
   - manual trigger -- make alfred do task now (will teleport to cerrigar if not there)
+- explorer path angle (lower is better)
+- max inventory items -- No. of items to count as inventory full. usefull for bossing when you dont pick all items up
+- failed action -- In event that alfred is unable to complete all task, alfred can stand there and dump tracker info to log, or alfred can just force retry and may be stuck in a loop (but atleast inactivity timer wont kick in)
+- skip stashing cache -- dont stash caches
+
 ### Display settings
 - Draw Status -- to enable the status on top left of screen
 - Draw Keep Items -- draw blue box around items that is set to keep in inventory
 - Draw Sell Items -- draw pink box around items that is set to sell in inventory
 - Draw Salvage Items -- draw orange box around items that is set to salvage in inventory
 - Various box sizing and offset settings to adjust depending on screen size similar to affix filter
-
-### General settings
-- use evade -- whether to use evade or not in town (default false)
-- explorer path angle (lower is better)
-- max inventory items -- No. of items to count as inventory full. usefull for bossing when you dont pick all items up
-- failed action -- In event that alfred is unable to complete all task, alfred can stand there and dump tracker info to log, or alfred can just force retry and may be stuck in a loop (but atleast inactivity timer wont kick in)
-- skip stashing cache -- dont stash caches
 
 ### Non-ancestral
 select what to do with non-ancestral items by types and marked as junk
@@ -57,11 +57,13 @@ select what to do with non-ancestral items by types and marked as junk
 #### Helm/Chest/Gloves/Pants/Boots/Amulet/Ring/Weapon/Offhand
 - search and add affixes that you want to keep
 - you can search by name, description or id
+
 ### Socketables
 - stash socketables
   - never -- never stash socketables
   - when full -- only stash socketables when socketables inventory is full
   - always -- always stash socketables whenever alfred is triggered
+
 ### Consumables
 - stash consumeables
   - never -- never stash boss materials
@@ -69,11 +71,14 @@ select what to do with non-ancestral items by types and marked as junk
   - always -- always stash boss materials whenever alfred is triggered
 - sliders for maximum amount of item to restock up to
     - set to 0 if u do not want to restock that item
+
 ### Dungeon Keys
 - stash dungeon keys
   - never -- never stash compasses and tributes
   - when full -- only stash compasses and tributes when compasses and tributes inventory is full
   - always -- always stash compasses and tributes whenever alfred is triggered
+- stash favourited sigils -- if you have any favourited sigils, alfred will stash it whenever stash dungeon keys is triggered
+- salvage non-favourited sigils -- if enabled, alfred will salvage all non-favourited sigils at blacksmith
 - sliders for maximum amount of item to restock up to
     - set to 0 if u do not want to restock that item
 
@@ -94,6 +99,13 @@ Also in the task folder, there is an `external-template.lua` as a sample on how 
 - some aspects are giving false positive, mainly those that have multiple data (e.g. frost stride). for now, alfred is treating them as real max aspect to not accidentally sell/salvage a max one
 
 ## Changelog
+### V1.7.5
+- added stash favourited sigils option (under dungeon keys)
+- added salvage non-favourited sigils option (under dungeon keys)
+- removed evade option
+- added safeguard for return teleport when portal doesnt exist to stop alfred from keep trying to find portal
+- "possible pathing improvement"
+
 ### V1.7.4
 - revert temp fix for drawing (api is fixed)
 - fix stashing key sometimes not working properly
