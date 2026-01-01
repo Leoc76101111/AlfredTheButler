@@ -253,6 +253,8 @@ function utils.reset_all_task()
     tracker.all_task_done = false
     tracker.stash_socketables = false
     tracker.stash_keys = false
+    tracker.stash_sigils = false
+    tracker.salvage_sigils = false
     tracker.stash_boss_materials = false
     tracker.gamble_failed = false
     tracker.gamble_done = false
