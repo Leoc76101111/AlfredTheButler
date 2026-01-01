@@ -107,6 +107,9 @@ function extension.done()
     tracker.gambling = false
 end
 function extension.failed()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     reset_other_tasks()
     tracker.gamble_failed = true
     tracker.gambling = false

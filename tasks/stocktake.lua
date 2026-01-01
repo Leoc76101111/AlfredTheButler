@@ -74,10 +74,16 @@ function extension.is_done()
     return not tracker.stocktake
 end
 function extension.done()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.stocktake_done = true
     stash_item_count = -1
 end
 function extension.failed()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.stocktake_failed = true
     stash_item_count = -1
 end

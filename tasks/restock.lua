@@ -147,6 +147,9 @@ function extension.done()
     last_interaction_item_count = -1
 end
 function extension.failed()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.restock_failed = true
     execute_restock = false
     stash_item_count = -1

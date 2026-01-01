@@ -199,6 +199,9 @@ function extension.done()
     last_interaction_item_count = -1
 end
 function extension.failed()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.stash_failed = true
     tracker.gamble_paused = false
     stash_item_count = -1

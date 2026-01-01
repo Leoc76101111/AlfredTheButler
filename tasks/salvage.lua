@@ -86,6 +86,9 @@ function extension.done()
     tracker.salvage_done = true
 end
 function extension.failed()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.salvage_failed = true
 end
 function extension.is_in_vendor_screen()

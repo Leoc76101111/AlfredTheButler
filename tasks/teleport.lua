@@ -79,9 +79,15 @@ function extension.is_done()
         (utils.player_in_zone('Scos_Cerrigar') and npc == nil and utils.distance_to(npc_location) < 5)
 end
 function extension.done()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.teleport_done = true
 end
 function extension.failed()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.teleport_failed = true
 end
 function extension.is_in_vendor_screen() return false end

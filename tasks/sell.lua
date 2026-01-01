@@ -66,6 +66,9 @@ function extension.done()
     tracker.sell_done = true
 end
 function extension.failed()
+    if BatmobilePlugin then
+        BatmobilePlugin.clear_target(plugin_label)
+    end
     tracker.sell_failed = true
 end
 function extension.is_in_vendor_screen()
