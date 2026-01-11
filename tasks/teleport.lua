@@ -70,8 +70,13 @@ function extension.reset()
     elseif tracker.last_task ==  'sell' or tracker.last_task == 'gamble' then
         new_position = vec3:new(-1670.6953125, -598.2548828125, 36.8857421875)
     end
-    explorerlite:set_custom_target(new_position)
-    explorerlite:move_to_target()
+    if BatmobilePlugin then
+        BatmobilePlugin.set_target(plugin_label, new_position)
+        BatmobilePlugin.move(plugin_label)
+    else
+        explorerlite:set_custom_target(new_position)
+        explorerlite:move_to_target()
+    end
 end
 function extension.is_done()
     local npc = extension.get_npc()

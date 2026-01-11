@@ -1,5 +1,5 @@
 local plugin_label = 'alfred_the_butler'
-local plugin_version = '1.7.7'
+local plugin_version = '1.7.8'
 console.print("Lua Plugin - Alfred the Butler - Leoric - v" .. plugin_version)
 
 local utils = require 'core.utils'
@@ -418,6 +418,7 @@ function gui.render()
             render_menu_header('type in the gamble category including any spaces in between')
             gui.elements.gamble_non_english:render('Gamble category', 'type in the gamble category including any spaces in between', false, '', '')
         end
+        gui.elements.gamble_tree:pop()
     end
 
     -- if gui.elements.gamble_tree:push('Gamble') then

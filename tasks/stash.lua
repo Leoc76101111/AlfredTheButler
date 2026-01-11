@@ -129,8 +129,13 @@ function extension.reset()
     if task.reset_state == status_enum['MOVING'] then
         new_position = vec3:new(-1651.9208984375, -598.6142578125, 36.3134765625)
     end
-    explorerlite:set_custom_target(new_position)
-    explorerlite:move_to_target()
+    if BatmobilePlugin then
+        BatmobilePlugin.set_target(plugin_label, new_position)
+        BatmobilePlugin.move(plugin_label)
+    else
+        explorerlite:set_custom_target(new_position)
+        explorerlite:move_to_target()
+    end
 end
 function extension.is_done()
     if task.check_status(status_enum['EXECUTE']) and
