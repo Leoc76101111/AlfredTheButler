@@ -817,6 +817,7 @@ function utils.export_inventory_info()
                         ['roll'] = affix:get_roll(),
                         ['max_roll'] = affix:get_roll_max(),
                         ['min_roll'] = affix:get_roll_min(),
+                        ['matched_affix'] = utils.is_correct_affix(item_info['type'], affix)
                     }
                 end
             end

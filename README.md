@@ -99,6 +99,9 @@ Also in the task folder, there is an `external-template.lua` as a sample on how 
 - some aspects are giving false positive, mainly those that have multiple data (e.g. frost stride). for now, alfred is treating them as real max aspect to not accidentally sell/salvage a max one
 
 ## Changelog
+### V1.7.9
+- added matched_affix to export_inventory_info for debugging
+
 ### V1.7.8
 - fix reset not using batmobile
 
